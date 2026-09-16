@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import { defineConfig } from "eslint/config";
+import eslintConfigPrettier from "eslint-config-prettier/flat";
 import unicorn from "eslint-plugin-unicorn";
 import tseslint from "typescript-eslint";
 
@@ -29,4 +30,5 @@ export default defineConfig([
       "@typescript-eslint/no-explicit-any": "error",
     },
   },
+  eslintConfigPrettier,
 ]);
