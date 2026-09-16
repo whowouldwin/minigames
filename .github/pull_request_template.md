@@ -1,6 +1,6 @@
 1. Task: https://github.com/rolling-scopes-school/qualifying-stage/blob/main/tasks/minigames/story-1.md
 2. Screenshot:
-   ![]()
+   ![](<>)
 3. Deployment: ...
 4. Done ... / deadline 21.09.2026
 5. Score: ... / 294
@@ -16,7 +16,7 @@
 - [x] **RSS-QS-1-2-1** — Bundler setup (10 points)
 - [x] **RSS-QS-1-2-2** — TypeScript configuration (5 points)
 - [x] **RSS-QS-1-2-3** — ESLint configuration (5 points)
-- [ ] **RSS-QS-1-2-4** — Prettier configuration (5 points)
+- [x] **RSS-QS-1-2-4** — Prettier configuration (5 points)
 - [ ] **RSS-QS-1-2-5** — Husky Git hooks (8 points)
 - [ ] **RSS-QS-1-2-6** — Sass, tokens, breakpoints, shared styles (10 points)
 - [ ] **RSS-QS-1-2-7** — SPA architecture (20 points)
