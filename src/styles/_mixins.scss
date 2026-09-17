@@ -1,0 +1,19 @@
+@use "tokens";
+
+@mixin mobile {
+  @media (max-width: tokens.$breakpoint-mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: tokens.$breakpoint-tablet) {
+    @content;
+  }
+}
+
+@mixin limit-layout-width {
+  width: 100%;
+  max-width: tokens.$layout-max-width;
+  margin-inline: auto;
+}
