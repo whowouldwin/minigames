@@ -1,3 +1,8 @@
+@use 'tokens' as *;
+
 body {
   margin: 0;
+  background-color: $bg;
+  color: $on-bg;
+  font-family: $Inter;
 }
