@@ -21,11 +21,9 @@ $like: #ff4b4b;
 $error: #b3261e;
 $price-free: #0b8a8f;
 
-
 // Borders
 $outline: #e5e7eb;
 $outline-variant: #d2d2d2;
-
 
 // Additional
 $avatar-random-1: #e9eef6;
@@ -33,7 +31,6 @@ $avatar-random-2: #a3e2c9;
 $avatar-random-3: #bce3ff;
 $avatar-random-4: #ffc6ff;
 $avatar-random-5: #e8dff5;
-
 
 // Size
 $display-large: 56px;
@@ -53,18 +50,15 @@ $label-large: 14px;
 $label-medium: 12px;
 $label-small: 10px;
 
-
 // Weight
 $regular: 400;
 $medium: 500;
 $bold: 700;
 $extra-bold: 800;
 
-
 // Font-family
-$Inter: 'Inter', sans-serif;
-$Roboto: 'Roboto', sans-serif;
-
+$Inter: "Inter", sans-serif;
+$Roboto: "Roboto", sans-serif;
 
 // Size
 $size-05: 4px;
@@ -84,7 +78,6 @@ $size-13: 104px;
 $size-14: 112px;
 $size-15: 120px;
 
-
 // Corner
 $corner-extra-small: 4px;
 $corner-small: 8px;
@@ -92,7 +85,6 @@ $corner-medium: 12px;
 $corner-large: 16px;
 $corner-extra-large: 24px;
 $corner-full: 9999px;
-
 
 // Button
 $btn-large-x: 24px;
@@ -106,12 +98,10 @@ $btn-small-y: 8px;
 
 $btn-icon: 8px;
 
-
 // Shadow
 $level-1: 4px 4px 0 0 $on-primary;
 $level-2: 6px 6px 0 0 $on-primary;
 $level-3: 8px 8px 0 0 $on-primary;
-
 
 // Breakpoints
 $breakpoint-mobile: 375px;
