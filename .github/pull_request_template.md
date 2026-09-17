@@ -17,9 +17,9 @@
 - [x] **RSS-QS-1-2-2** — TypeScript configuration (5 points)
 - [x] **RSS-QS-1-2-3** — ESLint configuration (5 points)
 - [x] **RSS-QS-1-2-4** — Prettier configuration (5 points)
-- [ ] **RSS-QS-1-2-5** — Husky Git hooks (8 points)
-- [ ] **RSS-QS-1-2-6** — Sass, tokens, breakpoints, shared styles (10 points)
-- [ ] **RSS-QS-1-2-7** — SPA architecture (20 points)
+- [x] **RSS-QS-1-2-5** — Husky Git hooks (8 points)
+- [x] **RSS-QS-1-2-6** — Sass, tokens, breakpoints, shared styles (10 points)
+- [x] **RSS-QS-1-2-7** — SPA architecture (20 points)
 
 ## Development Scripts — 10 points
 
