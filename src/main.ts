@@ -1,3 +1,1 @@
-console.log(
-  "Set up and configure a bundler (e.g., Webpack, Vite, Parcel, or other) for the project, supporting both development and production build modes. RSS-QS-1-2-1",
-);
+import './styles/globals.scss'
