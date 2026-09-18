@@ -1,7 +1,7 @@
 export const createApp = (): HTMLDivElement => {
   const app = document.createElement("div");
 
-  app.id = "app";
+  app.className = "app";
 
   return app;
 };

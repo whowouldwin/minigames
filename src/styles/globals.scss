@@ -1,8 +1,15 @@
 @use "tokens";
+@use 'layout';
 
 body {
   margin: 0;
   background-color: tokens.$bg;
   color: tokens.$on-bg;
   font-family: tokens.$Inter;
+}
+
+#app {
+  width: 100%;
+  max-width: tokens.$layout-max-width;
+  margin-inline: auto;
 }
