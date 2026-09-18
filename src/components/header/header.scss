@@ -1,0 +1,19 @@
+@use '../../styles/mixins';
+@use '../../styles/tokens';
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  @include mixins.responsive-inline-padding(tokens.$size-10);
+
+  padding-block: tokens.$size-3;
+
+  background-color: tokens.$bg;
+  border-bottom: 2px solid tokens.$on-primary;
+
+  @include mixins.tablet {
+    padding-block: tokens.$size-2;
+  }
+}
