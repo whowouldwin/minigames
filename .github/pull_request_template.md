@@ -23,7 +23,7 @@
 
 ## Development Scripts — 10 points
 
-- [ ] **RSS-QS-1-3-1** — ESLint script (5 points)
+- [x] **RSS-QS-1-3-1** — ESLint script (5 points)
 - [ ] **RSS-QS-1-3-2** — Prettier script (5 points)
 
 ## Adaptive Layout: Home Page — 130 points
