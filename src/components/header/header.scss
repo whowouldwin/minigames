@@ -13,6 +13,12 @@
   background-color: tokens.$bg;
   border-bottom: 2px solid tokens.$on-primary;
 
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: tokens.$size-4;
+  }
+
   @include mixins.tablet {
     padding-block: tokens.$size-2;
   }

@@ -1,0 +1,30 @@
+@use '../../../styles/mixins';
+@use '../../../styles/tokens';
+
+.main-navigation {
+  @include mixins.tablet {
+    display: none;
+  }
+
+  &__list {
+    display: flex;
+    align-items: center;
+    gap: tokens.$size-5;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__link {
+    color: tokens.$on-bg;
+    font-size: tokens.$title-xx-small;
+    font-weight: tokens.$medium;
+    line-height: normal;
+    white-space: nowrap;
+
+    &--active {
+      color: tokens.$on-primary;
+      font-weight: tokens.$bold;
+    }
+  }
+}
