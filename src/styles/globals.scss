@@ -1,8 +1,38 @@
+@use "fonts";
 @use "tokens";
+@use "layout";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: tokens.$breakpoint-mobile;
+}
 
 body {
   margin: 0;
-  background-color: tokens.$bg;
+  background-color: tokens.$white;
   color: tokens.$on-bg;
   font-family: tokens.$Inter;
+  font-optical-sizing: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+img {
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
 }

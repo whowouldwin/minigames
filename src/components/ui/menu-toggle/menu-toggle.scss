@@ -1,0 +1,51 @@
+@use "../../../styles/mixins";
+@use "../../../styles/tokens";
+
+.menu-toggle {
+  position: relative;
+
+  display: none;
+
+  width: tokens.$size-4;
+  height: tokens.$size-4;
+  padding: tokens.$btn-icon;
+
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: tokens.$size-05 - tokens.$border-width-medium;
+
+  background-color: tokens.$white;
+  border: 0;
+  border-radius: tokens.$corner-small;
+
+  cursor: pointer;
+
+  &::before {
+    position: absolute;
+    inset: 0;
+
+    border: tokens.$border-width-medium solid tokens.$on-primary;
+    border-radius: inherit;
+
+    content: "";
+    pointer-events: none;
+  }
+
+  &__line {
+    width: tokens.$size-2;
+    height: tokens.$border-width-medium;
+
+    background-color: tokens.$on-primary;
+  }
+
+  @include mixins.tablet {
+    display: flex;
+  }
+
+  @include mixins.mobile {
+    &__line {
+      width: tokens.$menu-line-mobile-width;
+    }
+  }
+}

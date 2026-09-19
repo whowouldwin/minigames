@@ -1,0 +1,28 @@
+@use "../../../styles/mixins";
+@use "../../../styles/tokens";
+
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: tokens.$size-1;
+  color: tokens.$on-primary;
+
+  &__icon {
+    display: block;
+    width: tokens.$size-4;
+    height: tokens.$size-4;
+    flex-shrink: 0;
+    object-fit: contain;
+  }
+
+  &__text {
+    font-size: tokens.$headline-medium;
+    font-weight: tokens.$bold;
+    line-height: normal;
+    white-space: nowrap;
+
+    @include mixins.tablet {
+      font-size: tokens.$headline-small;
+    }
+  }
+}
