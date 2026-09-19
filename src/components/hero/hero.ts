@@ -15,15 +15,24 @@ export const createHero = (): HTMLElement => {
 
   const description: HTMLParagraphElement = document.createElement("p");
   description.className = "hero__description";
-  description.textContent =
+
+  const desktopDescription: HTMLSpanElement = document.createElement("span");
+  desktopDescription.className = "hero__description-desktop";
+  desktopDescription.textContent =
     "Discover hundreds of curated casual mini-games. Play instantly in your browser — puzzle, match 3, farm, and board classics.";
+
+  const mobileDescription: HTMLSpanElement = document.createElement("span");
+  mobileDescription.className = "hero__description-mobile";
+  mobileDescription.textContent =
+    "Discover hundreds of curated casual mini-games right in your browser.";
+
+  description.append(desktopDescription, mobileDescription);
 
   const browseButton: HTMLButtonElement = createButton(
     "Browse Library",
     "filled",
     "large",
   );
-
   browseButton.classList.add("hero__button");
 
   content.append(title, description, browseButton);
