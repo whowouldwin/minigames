@@ -1,5 +1,5 @@
-@use '../../../styles/mixins';
-@use '../../../styles/tokens';
+@use "../../../styles/mixins";
+@use "../../../styles/tokens";
 
 .main-navigation {
   @include mixins.tablet {

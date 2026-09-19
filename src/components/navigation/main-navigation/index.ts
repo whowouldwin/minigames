@@ -1,1 +1,1 @@
-export { createMainNavigation } from './main-navigation';
+export { createMainNavigation } from "./main-navigation";

@@ -1,5 +1,5 @@
-@use '../../../styles/mixins';
-@use '../../../styles/tokens';
+@use "../../../styles/mixins";
+@use "../../../styles/tokens";
 
 .menu-toggle {
   position: relative;
@@ -28,7 +28,7 @@
     border: 2px solid tokens.$on-primary;
     border-radius: inherit;
 
-    content: '';
+    content: "";
     pointer-events: none;
   }
 
@@ -48,7 +48,7 @@
 
       background-color: tokens.$on-primary;
 
-      content: '';
+      content: "";
     }
   }
 

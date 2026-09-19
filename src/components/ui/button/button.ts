@@ -1,18 +1,18 @@
-import './button.scss';
+import "./button.scss";
 
-export type ButtonVariant = 'outlined' | 'filled';
-export type ButtonSize = 'small' | 'medium' | 'large';
+export type ButtonVariant = "outlined" | "filled";
+export type ButtonSize = "small" | "medium" | "large";
 
 export const createButton = (
-    text: string,
-    variant: ButtonVariant,
-    size: ButtonSize = 'medium',
+  text: string,
+  variant: ButtonVariant,
+  size: ButtonSize = "medium",
 ): HTMLButtonElement => {
-    const button: HTMLButtonElement = document.createElement('button');
+  const button: HTMLButtonElement = document.createElement("button");
 
-    button.className = `button button--${variant} button--${size}`;
-    button.type = 'button';
-    button.textContent = text;
+  button.className = `button button--${variant} button--${size}`;
+  button.type = "button";
+  button.textContent = text;
 
-    return button;
+  return button;
 };

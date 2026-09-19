@@ -1,4 +1,4 @@
-import {createHeader} from "../components/header";
+import { createHeader } from "../components/header";
 
 export const createApp = (): HTMLDivElement => {
   const app = document.createElement("div");
