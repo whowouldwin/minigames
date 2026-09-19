@@ -17,7 +17,7 @@ export const createMainNavigation = (): HTMLElement => {
 
     list.className = 'main-navigation__list';
 
-    navigationItems.forEach((label: string): void => {
+    for (const label of navigationItems) {
         const item: HTMLLIElement = document.createElement('li');
         const link: HTMLAnchorElement = document.createElement('a');
 
@@ -32,7 +32,7 @@ export const createMainNavigation = (): HTMLElement => {
 
         item.append(link);
         list.append(item);
-    });
+    }
 
     navigation.append(list);
 

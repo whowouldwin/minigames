@@ -55,6 +55,11 @@
   }
 
   @include mixins.tablet {
+    height: tokens.$size-9;
     padding-block: tokens.$size-2;
+  }
+
+  @include mixins.mobile {
+    height: auto;
   }
 }
