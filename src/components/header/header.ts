@@ -1,8 +1,8 @@
 import { createMainNavigation } from "../navigation/main-navigation";
-import { createMobileMenu } from "../mobile-menu";
 import { createButton } from "../ui/button";
 import { createMenuToggle } from "../ui/menu-toggle";
 import { createSiteLogo } from "../ui/site-logo";
+import { createMobileMenu, setupMobileMenu } from "../mobile-menu";
 
 import "./header.scss";
 
@@ -31,15 +31,7 @@ export const createHeader = (): HTMLElement => {
 
   const mobileMenu: HTMLElement = createMobileMenu();
 
-  menuToggle.addEventListener("click", () => {
-    const isOpen: boolean = mobileMenu.classList.toggle("mobile-menu--open");
-
-    menuToggle.classList.toggle("menu-toggle--open", isOpen);
-
-    mobileMenu.setAttribute("aria-hidden", String(!isOpen));
-    menuToggle.setAttribute("aria-expanded", String(isOpen));
-    menuToggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
-  });
+  setupMobileMenu(menuToggle, mobileMenu);
 
   header.append(createSiteLogo(), actions, mobileMenu);
 
