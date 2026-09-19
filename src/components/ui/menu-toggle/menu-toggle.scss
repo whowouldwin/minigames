@@ -46,8 +46,6 @@
   }
 
   &--open {
-    z-index: 2;
-
     background-color: tokens.$bg-footer-low;
 
     &::before {
