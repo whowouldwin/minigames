@@ -1,22 +1,47 @@
+@use "sass:color";
+
 @use "../../styles/mixins";
 @use "../../styles/tokens";
+
+$hero-content-desktop-width: 640px;
+$hero-content-tablet-width: 480px;
+
+$hero-border-desktop: 3px;
+$hero-border-tablet: 2.5px;
+
+$hero-overlay-opacity: 0.65;
+$hero-image-opacity: 0.2;
+
+$hero-desktop-image-scale: 1.19;
+$hero-desktop-image-origin-y: 73%;
+
+$hero-title-line-height-desktop: 1.1;
+$hero-title-line-height-tablet: 1.15;
+$hero-title-line-height-mobile: 1.2;
+
+$hero-description-line-height-desktop: 1.5;
+$hero-description-line-height-compact: 1.4;
 
 .hero {
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
   padding: tokens.$size-14 tokens.$size-15;
   overflow: hidden;
-  background-color: rgba(30, 27, 58, 0.65);
+  background-color: color.change(
+    tokens.$bg-footer,
+    $alpha: $hero-overlay-opacity
+  );
 
   &::before {
     position: absolute;
     inset: 0;
     background: url("../../assets/images/hero-background.png") center / cover
       no-repeat;
-    opacity: 0.2;
-    transform: scale(1.19);
-    transform-origin: center 73%;
+    opacity: $hero-image-opacity;
+    transform: scale($hero-desktop-image-scale);
+    transform-origin: center $hero-desktop-image-origin-y;
     content: "";
     pointer-events: none;
   }
@@ -27,13 +52,13 @@
     flex-direction: column;
     align-items: flex-start;
     gap: tokens.$size-3;
-    width: 640px;
+    width: 100%;
+    max-width: $hero-content-desktop-width;
     padding: tokens.$size-6;
     background-color: tokens.$bg;
     border-radius: tokens.$corner-extra-large;
-    border: 0;
     box-shadow:
-      inset 0 0 0 3px tokens.$on-primary,
+      inset 0 0 0 $hero-border-desktop tokens.$on-primary,
       tokens.$level-3;
   }
 
@@ -46,14 +71,14 @@
     color: tokens.$on-primary;
     font-size: tokens.$display-large;
     font-weight: tokens.$bold;
-    line-height: 1.1;
+    line-height: $hero-title-line-height-desktop;
   }
 
   &__description {
     color: tokens.$on-bg;
     font-size: tokens.$body-large;
     font-weight: tokens.$medium;
-    line-height: 1.5;
+    line-height: $hero-description-line-height-desktop;
   }
 
   &__description-mobile {
@@ -75,24 +100,24 @@
     }
 
     &__content {
-      width: 480px;
+      max-width: $hero-content-tablet-width;
       padding: tokens.$size-3;
       gap: tokens.$size-2;
-
-      border-width: tokens.$border-width-medium;
       border-radius: tokens.$corner-large;
 
-      box-shadow: tokens.$level-2;
+      box-shadow:
+        inset 0 0 0 $hero-border-tablet tokens.$on-primary,
+        tokens.$level-2;
     }
 
     &__title {
       font-size: tokens.$display-medium;
-      line-height: 1.15;
+      line-height: $hero-title-line-height-tablet;
     }
 
     &__description {
       font-size: tokens.$body-small;
-      line-height: 1.4;
+      line-height: $hero-description-line-height-compact;
     }
 
     &__button {
@@ -106,19 +131,21 @@
     padding: tokens.$size-8 tokens.$size-2;
 
     &__content {
-      width: 100%;
+      max-width: none;
       border-radius: tokens.$corner-medium;
-      box-shadow: tokens.$level-1;
+      box-shadow:
+        inset 0 0 0 tokens.$border-width-medium tokens.$on-primary,
+        tokens.$level-1;
     }
 
     &__title {
       font-size: tokens.$display-small;
-      line-height: 1.2;
+      line-height: $hero-title-line-height-mobile;
     }
 
     &__description {
       font-size: tokens.$label-medium;
-      line-height: 1.4;
+      line-height: $hero-description-line-height-compact;
     }
 
     &__description-desktop {
