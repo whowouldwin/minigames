@@ -3,15 +3,15 @@
 .mobile-menu {
   position: fixed;
   inset: 0;
+  z-index: 1;
 
   display: flex;
   flex-direction: column;
+  gap: tokens.$size-4;
 
   width: 100%;
   min-height: 100dvh;
-
   padding: tokens.$size-3;
-  gap: tokens.$size-4;
 
   background-color: tokens.$bg-footer;
 
@@ -22,8 +22,8 @@
   transform: translateX(100%);
 
   transition:
-    transform tokens.$transition-duration-medium ease,
-    opacity tokens.$transition-duration-medium ease,
+    transform tokens.$transition-duration-medium ease-in-out,
+    opacity tokens.$transition-duration-medium ease-in-out,
     visibility 0s linear tokens.$transition-duration-medium;
 
   &--open {
@@ -32,7 +32,62 @@
     pointer-events: auto;
 
     transform: translateX(0);
-
     transition-delay: 0s;
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__logo {
+    color: tokens.$white;
+  }
+
+  &__navigation {
+    flex: 1;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$size-3;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+  }
+
+  &__link {
+    color: tokens.$on-bg-footer;
+
+    font-size: tokens.$title-xxx-small;
+    font-weight: tokens.$medium;
+    line-height: normal;
+
+    &--active {
+      color: tokens.$primary;
+      font-weight: tokens.$bold;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$size-2;
+
+    width: 100%;
+  }
+
+  &__login-button,
+  &__signup-button {
+    width: 100%;
+  }
+
+  &__login-button {
+    color: tokens.$white;
+    box-shadow: inset 0 0 0 tokens.$border-width-medium tokens.$white;
   }
 }
