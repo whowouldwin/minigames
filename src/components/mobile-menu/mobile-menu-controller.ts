@@ -31,7 +31,7 @@ export const setupMobileMenu = (
       mobileMenu.addEventListener(
         "transitionend",
         () => {
-          window.location.href = href;
+          globalThis.location.assign(href);
         },
         { once: true },
       );
@@ -40,11 +40,13 @@ export const setupMobileMenu = (
 
   document.addEventListener("keydown", (event: KeyboardEvent) => {
     if (
-      event.key === "Escape" &&
-      mobileMenu.classList.contains("mobile-menu--open")
+      event.key !== "Escape" ||
+      !mobileMenu.classList.contains("mobile-menu--open")
     ) {
-      setOpen(false);
-      menuToggle.focus();
+      return;
     }
+
+    setOpen(false);
+    menuToggle.focus();
   });
 };
