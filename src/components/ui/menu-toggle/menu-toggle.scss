@@ -13,7 +13,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: calc(tokens.$size-05 - tokens.$border-width-medium);
+  gap: tokens.$size-05 - tokens.$border-width-medium;
 
   background-color: tokens.$white;
   border: 0;
