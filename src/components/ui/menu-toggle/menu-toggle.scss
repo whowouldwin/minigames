@@ -3,6 +3,7 @@
 
 .menu-toggle {
   position: relative;
+  z-index: 2;
 
   display: none;
 
@@ -37,6 +38,35 @@
     height: tokens.$border-width-medium;
 
     background-color: tokens.$on-primary;
+
+    transition:
+      transform tokens.$transition-duration-medium ease,
+      opacity tokens.$transition-duration-medium ease,
+      background-color tokens.$transition-duration-medium ease;
+  }
+
+  &--open {
+    background-color: tokens.$bg-footer-low;
+
+    &::before {
+      opacity: 0;
+    }
+
+    .menu-toggle__line {
+      background-color: tokens.$white;
+
+      &:nth-child(1) {
+        transform: translateY(tokens.$size-05) rotate(45deg);
+      }
+
+      &:nth-child(2) {
+        opacity: 0;
+      }
+
+      &:nth-child(3) {
+        transform: translateY(-4px) rotate(-45deg);
+      }
+    }
   }
 
   @include mixins.tablet {

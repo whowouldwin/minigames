@@ -1,7 +1,8 @@
-import { createSiteLogo } from "../ui/site-logo";
-import { createButton } from "../ui/button";
 import { createMainNavigation } from "../navigation/main-navigation";
+import { createButton } from "../ui/button";
 import { createMenuToggle } from "../ui/menu-toggle";
+import { createSiteLogo } from "../ui/site-logo";
+import { createMobileMenu, setupMobileMenu } from "../mobile-menu";
 
 import "./header.scss";
 
@@ -17,7 +18,6 @@ export const createHeader = (): HTMLElement => {
   buttons.className = "header__buttons";
 
   const loginButton: HTMLButtonElement = createButton("Log In", "outlined");
-
   const signupButton: HTMLButtonElement = createButton("Sign Up", "filled");
 
   loginButton.classList.add("header__login-button");
@@ -25,9 +25,15 @@ export const createHeader = (): HTMLElement => {
 
   buttons.append(loginButton, signupButton);
 
-  actions.append(createMainNavigation(), buttons, createMenuToggle());
+  const menuToggle: HTMLButtonElement = createMenuToggle();
 
-  header.append(createSiteLogo(), actions);
+  actions.append(createMainNavigation(), buttons, menuToggle);
+
+  const mobileMenu: HTMLElement = createMobileMenu();
+
+  setupMobileMenu(menuToggle, mobileMenu);
+
+  header.append(createSiteLogo(), actions, mobileMenu);
 
   return header;
 };

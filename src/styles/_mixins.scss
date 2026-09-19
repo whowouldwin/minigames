@@ -6,6 +6,12 @@
   }
 }
 
+@mixin compact-desktop {
+  @media (max-width: tokens.$breakpoint-compact-desktop) {
+    @content;
+  }
+}
+
 @mixin tablet {
   @media (max-width: tokens.$breakpoint-tablet) {
     @content;

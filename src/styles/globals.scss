@@ -8,10 +8,6 @@
   box-sizing: border-box;
 }
 
-html {
-  min-width: tokens.$breakpoint-mobile;
-}
-
 body {
   margin: 0;
   background-color: tokens.$white;

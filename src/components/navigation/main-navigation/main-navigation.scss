@@ -13,6 +13,10 @@
     margin: 0;
     padding: 0;
     list-style: none;
+
+    @include mixins.compact-desktop {
+      gap: tokens.$size-2;
+    }
   }
 
   &__link {
