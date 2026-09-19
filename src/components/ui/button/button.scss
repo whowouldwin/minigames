@@ -14,7 +14,7 @@
   border: 0;
   border-radius: tokens.$corner-small;
 
-  box-shadow: inset 0 0 0 2px tokens.$on-primary;
+  box-shadow: inset 0 0 0 tokens.$border-width-medium tokens.$on-primary;
 
   cursor: pointer;
   white-space: nowrap;

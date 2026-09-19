@@ -13,7 +13,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: tokens.$size-05;
+  gap: calc(tokens.$size-05 - tokens.$border-width-medium);
 
   background-color: tokens.$white;
   border: 0;
@@ -25,7 +25,7 @@
     position: absolute;
     inset: 0;
 
-    border: 2px solid tokens.$on-primary;
+    border: tokens.$border-width-medium solid tokens.$on-primary;
     border-radius: inherit;
 
     content: "";
@@ -33,23 +33,10 @@
   }
 
   &__line {
-    position: relative;
+    width: tokens.$size-2;
+    height: tokens.$border-width-medium;
 
-    width: 16px;
-    height: 0;
-
-    &::after {
-      position: absolute;
-      top: -1px;
-      left: 0;
-
-      width: 100%;
-      height: 2px;
-
-      background-color: tokens.$on-primary;
-
-      content: "";
-    }
+    background-color: tokens.$on-primary;
   }
 
   @include mixins.tablet {
@@ -58,7 +45,7 @@
 
   @include mixins.mobile {
     &__line {
-      width: 14px;
+      width: tokens.$menu-line-mobile-width;
     }
   }
 }
