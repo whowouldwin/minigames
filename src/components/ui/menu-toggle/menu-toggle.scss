@@ -37,6 +37,41 @@
     height: tokens.$border-width-medium;
 
     background-color: tokens.$on-primary;
+
+    transition:
+      transform tokens.$transition-duration-medium ease,
+      opacity tokens.$transition-duration-medium ease,
+      background-color tokens.$transition-duration-medium ease;
+  }
+
+  &--open {
+    position: fixed;
+    top: tokens.$size-3;
+    right: tokens.$size-3;
+    z-index: 2;
+
+    background-color: tokens.$bg-footer-low;
+
+    &::before {
+      opacity: 0;
+      transition: opacity tokens.$transition-duration-medium ease;
+    }
+
+    .menu-toggle__line {
+      background-color: tokens.$white;
+
+      &:nth-child(1) {
+        transform: translateY(tokens.$size-05) rotate(45deg);
+      }
+
+      &:nth-child(2) {
+        opacity: 0;
+      }
+
+      &:nth-child(3) {
+        transform: translateY(-4px) rotate(-45deg);
+      }
+    }
   }
 
   @include mixins.tablet {

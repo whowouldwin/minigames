@@ -34,8 +34,11 @@ export const createHeader = (): HTMLElement => {
   menuToggle.addEventListener("click", () => {
     const isOpen: boolean = mobileMenu.classList.toggle("mobile-menu--open");
 
+    menuToggle.classList.toggle("menu-toggle--open", isOpen);
+
     mobileMenu.setAttribute("aria-hidden", String(!isOpen));
     menuToggle.setAttribute("aria-expanded", String(isOpen));
+    menuToggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
   });
 
   header.append(createSiteLogo(), actions, mobileMenu);
