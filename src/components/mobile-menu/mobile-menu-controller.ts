@@ -17,6 +17,27 @@ export const setupMobileMenu = (
     setOpen(isOpen);
   });
 
+  const menuLinks: NodeListOf<HTMLAnchorElement> =
+    mobileMenu.querySelectorAll(".mobile-menu__link");
+
+  for (const link of menuLinks) {
+    link.addEventListener("click", (event: MouseEvent) => {
+      event.preventDefault();
+
+      const href: string = link.href;
+
+      setOpen(false);
+
+      mobileMenu.addEventListener(
+        "transitionend",
+        () => {
+          window.location.href = href;
+        },
+        { once: true },
+      );
+    });
+  }
+
   document.addEventListener("keydown", (event: KeyboardEvent) => {
     if (
       event.key === "Escape" &&

@@ -3,6 +3,7 @@
 
 .menu-toggle {
   position: relative;
+  z-index: 2;
 
   display: none;
 
@@ -45,16 +46,12 @@
   }
 
   &--open {
-    position: fixed;
-    top: tokens.$size-3;
-    right: tokens.$size-3;
     z-index: 2;
 
     background-color: tokens.$bg-footer-low;
 
     &::before {
       opacity: 0;
-      transition: opacity tokens.$transition-duration-medium ease;
     }
 
     .menu-toggle__line {

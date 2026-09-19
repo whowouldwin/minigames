@@ -21,7 +21,7 @@
     line-height: normal;
     white-space: nowrap;
 
-    @include mixins.tablet {
+    @include mixins.compact-desktop {
       font-size: tokens.$headline-small;
     }
   }
