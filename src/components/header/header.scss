@@ -28,12 +28,18 @@
     display: flex;
     align-items: center;
     gap: tokens.$size-4;
+    @include mixins.tablet {
+      gap: tokens.$size-2;
+    }
   }
 
   &__buttons {
     display: flex;
     align-items: center;
     gap: tokens.$size-2;
+    @include mixins.mobile {
+      display: none;
+    }
   }
 
   &__login-button {
@@ -45,10 +51,6 @@
   &__signup-button {
     @include mixins.tablet {
       padding: tokens.$btn-small-y tokens.$btn-small-x;
-    }
-
-    @include mixins.mobile {
-      display: none;
     }
   }
 

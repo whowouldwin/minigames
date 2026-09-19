@@ -1,6 +1,7 @@
 import { createSiteLogo } from '../ui/site-logo';
 import { createButton } from '../ui/button';
 import { createMainNavigation } from '../navigation/main-navigation';
+import { createMenuToggle } from '../ui/menu-toggle';
 
 import './header.scss';
 
@@ -30,7 +31,7 @@ export const createHeader = (): HTMLElement => {
 
     buttons.append(loginButton, signupButton);
 
-    actions.append(createMainNavigation(), buttons);
+    actions.append(createMainNavigation(), buttons, createMenuToggle());
 
     header.append(createSiteLogo(), actions);
 
