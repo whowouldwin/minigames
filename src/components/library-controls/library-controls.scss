@@ -132,7 +132,9 @@
 
     &__filters {
       flex: 1 1 100%;
+      width: 100%;
       overflow-x: auto;
+      overscroll-behavior-x: contain;
       touch-action: pan-x;
       scrollbar-width: none;
 
@@ -150,7 +152,10 @@
     padding-inline: tokens.$size-5;
 
     &__filters {
+      flex: 0 1 auto;
+      width: 100%;
       overflow-x: auto;
+      overscroll-behavior-x: contain;
     }
 
     &__sort {
