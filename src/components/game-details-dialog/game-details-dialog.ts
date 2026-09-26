@@ -9,6 +9,48 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
   const dialog: HTMLDialogElement = document.createElement("dialog");
   dialog.className = "game-details-dialog";
   dialog.setAttribute("aria-labelledby", "game-details-title");
+  let isClosing: boolean = false;
+  let trigger: HTMLElement | undefined;
+
+  const close = async (): Promise<void> => {
+    if (isClosing || !dialog.open) return;
+
+    isClosing = true;
+    dialog.classList.add("game-details-dialog--closing");
+    await Promise.allSettled(
+      dialog
+        .getAnimations()
+        .map((animation: Animation): Promise<Animation> => animation.finished),
+    );
+    dialog.close();
+    dialog.classList.remove("game-details-dialog--closing");
+    isClosing = false;
+
+    if (trigger?.isConnected) trigger.focus();
+  };
+
+  dialog.addEventListener("cancel", (event: Event): void => {
+    event.preventDefault();
+    void close();
+  });
+
+  let isBackdropDown: boolean = false;
+  const isOutside = (event: MouseEvent): boolean => {
+    const bounds: DOMRect = dialog.getBoundingClientRect();
+    return (
+      event.clientX < bounds.left ||
+      event.clientX > bounds.right ||
+      event.clientY < bounds.top ||
+      event.clientY > bounds.bottom
+    );
+  };
+
+  dialog.addEventListener("pointerdown", (event: PointerEvent): void => {
+    isBackdropDown = isOutside(event);
+  });
+  dialog.addEventListener("click", (event: MouseEvent): void => {
+    if (isBackdropDown && isOutside(event)) void close();
+  });
 
   const header: HTMLDivElement = document.createElement("div");
   header.className = "game-details-dialog__header";
@@ -22,7 +64,9 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
   closeButton.type = "button";
   closeButton.setAttribute("aria-label", "Close game details");
   closeButton.textContent = "×";
-  closeButton.addEventListener("click", (): void => dialog.close());
+  closeButton.addEventListener("click", (): void => {
+    void close();
+  });
 
   const description: HTMLParagraphElement = document.createElement("p");
   description.textContent =
@@ -56,7 +100,13 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
   return {
     element: dialog,
     open: (): void => {
-      if (!dialog.open) dialog.showModal();
+      if (isClosing || dialog.open) return;
+
+      trigger =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : undefined;
+      dialog.showModal();
     },
   };
 };
