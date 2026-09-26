@@ -1,0 +1,110 @@
+@use "../../styles/tokens";
+
+$game-details-dialog-backdrop: rgba(tokens.$bg-footer, 0.65);
+
+.game-details-dialog {
+  width: min(tokens.$game-details-dialog-width, calc(100% - tokens.$size-4));
+  max-width: none;
+  max-height: calc(100dvh - tokens.$size-4);
+  margin: auto;
+  padding: tokens.$size-3;
+  overflow-y: auto;
+
+  color: tokens.$on-bg;
+  background-color: tokens.$bg;
+  border: 0;
+  border-radius: tokens.$corner-extra-large;
+  box-shadow: tokens.$level-2;
+
+  &::backdrop {
+    background-color: $game-details-dialog-backdrop;
+  }
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: tokens.$size-2;
+  }
+
+  h2 {
+    margin: 0;
+    color: tokens.$on-primary;
+    font-size: tokens.$headline-medium;
+  }
+
+  p {
+    margin: tokens.$size-2 0;
+    font-size: tokens.$body-small;
+    line-height: 1.4;
+  }
+
+  &__close {
+    display: flex;
+    width: tokens.$size-5;
+    height: tokens.$size-5;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+
+    color: tokens.$on-primary;
+    background-color: tokens.$secondary;
+    border: tokens.$border-width-medium solid tokens.$on-primary;
+    border-radius: tokens.$corner-full;
+    font-size: tokens.$headline-medium;
+    line-height: 1;
+
+    cursor: pointer;
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: tokens.$size-2;
+    margin: 0 0 tokens.$size-3;
+
+    div {
+      min-width: 0;
+      padding: tokens.$size-1 tokens.$size-2;
+      background-color: tokens.$white;
+      border: tokens.$border-width-medium solid tokens.$on-primary;
+      border-radius: tokens.$corner-small;
+    }
+
+    dt {
+      font-size: tokens.$label-medium;
+    }
+
+    dd {
+      margin: tokens.$size-05 0 0;
+      color: tokens.$on-primary;
+      font-size: tokens.$label-large;
+      font-weight: tokens.$bold;
+    }
+  }
+
+  &__play {
+    width: 100%;
+    min-height: tokens.$size-6;
+    color: tokens.$on-primary;
+    background-color: tokens.$primary;
+    border: tokens.$border-width-medium solid tokens.$on-primary;
+    border-radius: tokens.$corner-small;
+    font-weight: tokens.$bold;
+
+    cursor: pointer;
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: tokens.$primary-high;
+      }
+    }
+  }
+}
+
+@media (max-width: tokens.$library-game-card-stacked-breakpoint) {
+  .game-details-dialog__info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

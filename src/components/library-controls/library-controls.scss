@@ -127,13 +127,20 @@
 }
 
 @media (max-width: tokens.$library-controls-scroll-breakpoint) {
-  .library-controls__filters {
-    overflow-x: auto;
-    touch-action: pan-x;
-    scrollbar-width: none;
+  .library-controls {
+    flex-wrap: wrap;
 
-    &::-webkit-scrollbar {
-      display: none;
+    &__filters {
+      flex: 1 1 100%;
+      width: 100%;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      touch-action: pan-x;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
   }
 }
@@ -145,7 +152,10 @@
     padding-inline: tokens.$size-5;
 
     &__filters {
+      flex: 0 1 auto;
+      width: 100%;
       overflow-x: auto;
+      overscroll-behavior-x: contain;
     }
 
     &__sort {
@@ -155,6 +165,7 @@
 
     &__sort-trigger {
       height: tokens.$sort-control-compact-height;
+      font-size: tokens.$label-medium;
     }
   }
 }

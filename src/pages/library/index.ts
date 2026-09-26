@@ -1,7 +1,8 @@
 import "./library-page.scss";
 import { createLibraryControls } from "../../components/library-controls";
+import { createLibraryGameList } from "../../components/library-game-list";
 
-export const createLibraryPage = (): HTMLElement => {
+export const createLibraryPage = (openGameDetails: () => void): HTMLElement => {
   const main: HTMLElement = document.createElement("main");
   main.className = "library-page";
 
@@ -15,7 +16,11 @@ export const createLibraryPage = (): HTMLElement => {
   description.textContent = "Browse our collection of casual mini-games";
 
   section.append(heading, description);
-  main.append(section, createLibraryControls());
+  main.append(
+    section,
+    createLibraryControls(),
+    createLibraryGameList(openGameDetails),
+  );
 
   return main;
 };

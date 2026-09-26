@@ -14,21 +14,22 @@
     padding-block: tokens.$size-5;
   }
 
-  h1,
-  p {
+  &__intro h1,
+  &__intro p {
     margin: 0;
   }
 
-  h1 {
+  &__intro h1 {
     color: tokens.$on-primary;
     font-size: tokens.$display-large;
     font-weight: tokens.$bold;
     line-height: normal;
   }
 
-  p {
+  &__intro p {
     color: tokens.$on-bg;
     font-size: tokens.$body-large;
+    font-weight: tokens.$medium;
     line-height: normal;
   }
 }
@@ -38,11 +39,11 @@
     padding-block: tokens.$size-3;
   }
 
-  .library-page h1 {
+  .library-page__intro h1 {
     font-size: tokens.$display-medium;
   }
 
-  .library-page p {
+  .library-page__intro p {
     font-size: tokens.$body-medium;
   }
 }
@@ -52,11 +53,11 @@
     padding-block: tokens.$size-2;
   }
 
-  .library-page h1 {
+  .library-page__intro h1 {
     font-size: tokens.$display-small;
   }
 
-  .library-page p {
+  .library-page__intro p {
     font-size: tokens.$body-small;
   }
 }
