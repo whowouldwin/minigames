@@ -1,6 +1,7 @@
 import "./library-page.scss";
 import { createLibraryControls } from "../../components/library-controls";
 import { createLibraryGameList } from "../../components/library-game-list";
+import { createLibraryPagination } from "../../components/library-pagination";
 
 export const createLibraryPage = (openGameDetails: () => void): HTMLElement => {
   const main: HTMLElement = document.createElement("main");
@@ -20,6 +21,7 @@ export const createLibraryPage = (openGameDetails: () => void): HTMLElement => {
     section,
     createLibraryControls(),
     createLibraryGameList(openGameDetails),
+    createLibraryPagination(),
   );
 
   return main;
