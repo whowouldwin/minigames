@@ -112,6 +112,28 @@ $sort-chevron-size: 9px;
 $sort-chevron-offset-y: -5px;
 $library-controls-scroll-breakpoint: 1100px;
 
+// Library game cards
+$library-game-card-desktop-height: 200px;
+$library-game-card-tablet-height: 152px;
+$library-game-card-mobile-height: 392px;
+$library-game-card-desktop-image-width: 320px;
+$library-game-card-tablet-image-width: 270px;
+$library-game-card-mobile-image-height: 160px;
+$library-game-card-grid-breakpoint: 1600px;
+$library-game-card-desktop-image-breakpoint: 1800px;
+$library-game-card-stacked-breakpoint: 600px;
+$library-game-card-border-width: 2.5px;
+$library-game-card-description-desktop-height: 67px;
+$library-game-card-description-tablet-height: 40px;
+$library-game-card-description-mobile-height: 40px;
+$library-game-card-details-height: 37px;
+$library-game-card-details-compact-height: 33px;
+$library-game-card-details-compact-width: 80px;
+$library-game-card-details-desktop-width: 88px;
+
+// Game details dialog preview
+$game-details-dialog-width: 600px;
+
 // Shadow
 $level-1: 4px 4px 0 0 $on-primary;
 $level-2: 6px 6px 0 0 $on-primary;
