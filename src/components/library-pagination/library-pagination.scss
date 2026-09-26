@@ -1,0 +1,97 @@
+@use "../../styles/mixins";
+@use "../../styles/tokens";
+
+.library-pagination {
+  --library-pagination-page-limit: 4;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: tokens.$size-5 tokens.$size-15;
+
+  &__navigation {
+    max-width: 100%;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: tokens.$size-2;
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__item[hidden] {
+    display: none;
+  }
+
+  &__arrow,
+  &__page {
+    display: inline-flex;
+    width: tokens.$size-5;
+    height: tokens.$size-5;
+    flex: 0 0 tokens.$size-5;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+
+    color: tokens.$on-primary;
+    background-color: tokens.$white;
+    border: tokens.$border-width-medium solid tokens.$on-primary;
+    border-radius: tokens.$corner-full;
+    cursor: pointer;
+    font-size: tokens.$label-large;
+    font-weight: tokens.$bold;
+    line-height: normal;
+
+    @media (hover: hover) {
+      &:hover:not(:disabled):not([aria-current="page"]) {
+        background-color: tokens.$surface;
+      }
+    }
+
+    &:focus-visible {
+      outline-offset: tokens.$size-05;
+    }
+  }
+
+  &__page[aria-current="page"] {
+    color: tokens.$white;
+    background-color: tokens.$bg-footer-low;
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: tokens.$bg-footer;
+      }
+    }
+  }
+
+  &__arrow:disabled {
+    color: tokens.$outline-variant;
+    background-color: tokens.$bg;
+    border-color: tokens.$outline-variant;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+@include mixins.tablet {
+  .library-pagination {
+    padding-inline: tokens.$size-5;
+
+    &__controls {
+      gap: tokens.$size-1;
+    }
+  }
+}
+
+@include mixins.mobile {
+  .library-pagination {
+    --library-pagination-page-limit: 3;
+
+    padding: tokens.$size-3 tokens.$size-2;
+  }
+}
