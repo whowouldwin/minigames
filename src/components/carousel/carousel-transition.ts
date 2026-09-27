@@ -19,7 +19,11 @@ const getAnimationDuration = (track: HTMLElement): number => {
     .trim();
   const milliseconds: number = Number(duration.replace("ms", ""));
 
-  return Number.isFinite(milliseconds) ? milliseconds : 450;
+  return globalThis.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? 0
+    : Number.isFinite(milliseconds)
+      ? milliseconds
+      : 450;
 };
 
 const animateCard = async (
