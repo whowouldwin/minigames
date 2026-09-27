@@ -10,6 +10,28 @@ export interface GameDetailsDialog {
   open: () => void;
 }
 
+const lockPageScroll = (): (() => void) => {
+  const body: HTMLElement = document.body;
+  const scrollY: number = window.scrollY;
+  const scrollbarWidth: number =
+    window.innerWidth - document.documentElement.clientWidth;
+  const previousOverflow: string = body.style.overflow;
+  const previousPaddingRight: string = body.style.paddingRight;
+
+  body.style.overflow = "hidden";
+
+  if (scrollbarWidth > 0) {
+    const bodyPaddingRight: string = getComputedStyle(body).paddingRight;
+    body.style.paddingRight = `calc(${bodyPaddingRight} + ${scrollbarWidth}px)`;
+  }
+
+  return (): void => {
+    body.style.overflow = previousOverflow;
+    body.style.paddingRight = previousPaddingRight;
+    window.scrollTo(0, scrollY);
+  };
+};
+
 const createRatingItem = (
   iconSource: string,
   value: string,
@@ -37,6 +59,7 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
   let isClosing: boolean = false;
   let isFavorite: boolean = false;
   let trigger: HTMLElement | undefined;
+  let restorePageScroll: (() => void) | undefined;
 
   const close = async (): Promise<void> => {
     if (isClosing || !dialog.open) return;
@@ -51,6 +74,8 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
     dialog.close();
     dialog.classList.remove("game-details-dialog--closing");
     isClosing = false;
+    restorePageScroll?.();
+    restorePageScroll = undefined;
 
     if (trigger?.isConnected) trigger.focus();
   };
@@ -200,6 +225,7 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
         document.activeElement instanceof HTMLElement
           ? document.activeElement
           : undefined;
+      restorePageScroll = lockPageScroll();
       dialog.showModal();
     },
   };
