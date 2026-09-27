@@ -1,4 +1,7 @@
 import closeIcon from "../../assets/icons/close.svg";
+import favoriteFilledIcon from "../../assets/icons/favorite-filled.svg";
+import favoriteOutlineIcon from "../../assets/icons/favorite-outline.svg";
+import starIcon from "../../assets/icons/star.svg";
 import tukoniCover from "../../assets/images/games/tukoni-forest-keepers.jpg";
 import "./game-details-dialog.scss";
 
@@ -7,11 +10,32 @@ export interface GameDetailsDialog {
   open: () => void;
 }
 
+const createRatingItem = (
+  iconSource: string,
+  value: string,
+): HTMLDivElement => {
+  const item: HTMLDivElement = document.createElement("div");
+  item.className = "game-details-dialog__rating-item";
+
+  const icon: HTMLImageElement = document.createElement("img");
+  icon.className = "game-details-dialog__rating-icon";
+  icon.src = iconSource;
+  icon.alt = "";
+
+  const label: HTMLSpanElement = document.createElement("span");
+  label.textContent = value;
+
+  item.append(icon, label);
+
+  return item;
+};
+
 export const createGameDetailsDialog = (): GameDetailsDialog => {
   const dialog: HTMLDialogElement = document.createElement("dialog");
   dialog.className = "game-details-dialog";
   dialog.setAttribute("aria-labelledby", "game-details-title");
   let isClosing: boolean = false;
+  let isFavorite: boolean = false;
   let trigger: HTMLElement | undefined;
 
   const close = async (): Promise<void> => {
@@ -63,8 +87,20 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
   cover.alt = "Tukoni: Forest Keepers game artwork";
 
   const title: HTMLHeadingElement = document.createElement("h2");
+  title.className = "game-details-dialog__title";
   title.id = "game-details-title";
   title.textContent = "Tukoni: Forest Keepers";
+
+  const titleRow: HTMLDivElement = document.createElement("div");
+  titleRow.className = "game-details-dialog__title-row";
+
+  const ratings: HTMLDivElement = document.createElement("div");
+  ratings.className = "game-details-dialog__ratings";
+  ratings.append(
+    createRatingItem(starIcon, "4.9"),
+    createRatingItem(favoriteFilledIcon, "31.2K"),
+  );
+  titleRow.append(title, ratings);
 
   const body: HTMLElement = document.createElement("section");
   body.className = "game-details-dialog__body";
@@ -85,6 +121,7 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
   closeButton.append(closeIconImage);
 
   const description: HTMLParagraphElement = document.createElement("p");
+  description.className = "game-details-dialog__description";
   description.textContent =
     "Tukoni: Forest Keepers — a cozy hand-drawn puzzle-adventure. You are Traveller, a little forest spirit on an important mission. Wander storybook meadows, visit mushroom villages, meet adorable inhabitants, solve gentle hand-crafted puzzles, brew herbal teas and help the Tukoni forest prepare peacefully for the coming winter.";
 
@@ -93,7 +130,7 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
   for (const [label, value] of [
     ["Genre", "Puzzle"],
     ["Players", "Solo"],
-    ["Duration", "40–90 min"],
+    ["Duration", "40-90 min"],
     ["Price", "Free"],
   ]) {
     const entry: HTMLDivElement = document.createElement("div");
@@ -110,8 +147,46 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
   playButton.type = "button";
   playButton.textContent = "Play Now";
 
+  const actions: HTMLDivElement = document.createElement("div");
+  actions.className = "game-details-dialog__actions";
+
+  const favoriteButton: HTMLButtonElement = document.createElement("button");
+  favoriteButton.className = "game-details-dialog__favorite";
+  favoriteButton.type = "button";
+  favoriteButton.setAttribute("aria-pressed", "false");
+
+  const favoriteIcon: HTMLImageElement = document.createElement("img");
+  favoriteIcon.className = "game-details-dialog__favorite-icon";
+  favoriteIcon.alt = "";
+  favoriteIcon.setAttribute("aria-hidden", "true");
+
+  const favoriteLabel: HTMLSpanElement = document.createElement("span");
+  favoriteLabel.className = "game-details-dialog__favorite-label";
+
+  const updateFavoriteButton = (): void => {
+    const label: string = isFavorite
+      ? "Remove from Favorites"
+      : "Add to Favorites";
+    favoriteButton.classList.toggle(
+      "game-details-dialog__favorite--active",
+      isFavorite,
+    );
+    favoriteButton.setAttribute("aria-label", label);
+    favoriteButton.setAttribute("aria-pressed", String(isFavorite));
+    favoriteIcon.src = isFavorite ? favoriteFilledIcon : favoriteOutlineIcon;
+    favoriteLabel.textContent = label;
+  };
+
+  favoriteButton.addEventListener("click", (): void => {
+    isFavorite = !isFavorite;
+    updateFavoriteButton();
+  });
+  favoriteButton.append(favoriteIcon, favoriteLabel);
+  updateFavoriteButton();
+  actions.append(playButton, favoriteButton);
+
   hero.append(cover, closeButton);
-  body.append(title, description, gameInfo, playButton);
+  body.append(titleRow, description, gameInfo, actions);
   dialog.append(hero, body);
 
   return {
@@ -119,6 +194,8 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
     open: (): void => {
       if (isClosing || dialog.open) return;
 
+      isFavorite = false;
+      updateFavoriteButton();
       trigger =
         document.activeElement instanceof HTMLElement
           ? document.activeElement

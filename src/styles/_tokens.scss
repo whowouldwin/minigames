@@ -133,7 +133,10 @@ $library-game-card-details-desktop-width: 88px;
 // Game details dialog preview
 $game-details-dialog-width: 600px;
 $game-details-dialog-hero-height: 220px;
+$game-details-description-line-height: 20px;
 $game-details-close-shadow: 2px 2px 0 0 $black;
+$game-details-info-widget-shadow: 3px 3px 0 0 $on-primary;
+$game-details-favorite-active-shadow: 4px 4px 0 0 $black;
 
 // Shadow
 $level-1: 4px 4px 0 0 $on-primary;
@@ -149,6 +152,7 @@ $breakpoint-compact-desktop: 1024px;
 
 // Border
 $border-width-medium: 2px;
+$border-width-thin: 1px;
 
 // Menu toggle
 $menu-line-mobile-width: 14px;
