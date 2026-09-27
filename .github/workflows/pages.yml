@@ -1,10 +1,10 @@
-name: Verify and deploy Story 1
+name: Verify and deploy Story 2
 
 on:
   push:
-    branches: [story-1]
+    branches: [story-2]
   pull_request:
-    branches: [story-1, main]
+    branches: [story-1, story-2, main]
   workflow_dispatch:
 
 permissions:
@@ -32,7 +32,7 @@ jobs:
         with:
           path: dist
   deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/story-1'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/story-2'
     needs: build
     runs-on: ubuntu-latest
     permissions:
