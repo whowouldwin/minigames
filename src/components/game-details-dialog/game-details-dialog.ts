@@ -1,3 +1,5 @@
+import closeIcon from "../../assets/icons/close.svg";
+import tukoniCover from "../../assets/images/games/tukoni-forest-keepers.jpg";
 import "./game-details-dialog.scss";
 
 export interface GameDetailsDialog {
@@ -52,21 +54,35 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
     if (isBackdropDown && isOutside(event)) void close();
   });
 
-  const header: HTMLDivElement = document.createElement("div");
-  header.className = "game-details-dialog__header";
+  const hero: HTMLElement = document.createElement("header");
+  hero.className = "game-details-dialog__hero";
+
+  const cover: HTMLImageElement = document.createElement("img");
+  cover.className = "game-details-dialog__cover";
+  cover.src = tukoniCover;
+  cover.alt = "Tukoni: Forest Keepers game artwork";
 
   const title: HTMLHeadingElement = document.createElement("h2");
   title.id = "game-details-title";
   title.textContent = "Tukoni: Forest Keepers";
 
+  const body: HTMLElement = document.createElement("section");
+  body.className = "game-details-dialog__body";
+  body.setAttribute("aria-labelledby", title.id);
+
   const closeButton: HTMLButtonElement = document.createElement("button");
   closeButton.className = "game-details-dialog__close";
   closeButton.type = "button";
   closeButton.setAttribute("aria-label", "Close game details");
-  closeButton.textContent = "×";
   closeButton.addEventListener("click", (): void => {
     void close();
   });
+
+  const closeIconImage: HTMLImageElement = document.createElement("img");
+  closeIconImage.src = closeIcon;
+  closeIconImage.alt = "";
+  closeIconImage.setAttribute("aria-hidden", "true");
+  closeButton.append(closeIconImage);
 
   const description: HTMLParagraphElement = document.createElement("p");
   description.textContent =
@@ -94,8 +110,9 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
   playButton.type = "button";
   playButton.textContent = "Play Now";
 
-  header.append(title, closeButton);
-  dialog.append(header, description, gameInfo, playButton);
+  hero.append(cover, closeButton);
+  body.append(title, description, gameInfo, playButton);
+  dialog.append(hero, body);
 
   return {
     element: dialog,
