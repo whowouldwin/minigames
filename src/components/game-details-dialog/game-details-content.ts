@@ -3,12 +3,14 @@ import favoriteFilledIcon from "../../assets/icons/favorite-filled.svg";
 import favoriteOutlineIcon from "../../assets/icons/favorite-outline.svg";
 import starIcon from "../../assets/icons/star.svg";
 import tukoniCover from "../../assets/images/games/tukoni-forest-keepers.jpg";
+import { createGameDetailsComments } from "./game-details-comments";
 import { createGameDetailsTopRecords } from "./game-details-top-records";
 
 export interface GameDetailsContent {
   hero: HTMLElement;
   body: HTMLElement;
   resetFavorite: () => void;
+  resetComments: () => void;
 }
 
 interface FavoriteButton {
@@ -178,17 +180,20 @@ export const createGameDetailsContent = (
   body.setAttribute("aria-labelledby", title.id);
 
   const favoriteButton: FavoriteButton = createFavoriteButton();
+  const comments = createGameDetailsComments();
   body.append(
     createTitleRow(title),
     createDescription(),
     createGameInfo(),
     createActions(favoriteButton.element),
     createGameDetailsTopRecords(),
+    comments.element,
   );
 
   return {
     hero: createHero(close),
     body,
     resetFavorite: favoriteButton.reset,
+    resetComments: comments.reset,
   };
 };

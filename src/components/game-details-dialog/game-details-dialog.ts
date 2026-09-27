@@ -65,6 +65,7 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
       if (isClosing || dialog.open) return;
 
       content.resetFavorite();
+      content.resetComments();
       trigger =
         document.activeElement instanceof HTMLElement
           ? document.activeElement
