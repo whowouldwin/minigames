@@ -5,6 +5,7 @@ interface GameRecord {
   player: string;
   score: string;
   date: string;
+  daysAgo: number;
 }
 
 const topRecords: GameRecord[] = [
@@ -13,18 +14,21 @@ const topRecords: GameRecord[] = [
     player: "ForestSpirit",
     score: "356,700 pts",
     date: "2 days ago",
+    daysAgo: 2,
   },
   {
     medal: "🥈",
     player: "TeaBrewer",
     score: "332,400pts",
     date: "5 days ago",
+    daysAgo: 5,
   },
   {
     medal: "🥉",
     player: "HerbalistPath",
     score: "308,900 pts",
     date: "1 week ago",
+    daysAgo: 7,
   },
 ];
 
@@ -33,6 +37,7 @@ const createRecordRow = ({
   player,
   score,
   date,
+  daysAgo,
 }: GameRecord): HTMLLIElement => {
   const row: HTMLLIElement = document.createElement("li");
   row.className = "game-details-records__row";
@@ -56,6 +61,9 @@ const createRecordRow = ({
 
   const dateLabel: HTMLTimeElement = document.createElement("time");
   dateLabel.className = "game-details-records__date";
+  dateLabel.dateTime = new Date(
+    Date.now() - daysAgo * 24 * 60 * 60 * 1000,
+  ).toISOString();
   dateLabel.textContent = date;
 
   row.append(playerInfo, scoreLabel, dateLabel);
