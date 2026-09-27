@@ -1,14 +1,13 @@
 import arrowBackIcon from "../../assets/icons/arrow-back.svg";
 import arrowForwardIcon from "../../assets/icons/arrow-forward.svg";
 
-import { createGameCard } from "../game-card";
-
 import { games } from "./carousel-data";
+import { setupCarouselController } from "./carousel-controller";
 import { createNavigationButton } from "./create-navigation-button";
 
 import "./carousel.scss";
 
-export const createCarousel = (): HTMLElement => {
+export const createCarousel = (openGameDetails: () => void): HTMLElement => {
   const section: HTMLElement = document.createElement("section");
   section.className = "carousel";
 
@@ -31,20 +30,31 @@ export const createCarousel = (): HTMLElement => {
   const navigation: HTMLDivElement = document.createElement("div");
   navigation.className = "carousel__navigation";
 
-  navigation.append(
-    createNavigationButton(arrowBackIcon, "Previous games", "previous"),
-    createNavigationButton(arrowForwardIcon, "Next games", "next"),
+  const previousButton: HTMLButtonElement = createNavigationButton(
+    arrowBackIcon,
+    "Previous games",
+    "previous",
   );
+  const nextButton: HTMLButtonElement = createNavigationButton(
+    arrowForwardIcon,
+    "Next games",
+    "next",
+  );
+  navigation.append(previousButton, nextButton);
 
   const track: HTMLDivElement = document.createElement("div");
   track.className = "carousel__track";
 
-  for (const game of games) {
-    track.append(createGameCard(game));
-  }
-
   header.append(heading, navigation);
   section.append(header, track);
+
+  setupCarouselController({
+    track,
+    games,
+    openGameDetails,
+    previousButton,
+    nextButton,
+  });
 
   return section;
 };

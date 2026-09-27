@@ -23,6 +23,7 @@ $carousel-mobile-card-height: 200px;
 $carousel-accent-border-width: 1.5px;
 
 $carousel-mobile-track-extra-width: 6px;
+$carousel-transition-duration: 450ms;
 
 .carousel {
   display: flex;
@@ -124,6 +125,7 @@ $carousel-mobile-track-extra-width: 6px;
   }
 
   &__track {
+    position: relative;
     display: grid;
 
     grid-template-columns:
@@ -140,11 +142,21 @@ $carousel-mobile-track-extra-width: 6px;
     padding-inline: tokens.$size-1;
 
     overflow: hidden;
+    touch-action: pan-y;
+    user-select: none;
+
+    --carousel-transition-duration: #{$carousel-transition-duration};
   }
 
   .game-card {
     min-width: 0;
     height: $carousel-desktop-card-height;
+
+    cursor: pointer;
+
+    &__image {
+      -webkit-user-drag: none;
+    }
   }
 
   @include mixins.compact-desktop {
