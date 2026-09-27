@@ -3,6 +3,7 @@ import favoriteFilledIcon from "../../assets/icons/favorite-filled.svg";
 import favoriteOutlineIcon from "../../assets/icons/favorite-outline.svg";
 import starIcon from "../../assets/icons/star.svg";
 import tukoniCover from "../../assets/images/games/tukoni-forest-keepers.jpg";
+import { createGameDetailsTopRecords } from "./game-details-top-records";
 
 export interface GameDetailsContent {
   hero: HTMLElement;
@@ -182,6 +183,7 @@ export const createGameDetailsContent = (
     createDescription(),
     createGameInfo(),
     createActions(favoriteButton.element),
+    createGameDetailsTopRecords(),
   );
 
   return {
