@@ -1,8 +1,11 @@
 import { createButton } from "../ui/button";
+import type { AppPage } from "../../types/app-page";
 
 import "./hero.scss";
 
-export const createHero = (): HTMLElement => {
+export const createHero = (
+  navigateTo: (page: AppPage) => void,
+): HTMLElement => {
   const hero: HTMLElement = document.createElement("section");
   hero.className = "hero";
 
@@ -34,6 +37,9 @@ export const createHero = (): HTMLElement => {
     "large",
   );
   browseButton.classList.add("hero__button");
+  browseButton.addEventListener("click", (): void => {
+    navigateTo("library");
+  });
 
   content.append(title, description, browseButton);
   hero.append(content);
