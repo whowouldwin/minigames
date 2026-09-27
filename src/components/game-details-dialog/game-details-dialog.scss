@@ -48,6 +48,9 @@ $game-details-dialog-animation-duration: 200ms;
   }
 
   &__body {
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$size-3;
     padding: tokens.$size-3;
   }
 
@@ -62,13 +65,45 @@ $game-details-dialog-animation-duration: 200ms;
   h2 {
     margin: 0;
     color: tokens.$on-primary;
-    font-size: tokens.$headline-medium;
+    font-size: tokens.$display-medium;
   }
 
-  p {
-    margin: tokens.$size-2 0;
-    font-size: tokens.$body-small;
-    line-height: 1.4;
+  &__title-row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: tokens.$size-2;
+  }
+
+  &__ratings {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: tokens.$size-2;
+  }
+
+  &__rating-item {
+    display: flex;
+    align-items: center;
+    gap: tokens.$size-05;
+
+    color: tokens.$on-primary;
+    font-size: tokens.$label-large;
+    font-weight: tokens.$bold;
+    line-height: normal;
+  }
+
+  &__rating-icon {
+    display: block;
+  }
+
+  &__description {
+    width: 100%;
+    margin: 0;
+    color: tokens.$on-bg;
+    font-size: tokens.$body-medium;
+    line-height: tokens.$game-details-description-line-height;
   }
 
   &__close {
@@ -113,18 +148,22 @@ $game-details-dialog-animation-duration: 200ms;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: tokens.$size-2;
-    margin: 0 0 tokens.$size-3;
+    width: 100%;
+    margin: 0;
 
     div {
       min-width: 0;
       padding: tokens.$size-1 tokens.$size-2;
       background-color: tokens.$white;
-      border: tokens.$border-width-medium solid tokens.$on-primary;
+      border: tokens.$border-width-thin solid tokens.$outline-variant;
       border-radius: tokens.$corner-small;
+      box-shadow: tokens.$game-details-info-widget-shadow;
     }
 
     dt {
       font-size: tokens.$label-medium;
+      font-weight: tokens.$regular;
+      line-height: normal;
     }
 
     dd {
@@ -132,25 +171,80 @@ $game-details-dialog-animation-duration: 200ms;
       color: tokens.$on-primary;
       font-size: tokens.$label-large;
       font-weight: tokens.$bold;
+      line-height: normal;
     }
   }
 
-  &__play {
+  &__actions {
+    display: flex;
     width: 100%;
-    min-height: tokens.$size-6;
+    gap: tokens.$size-2;
+  }
+
+  &__play,
+  &__favorite {
+    display: inline-flex;
+    height: tokens.$size-6;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    gap: tokens.$size-1;
+    padding: tokens.$btn-large-y tokens.$btn-large-x;
+
+    color: tokens.$on-primary;
+    border-radius: tokens.$corner-medium;
+    box-shadow: tokens.$level-1;
+
+    cursor: pointer;
+    font-size: tokens.$label-extra-large;
+    font-weight: tokens.$bold;
+    line-height: normal;
+    white-space: nowrap;
+  }
+
+  &__play {
     color: tokens.$on-primary;
     background-color: tokens.$primary;
     border: tokens.$border-width-medium solid tokens.$on-primary;
-    border-radius: tokens.$corner-small;
-    font-weight: tokens.$bold;
-
-    cursor: pointer;
 
     @media (hover: hover) {
       &:hover {
         background-color: tokens.$primary-high;
       }
     }
+
+    &:active {
+      background-color: tokens.$primary-low;
+    }
+  }
+
+  &__favorite {
+    background-color: tokens.$white;
+    border: tokens.$border-width-thin solid tokens.$outline-variant;
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: tokens.$surface;
+      }
+    }
+
+    &:active {
+      background-color: tokens.$primary-low;
+    }
+
+    &:focus-visible {
+      outline-offset: tokens.$size-05;
+    }
+
+    &--active {
+      color: tokens.$black;
+      box-shadow: tokens.$game-details-favorite-active-shadow;
+    }
+  }
+
+  &__favorite-icon {
+    display: block;
+    flex: 0 0 auto;
   }
 }
 
@@ -161,6 +255,22 @@ $game-details-dialog-animation-duration: 200ms;
 
   .game-details-dialog__info {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .game-details-dialog__title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: tokens.$size-1;
+  }
+
+  .game-details-dialog__favorite {
+    width: tokens.$size-6;
+    flex: 0 0 tokens.$size-6;
+    padding: 0;
+  }
+
+  .game-details-dialog__favorite-label {
+    display: none;
   }
 
   .game-details-dialog__close {
