@@ -16,11 +16,13 @@ export const createApp = (): HTMLDivElement => {
     createGameDetailsDialog();
   const pageOutlet: HTMLDivElement = document.createElement("div");
   pageOutlet.className = "app__page";
-  pageOutlet.append(createHomePage());
+  pageOutlet.append(createHomePage(gameDetails.open));
 
   const navigateTo = (page: AppPage): void => {
     const nextPage: HTMLElement =
-      page === "home" ? createHomePage() : createLibraryPage(gameDetails.open);
+      page === "home"
+        ? createHomePage(gameDetails.open)
+        : createLibraryPage(gameDetails.open);
     pageOutlet.replaceChildren(nextPage);
     updateNavigationState(header, page);
   };
