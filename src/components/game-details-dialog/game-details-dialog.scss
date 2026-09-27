@@ -1,6 +1,7 @@
 @use "../../styles/tokens";
 
 $game-details-dialog-backdrop: rgba(tokens.$bg-footer, 0.65);
+$game-details-dialog-animation-duration: 200ms;
 
 .game-details-dialog {
   width: min(tokens.$game-details-dialog-width, calc(100% - tokens.$size-4));
@@ -16,8 +17,25 @@ $game-details-dialog-backdrop: rgba(tokens.$bg-footer, 0.65);
   border-radius: tokens.$corner-extra-large;
   box-shadow: tokens.$level-2;
 
+  &[open] {
+    animation: game-details-dialog-enter $game-details-dialog-animation-duration
+      ease-out;
+  }
+
   &::backdrop {
     background-color: $game-details-dialog-backdrop;
+    animation: game-details-backdrop-enter
+      $game-details-dialog-animation-duration ease-out;
+  }
+
+  &--closing[open] {
+    animation: game-details-dialog-leave $game-details-dialog-animation-duration
+      ease-in forwards;
+  }
+
+  &--closing::backdrop {
+    animation: game-details-backdrop-leave
+      $game-details-dialog-animation-duration ease-in forwards;
   }
 
   &__header {
@@ -106,5 +124,47 @@ $game-details-dialog-backdrop: rgba(tokens.$bg-footer, 0.65);
 @media (max-width: tokens.$library-game-card-stacked-breakpoint) {
   .game-details-dialog__info {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@keyframes game-details-dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(tokens.$size-2);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes game-details-dialog-leave {
+  to {
+    opacity: 0;
+    transform: translateY(tokens.$size-2);
+  }
+}
+
+@keyframes game-details-backdrop-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes game-details-backdrop-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-details-dialog[open],
+  .game-details-dialog::backdrop {
+    animation: none;
   }
 }
