@@ -1,4 +1,5 @@
 import { createAuthForm } from "./auth-form";
+import { closeDialogWithAnimation, setupDialogDismissal } from "../ui/dialog";
 import type { AuthMode } from "./auth-form";
 import "./auth-dialog.scss";
 
@@ -70,36 +71,12 @@ export const createAuthDialog = (): AuthDialog => {
   const close = async (): Promise<void> => {
     if (isClosing || !dialog.open) return;
     isClosing = true;
-    dialog.classList.add("auth-dialog--closing");
-    await Promise.allSettled(
-      dialog
-        .getAnimations()
-        .map((animation: Animation): Promise<Animation> => animation.finished),
-    );
-    dialog.close();
-    dialog.classList.remove("auth-dialog--closing");
+    await closeDialogWithAnimation(dialog, "auth-dialog--closing");
     isClosing = false;
     trigger?.focus();
   };
-  dialog.addEventListener("cancel", (event: Event): void => {
-    event.preventDefault();
+  setupDialogDismissal(dialog, (): void => {
     void close();
-  });
-  let isBackdropDown: boolean = false;
-  const isOutside = (event: MouseEvent): boolean => {
-    const bounds: DOMRect = dialog.getBoundingClientRect();
-    return (
-      event.clientX < bounds.left ||
-      event.clientX > bounds.right ||
-      event.clientY < bounds.top ||
-      event.clientY > bounds.bottom
-    );
-  };
-  dialog.addEventListener("pointerdown", (event: PointerEvent): void => {
-    isBackdropDown = isOutside(event);
-  });
-  dialog.addEventListener("click", (event: MouseEvent): void => {
-    if (isBackdropDown && isOutside(event)) void close();
   });
   dialog.append(tabs, panel);
   setMode("login");

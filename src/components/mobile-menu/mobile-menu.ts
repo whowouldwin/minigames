@@ -1,3 +1,4 @@
+import type { AppPage } from "../../types/app-page";
 import { createNavigationList } from "../navigation/create-navigation-list";
 import { createButton } from "../ui/button";
 import { createMenuToggle } from "../ui/menu-toggle";
@@ -5,7 +6,10 @@ import { createSiteLogo } from "../ui/site-logo";
 
 import "./mobile-menu.scss";
 
-export const createMobileMenu = (): HTMLElement => {
+export const createMobileMenu = (
+  activePage: AppPage,
+  navigateTo: (page: AppPage) => void,
+): HTMLElement => {
   const menu: HTMLElement = document.createElement("div");
 
   menu.className = "mobile-menu";
@@ -14,7 +18,7 @@ export const createMobileMenu = (): HTMLElement => {
   const top: HTMLDivElement = document.createElement("div");
   top.className = "mobile-menu__top";
 
-  const logo: HTMLAnchorElement = createSiteLogo();
+  const logo: HTMLAnchorElement = createSiteLogo(navigateTo);
   logo.classList.add("mobile-menu__logo");
 
   const closeButton: HTMLButtonElement = createMenuToggle();
@@ -28,7 +32,9 @@ export const createMobileMenu = (): HTMLElement => {
   navigation.className = "mobile-menu__navigation";
   navigation.setAttribute("aria-label", "Mobile navigation");
 
-  navigation.append(createNavigationList("mobile-menu"));
+  navigation.append(
+    createNavigationList("mobile-menu", activePage, navigateTo),
+  );
 
   const actions: HTMLDivElement = document.createElement("div");
   actions.className = "mobile-menu__actions";

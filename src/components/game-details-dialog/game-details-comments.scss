@@ -1,0 +1,257 @@
+@use "../../styles/tokens";
+
+.game-details-comments {
+  display: flex;
+  flex-direction: column;
+  gap: tokens.$size-2;
+  width: 100%;
+
+  &__title {
+    margin: 0;
+    color: tokens.$on-primary;
+    font-size: tokens.$body-medium;
+    font-weight: tokens.$bold;
+    line-height: normal;
+  }
+
+  &__form {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: tokens.$size-2;
+  }
+
+  &__form-avatar,
+  &__submit {
+    display: flex;
+    width: tokens.$size-5;
+    height: tokens.$size-5;
+    flex: 0 0 tokens.$size-5;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__form-avatar {
+    color: tokens.$on-primary;
+    background-color: tokens.$primary;
+    border: tokens.$game-details-comment-border-width solid tokens.$on-primary;
+    border-radius: tokens.$corner-full;
+    font-size: tokens.$label-large;
+    font-weight: tokens.$bold;
+    line-height: normal;
+  }
+
+  &__textarea {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: tokens.$size-6;
+    max-height: tokens.$size-11;
+    flex: 1 1 auto;
+    overflow-y: hidden;
+    padding: tokens.$size-1 tokens.$size-2;
+    color: tokens.$on-primary;
+    background-color: tokens.$white;
+    border: tokens.$border-width-thin solid tokens.$on-primary;
+    border-radius: tokens.$corner-small;
+
+    font-family: tokens.$Inter;
+    font-size: tokens.$body-small;
+    line-height: normal;
+    resize: none;
+
+    &::placeholder {
+      color: tokens.$on-bg-low;
+      opacity: 1;
+    }
+
+    &:focus-visible {
+      outline-offset: tokens.$size-05;
+    }
+  }
+
+  &__submit {
+    padding: 0;
+    background-color: tokens.$bg-footer-low;
+    border: tokens.$game-details-comment-border-width solid tokens.$on-primary;
+    border-radius: tokens.$corner-small;
+    cursor: pointer;
+
+    img {
+      display: block;
+      width: tokens.$size-3;
+      height: tokens.$size-3;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: tokens.$bg-footer-lowest;
+      }
+    }
+
+    &:active {
+      background-color: tokens.$bg-footer;
+    }
+
+    &:focus-visible {
+      outline-offset: tokens.$size-05;
+    }
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$size-2;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__card {
+    width: 100%;
+    padding: tokens.$size-2;
+    background-color: tokens.$white;
+    border-radius: tokens.$corner-medium;
+    box-shadow: tokens.$game-details-comment-card-shadow;
+  }
+
+  &__article {
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$size-1;
+  }
+
+  &__header,
+  &__author {
+    display: flex;
+    align-items: center;
+  }
+
+  &__header {
+    justify-content: space-between;
+    gap: tokens.$size-1;
+    width: 100%;
+  }
+
+  &__author {
+    min-width: 0;
+    gap: tokens.$size-1;
+  }
+
+  &__avatar {
+    display: flex;
+    width: tokens.$game-details-comment-avatar-size;
+    height: tokens.$game-details-comment-avatar-size;
+    flex: 0 0 tokens.$game-details-comment-avatar-size;
+    align-items: center;
+    justify-content: center;
+    color: tokens.$on-primary;
+    background-color: tokens.$primary;
+    border: tokens.$border-width-thin solid tokens.$on-primary;
+    border-radius: tokens.$game-details-comment-avatar-radius;
+    font-size: tokens.$label-medium;
+    font-weight: tokens.$bold;
+    line-height: normal;
+  }
+
+  &__avatar--blue {
+    background-color: tokens.$avatar-random-3;
+  }
+
+  &__avatar--neutral {
+    background-color: tokens.$avatar-random-1;
+  }
+
+  &__author-name {
+    overflow: hidden;
+    margin: 0;
+    color: tokens.$on-primary;
+    font-size: tokens.$body-small;
+    font-weight: tokens.$bold;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__date {
+    flex: 0 0 auto;
+    color: tokens.$on-bg;
+    font-size: tokens.$label-medium;
+    line-height: normal;
+    white-space: nowrap;
+  }
+
+  &__text,
+  &__text--compact {
+    width: 100%;
+    margin: 0;
+    color: tokens.$on-primary;
+    font-size: tokens.$body-small;
+    line-height: tokens.$game-details-comment-line-height;
+  }
+
+  &__text--compact {
+    display: none;
+  }
+
+  &__footer {
+    display: flex;
+    width: 100%;
+    align-items: center;
+  }
+
+  &__like {
+    display: inline-flex;
+    min-height: tokens.$size-3;
+    align-items: center;
+    gap: tokens.$size-05;
+    padding: 0;
+    color: tokens.$on-primary;
+    background: transparent;
+    border: 0;
+    border-radius: tokens.$corner-small;
+    cursor: pointer;
+    font-size: tokens.$label-medium;
+    font-weight: tokens.$bold;
+    line-height: normal;
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: tokens.$surface;
+      }
+    }
+
+    &:active {
+      background-color: tokens.$primary-low;
+    }
+
+    &:focus-visible {
+      outline-offset: tokens.$size-05;
+    }
+
+    &--active {
+      color: tokens.$like;
+    }
+  }
+
+  &__like-icon {
+    display: block;
+    width: tokens.$size-2;
+    height: auto;
+    opacity: 0.72;
+  }
+
+  &__like--active &__like-icon {
+    opacity: 1;
+  }
+}
+
+@media (max-width: tokens.$library-game-card-stacked-breakpoint) {
+  .game-details-comments__text--wide-only {
+    display: none;
+  }
+
+  .game-details-comments__text--compact {
+    display: block;
+  }
+}

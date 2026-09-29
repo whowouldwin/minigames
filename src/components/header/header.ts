@@ -5,11 +5,14 @@ import { createSiteLogo } from "../ui/site-logo";
 import { createMobileMenu, setupMobileMenu } from "../mobile-menu";
 
 import type { AuthMode } from "../auth-dialog";
+import type { AppPage } from "../../types/app-page";
 
 import "./header.scss";
 
 export const createHeader = (
   openAuth: (mode: AuthMode) => void,
+  activePage: AppPage,
+  navigateTo: (page: AppPage) => void,
 ): HTMLElement => {
   const header: HTMLElement = document.createElement("header");
 
@@ -37,13 +40,17 @@ export const createHeader = (
 
   const menuToggle: HTMLButtonElement = createMenuToggle();
 
-  actions.append(createMainNavigation(), buttons, menuToggle);
+  actions.append(
+    createMainNavigation(activePage, navigateTo),
+    buttons,
+    menuToggle,
+  );
 
-  const mobileMenu: HTMLElement = createMobileMenu();
+  const mobileMenu: HTMLElement = createMobileMenu(activePage, navigateTo);
 
   setupMobileMenu(menuToggle, mobileMenu, openAuth);
 
-  header.append(createSiteLogo(), actions, mobileMenu);
+  header.append(createSiteLogo(navigateTo), actions, mobileMenu);
 
   return header;
 };

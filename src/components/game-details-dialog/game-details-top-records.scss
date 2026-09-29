@@ -1,0 +1,84 @@
+@use "../../styles/tokens";
+
+.game-details-records {
+  display: flex;
+  flex-direction: column;
+  gap: tokens.$size-2;
+  width: 100%;
+  line-height: normal;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: tokens.$size-1;
+    margin: 0;
+    color: tokens.$on-primary;
+    font-size: tokens.$body-medium;
+    font-weight: tokens.$bold;
+    line-height: normal;
+  }
+
+  &__trophy {
+    font-size: tokens.$body-large;
+    line-height: 1;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$size-1;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: tokens.$size-2;
+    width: 100%;
+    padding: tokens.$size-2;
+    background-color: tokens.$white;
+    border-radius: tokens.$corner-small;
+  }
+
+  &__player {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: tokens.$size-2;
+    color: tokens.$on-primary;
+  }
+
+  &__medal {
+    flex: 0 0 auto;
+    font-size: tokens.$body-medium;
+    line-height: 1;
+  }
+
+  &__player-name,
+  &__score {
+    min-width: 0;
+    overflow: hidden;
+    color: tokens.$on-primary;
+    font-size: tokens.$label-large;
+    font-weight: tokens.$bold;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__date {
+    color: tokens.$on-bg;
+    font-size: tokens.$label-medium;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: tokens.$library-game-card-stacked-breakpoint) {
+  .game-details-records__row,
+  .game-details-records__player {
+    gap: tokens.$size-1;
+  }
+}

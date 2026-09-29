@@ -1,22 +1,40 @@
 import { createHeader } from "../components/header";
-import { createHero } from "../components/hero";
-import { createCarousel } from "../components/carousel";
-import { createLeaderboard } from "../components/leaderboard";
-import { createGameDevelopment } from "../components/game-dev";
 import { createFooter } from "../components/footer";
 import { createAuthDialog } from "../components/auth-dialog";
+import { createGameDetailsDialog } from "../components/game-details-dialog";
+import { updateNavigationState } from "../components/navigation/create-navigation-list";
+import { createHomePage } from "../pages/home";
+import { createLibraryPage } from "../pages/library";
+import type { AppPage } from "../types/app-page";
 
 export const createApp = (): HTMLDivElement => {
   const app: HTMLDivElement = document.createElement("div");
   app.className = "app";
+
   const auth: ReturnType<typeof createAuthDialog> = createAuthDialog();
-  const main: HTMLElement = document.createElement("main");
-  main.append(
-    createHero(),
-    createCarousel(),
-    createLeaderboard(),
-    createGameDevelopment(),
+  const gameDetails: ReturnType<typeof createGameDetailsDialog> =
+    createGameDetailsDialog();
+  const pageOutlet: HTMLDivElement = document.createElement("div");
+  pageOutlet.className = "app__page";
+
+  const navigateTo = (page: AppPage): void => {
+    const nextPage: HTMLElement =
+      page === "home"
+        ? createHomePage(gameDetails.open, navigateTo)
+        : createLibraryPage(gameDetails.open);
+    pageOutlet.replaceChildren(nextPage);
+    updateNavigationState(header, page);
+  };
+
+  const header: HTMLElement = createHeader(auth.open, "home", navigateTo);
+  pageOutlet.append(createHomePage(gameDetails.open, navigateTo));
+  app.append(
+    header,
+    pageOutlet,
+    createFooter(navigateTo),
+    auth.element,
+    gameDetails.element,
   );
-  app.append(createHeader(auth.open), main, createFooter(), auth.element);
+
   return app;
 };

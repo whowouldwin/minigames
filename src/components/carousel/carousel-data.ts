@@ -1,40 +1,68 @@
-import gamePreview1 from "../../assets/images/games/game-preview-1.jpg";
-import gamePreview2 from "../../assets/images/games/game-preview-2.jpg";
-import gamePreview3 from "../../assets/images/games/game-preview-3.jpg";
-import gamePreview4 from "../../assets/images/games/game-preview-4.jpg";
-import gamePreview5 from "../../assets/images/games/game-preview-5.jpg";
+import catMailCo from "../../assets/images/games/library/cat-mail-co.jpg";
+import heartopia from "../../assets/images/games/library/heartopia.jpg";
+import islandersNewShores from "../../assets/images/games/library/islanders-new-shores.jpg";
+import palia from "../../assets/images/games/library/palia.jpg";
+import shelveThePotions from "../../assets/images/games/library/shelve-the-potions.jpg";
+import tailsideCozyCafeSim from "../../assets/images/games/library/tailside-cozy-cafe-sim.jpg";
+import tinyGlade from "../../assets/images/games/library/tiny-glade.jpg";
+import vacationCafe from "../../assets/images/games/library/vacation-cafe.jpg";
+import winterBurrow from "../../assets/images/games/library/winter-burrow.jpg";
 
 import type { GameCardData } from "../game-card";
 
 export const games: readonly GameCardData[] = [
   {
-    title: "Candy Crush",
-    image: gamePreview1,
-    rating: "",
-    likes: "",
-  },
-  {
-    title: "ISLANDERS: New Shores",
-    image: gamePreview3,
-    rating: "4.9",
-    likes: "54.2K",
-  },
-  {
     title: "Vacation Cafe Simulator",
-    image: gamePreview4,
+    image: vacationCafe,
     rating: "4.8",
     likes: "28.7K",
   },
   {
     title: "Winter Burrow",
-    image: gamePreview5,
+    image: winterBurrow,
     rating: "4.9",
     likes: "32.4K",
   },
   {
-    title: "Bubble Shooter",
-    image: gamePreview2,
-    rating: "4.4",
-    likes: "15.8K",
+    title: "Shelve the Potions!",
+    image: shelveThePotions,
+    rating: "4.7",
+    likes: "21.3K",
+  },
+  {
+    title: "Heartopia",
+    image: heartopia,
+    rating: "4.6",
+    likes: "46.8K",
+  },
+  {
+    title: "Palia",
+    image: palia,
+    rating: "4.8",
+    likes: "89.5K",
+  },
+  {
+    title: "Cat Mail Co.",
+    image: catMailCo,
+    rating: "4.9",
+    likes: "38.2K",
+  },
+  {
+    title: "Tiny Glade",
+    image: tinyGlade,
+    rating: "4.9",
+    likes: "67.3K",
+  },
+  {
+    title: "Tailside: Cozy Cafe Sim",
+    image: tailsideCozyCafeSim,
+    rating: "4.8",
+    likes: "35.6K",
+  },
+  {
+    title: "ISLANDERS: New Shores",
+    image: islandersNewShores,
+    rating: "4.9",
+    likes: "54.2K",
   },
 ];

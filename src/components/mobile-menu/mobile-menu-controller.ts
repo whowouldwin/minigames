@@ -21,43 +21,28 @@ export const setupMobileMenu = (
     if (isOpen) closeButton?.focus();
     else menuToggle.focus();
   };
-  menuToggle.addEventListener("click", (): void => {
-    setOpen(true);
-  });
-  closeButton?.addEventListener("click", (): void => {
+  const closeAndScrollToTop = (): void => {
     setOpen(false);
-  });
-  for (const link of mobileMenu.querySelectorAll<HTMLAnchorElement>("a")) {
-    link.addEventListener("click", (event: MouseEvent): void => {
-      event.preventDefault();
-      setOpen(false);
-      globalThis.scrollTo({ top: 0, behavior: "smooth" });
-    });
-  }
-  mobileMenu
-    .querySelector(".mobile-menu__login-button")
-    ?.addEventListener("click", (): void => {
-      setOpen(false);
-      openAuth("login");
-    });
-  mobileMenu
-    .querySelector(".mobile-menu__signup-button")
-    ?.addEventListener("click", (): void => {
-      setOpen(false);
-      openAuth("register");
-    });
-  document.addEventListener("keydown", (event: KeyboardEvent): void => {
+    globalThis.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const openAuthFromMenu = (mode: AuthMode): void => {
+    setOpen(false);
+    openAuth(mode);
+  };
+  const handleKeydown = (event: KeyboardEvent): void => {
     if (!mobileMenu.classList.contains("mobile-menu--open")) return;
     if (event.key === "Escape") {
       setOpen(false);
       return;
     }
     if (event.key !== "Tab") return;
+
     const focusable: HTMLElement[] = [
       ...mobileMenu.querySelectorAll<HTMLElement>("a, button"),
     ];
     const first: HTMLElement | undefined = focusable[0];
     const last: HTMLElement | undefined = focusable.at(-1);
+
     if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
       last?.focus();
@@ -65,13 +50,44 @@ export const setupMobileMenu = (
       event.preventDefault();
       first?.focus();
     }
+  };
+  const closeWhenMenuToggleIsHidden = (): void => {
+    const isMenuOpen: boolean =
+      mobileMenu.classList.contains("mobile-menu--open");
+    const isMenuToggleHidden: boolean =
+      getComputedStyle(menuToggle).display === "none";
+
+    if (isMenuOpen && isMenuToggleHidden) setOpen(false);
+  };
+
+  menuToggle.addEventListener("click", (): void => {
+    setOpen(true);
   });
-  const resizeObserver: ResizeObserver = new ResizeObserver((): void => {
-    if (
-      getComputedStyle(menuToggle).display === "none" &&
-      mobileMenu.classList.contains("mobile-menu--open")
-    )
-      setOpen(false);
+  closeButton?.addEventListener("click", (): void => {
+    setOpen(false);
   });
+  for (const link of mobileMenu.querySelectorAll<HTMLAnchorElement>(
+    ":scope .mobile-menu__navigation a",
+  )) {
+    link.addEventListener("click", closeAndScrollToTop);
+  }
+  mobileMenu
+    .querySelector(".mobile-menu__logo")
+    ?.addEventListener("click", closeAndScrollToTop);
+  mobileMenu
+    .querySelector(".mobile-menu__login-button")
+    ?.addEventListener("click", (): void => {
+      openAuthFromMenu("login");
+    });
+  mobileMenu
+    .querySelector(".mobile-menu__signup-button")
+    ?.addEventListener("click", (): void => {
+      openAuthFromMenu("register");
+    });
+  document.addEventListener("keydown", handleKeydown);
+
+  const resizeObserver: ResizeObserver = new ResizeObserver(
+    closeWhenMenuToggleIsHidden,
+  );
   resizeObserver.observe(menuToggle);
 };

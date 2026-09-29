@@ -1,0 +1,322 @@
+@use "../../styles/tokens";
+
+$game-details-dialog-backdrop: rgba(tokens.$bg-footer, 0.65);
+$game-details-dialog-animation-duration: 200ms;
+
+.game-details-dialog {
+  width: min(tokens.$game-details-dialog-width, calc(100% - tokens.$size-4));
+  max-width: none;
+  max-height: calc(100dvh - tokens.$size-4);
+  margin: auto;
+  padding: 0;
+  overflow-y: auto;
+
+  color: tokens.$on-bg;
+  background-color: tokens.$bg;
+  border: 0;
+  border-radius: tokens.$corner-extra-large;
+  box-shadow: tokens.$level-2;
+
+  &[open] {
+    animation: game-details-dialog-enter $game-details-dialog-animation-duration
+      ease-out;
+  }
+
+  &::backdrop {
+    background-color: $game-details-dialog-backdrop;
+    animation: game-details-backdrop-enter
+      $game-details-dialog-animation-duration ease-out;
+  }
+
+  &--closing[open] {
+    animation: game-details-dialog-leave $game-details-dialog-animation-duration
+      ease-in forwards;
+  }
+
+  &--closing::backdrop {
+    animation: game-details-backdrop-leave
+      $game-details-dialog-animation-duration ease-in forwards;
+  }
+
+  &__hero {
+    position: relative;
+    width: 100%;
+    height: tokens.$game-details-dialog-hero-height;
+    flex: 0 0 auto;
+    overflow: hidden;
+    border-radius: tokens.$corner-extra-large tokens.$corner-extra-large 0 0;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$size-3;
+    padding: tokens.$size-3;
+  }
+
+  &__cover {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  h2 {
+    margin: 0;
+    color: tokens.$on-primary;
+    font-size: tokens.$display-medium;
+  }
+
+  &__title-row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: tokens.$size-2;
+  }
+
+  &__ratings {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: tokens.$size-2;
+  }
+
+  &__rating-item {
+    display: flex;
+    align-items: center;
+    gap: tokens.$size-05;
+
+    color: tokens.$on-primary;
+    font-size: tokens.$label-large;
+    font-weight: tokens.$bold;
+    line-height: normal;
+  }
+
+  &__rating-icon {
+    display: block;
+  }
+
+  &__description {
+    width: 100%;
+    margin: 0;
+    color: tokens.$on-bg;
+    font-size: tokens.$body-medium;
+    line-height: tokens.$game-details-description-line-height;
+  }
+
+  &__close {
+    position: absolute;
+    top: tokens.$size-2;
+    right: tokens.$size-2;
+    display: flex;
+    width: tokens.$size-5;
+    height: tokens.$size-5;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+
+    background-color: tokens.$white;
+    border: tokens.$border-width-medium solid tokens.$on-primary;
+    border-radius: tokens.$corner-full;
+    box-shadow: tokens.$game-details-close-shadow;
+
+    cursor: pointer;
+
+    img {
+      display: block;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: tokens.$surface;
+      }
+    }
+
+    &:active {
+      background-color: tokens.$primary-low;
+    }
+
+    &:focus-visible {
+      outline-offset: tokens.$size-05;
+    }
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: tokens.$size-2;
+    width: 100%;
+    margin: 0;
+
+    div {
+      min-width: 0;
+      padding: tokens.$size-1 tokens.$size-2;
+      background-color: tokens.$white;
+      border: tokens.$border-width-thin solid tokens.$outline-variant;
+      border-radius: tokens.$corner-small;
+      box-shadow: tokens.$game-details-info-widget-shadow;
+    }
+
+    dt {
+      font-size: tokens.$label-medium;
+      font-weight: tokens.$regular;
+      line-height: normal;
+    }
+
+    dd {
+      margin: tokens.$size-05 0 0;
+      color: tokens.$on-primary;
+      font-size: tokens.$label-large;
+      font-weight: tokens.$bold;
+      line-height: normal;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    width: 100%;
+    gap: tokens.$size-2;
+  }
+
+  &__play,
+  &__favorite {
+    display: inline-flex;
+    height: tokens.$size-6;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    gap: tokens.$size-1;
+    padding: tokens.$btn-large-y tokens.$btn-large-x;
+
+    color: tokens.$on-primary;
+    border-radius: tokens.$corner-medium;
+    box-shadow: tokens.$level-1;
+
+    cursor: pointer;
+    font-size: tokens.$label-extra-large;
+    font-weight: tokens.$bold;
+    line-height: normal;
+    white-space: nowrap;
+  }
+
+  &__play {
+    color: tokens.$on-primary;
+    background-color: tokens.$primary;
+    border: tokens.$border-width-medium solid tokens.$on-primary;
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: tokens.$primary-high;
+      }
+    }
+
+    &:active {
+      background-color: tokens.$primary-low;
+    }
+  }
+
+  &__favorite {
+    background-color: tokens.$white;
+    border: tokens.$border-width-thin solid tokens.$outline-variant;
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: tokens.$surface;
+      }
+    }
+
+    &:active {
+      background-color: tokens.$primary-low;
+    }
+
+    &:focus-visible {
+      outline-offset: tokens.$size-05;
+    }
+
+    &--active {
+      color: tokens.$black;
+      box-shadow: tokens.$game-details-favorite-active-shadow;
+    }
+  }
+
+  &__favorite-icon {
+    display: block;
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: tokens.$library-game-card-stacked-breakpoint) {
+  .game-details-dialog {
+    width: 100%;
+  }
+
+  .game-details-dialog__info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .game-details-dialog__title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: tokens.$size-1;
+  }
+
+  .game-details-dialog__favorite {
+    width: tokens.$size-6;
+    flex: 0 0 tokens.$size-6;
+    padding: 0;
+  }
+
+  .game-details-dialog__favorite-label {
+    display: none;
+  }
+
+  .game-details-dialog__close {
+    width: tokens.$size-4;
+    height: tokens.$size-4;
+  }
+}
+
+@keyframes game-details-dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(tokens.$size-2);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes game-details-dialog-leave {
+  to {
+    opacity: 0;
+    transform: translateY(tokens.$size-2);
+  }
+}
+
+@keyframes game-details-backdrop-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes game-details-backdrop-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-details-dialog[open],
+  .game-details-dialog::backdrop {
+    animation: none;
+  }
+}
