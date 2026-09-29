@@ -1,10 +1,8 @@
 export const sortOptions: readonly string[] = [
-  "Rating",
-  "Most Popular",
-  "Newest",
-  "Price: Low to High",
-  "Price: High to Low",
-  "Name: A to Z",
+  "Rating ↑",
+  "Rating ↓",
+  "Name A→Z",
+  "Name Z→A",
 ];
 
-export const defaultSortOption: string = sortOptions[0];
+export const defaultSortOption: string = "Rating ↓";
