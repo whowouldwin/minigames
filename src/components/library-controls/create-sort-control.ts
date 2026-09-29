@@ -1,4 +1,7 @@
 import { defaultSortOption, sortOptions } from "./sort-options";
+import sortArrowDown from "../../assets/icons/sort-arrow-down.svg";
+import sortArrowUp from "../../assets/icons/sort-arrow-up.svg";
+import sortOptionCheck from "../../assets/icons/sort-option-check.svg";
 
 const updateOptionStates = (
   options: HTMLButtonElement[],
@@ -26,8 +29,9 @@ export const createSortControl = (): HTMLDivElement => {
   const selectedLabel: HTMLSpanElement = document.createElement("span");
   selectedLabel.className = "library-controls__sort-label";
 
-  const arrow: HTMLSpanElement = document.createElement("span");
+  const arrow: HTMLImageElement = document.createElement("img");
   arrow.className = "library-controls__sort-arrow";
+  arrow.alt = "";
   arrow.setAttribute("aria-hidden", "true");
 
   trigger.append(selectedLabel, arrow);
@@ -43,11 +47,21 @@ export const createSortControl = (): HTMLDivElement => {
     const option: HTMLButtonElement = document.createElement("button");
     option.className = "library-controls__sort-option";
     option.type = "button";
-    option.textContent = label;
     option.setAttribute("role", "option");
 
+    const check: HTMLImageElement = document.createElement("img");
+    check.className = "library-controls__sort-check";
+    check.src = sortOptionCheck;
+    check.alt = "";
+    check.setAttribute("aria-hidden", "true");
+
+    const optionLabel: HTMLSpanElement = document.createElement("span");
+    optionLabel.textContent = label;
+
+    option.append(check, optionLabel);
+
     option.addEventListener("click", (): void => {
-      selectedLabel.textContent = `Sort by: ${label} ↓`;
+      selectedLabel.textContent = `Sort by: ${label}`;
       updateOptionStates(options, label);
       closeListbox();
       trigger.focus();
@@ -66,12 +80,18 @@ export const createSortControl = (): HTMLDivElement => {
   const closeListbox = (): void => {
     listbox.hidden = true;
     trigger.setAttribute("aria-expanded", "false");
+    updateArrow();
     document.removeEventListener("click", handleOutsideClick);
+  };
+
+  const updateArrow = (): void => {
+    arrow.src = listbox.hidden ? sortArrowDown : sortArrowUp;
   };
 
   const openListbox = (): void => {
     listbox.hidden = false;
     trigger.setAttribute("aria-expanded", "true");
+    updateArrow();
     document.addEventListener("click", handleOutsideClick);
     options
       .find(
@@ -81,8 +101,9 @@ export const createSortControl = (): HTMLDivElement => {
       ?.focus();
   };
 
-  selectedLabel.textContent = `Sort by: ${defaultSortOption} ↓`;
+  selectedLabel.textContent = `Sort by: ${defaultSortOption}`;
   updateOptionStates(options, defaultSortOption);
+  updateArrow();
 
   trigger.addEventListener("click", (): void => {
     if (listbox.hidden) {
