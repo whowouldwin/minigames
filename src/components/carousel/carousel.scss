@@ -146,6 +146,13 @@ $carousel-transition-duration: 450ms;
     user-select: none;
 
     --carousel-transition-duration: #{$carousel-transition-duration};
+
+    .request-skeleton,
+    .request-feedback {
+      grid-column: 1 / -1;
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .game-card {
