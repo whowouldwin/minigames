@@ -4,7 +4,10 @@ export const API_BASE_URL =
   "https://faxb76kxra.execute-api.eu-central-1.amazonaws.com/api";
 
 export const apiAssetUrl = (path: string): string =>
-  new URL(path, `${API_BASE_URL}/`).href;
+  new URL(
+    path.replace(/^\/+/, ""),
+    new URL(import.meta.env.BASE_URL, globalThis.location.origin),
+  ).href;
 
 export class ApiError extends Error {
   readonly status: number;

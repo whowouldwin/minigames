@@ -6,6 +6,7 @@ import { updateNavigationState } from "../components/navigation/create-navigatio
 import { createHomePage } from "../pages/home";
 import { createLibraryPage } from "../pages/library";
 import type { AppPage } from "../types/app-page";
+import { createSnackbar } from "../components/ui/snackbar";
 
 export const createApp = (): HTMLDivElement => {
   const app: HTMLDivElement = document.createElement("div");
@@ -14,26 +15,28 @@ export const createApp = (): HTMLDivElement => {
   const auth: ReturnType<typeof createAuthDialog> = createAuthDialog();
   const gameDetails: ReturnType<typeof createGameDetailsDialog> =
     createGameDetailsDialog();
+  const snackbar = createSnackbar();
   const pageOutlet: HTMLDivElement = document.createElement("div");
   pageOutlet.className = "app__page";
 
   const navigateTo = (page: AppPage): void => {
     const nextPage: HTMLElement =
       page === "home"
-        ? createHomePage(gameDetails.open, navigateTo)
+        ? createHomePage(gameDetails.open, navigateTo, snackbar)
         : createLibraryPage(gameDetails.open);
     pageOutlet.replaceChildren(nextPage);
     updateNavigationState(header, page);
   };
 
   const header: HTMLElement = createHeader(auth.open, "home", navigateTo);
-  pageOutlet.append(createHomePage(gameDetails.open, navigateTo));
+  pageOutlet.append(createHomePage(gameDetails.open, navigateTo, snackbar));
   app.append(
     header,
     pageOutlet,
     createFooter(navigateTo),
     auth.element,
     gameDetails.element,
+    snackbar.element,
   );
 
   return app;
