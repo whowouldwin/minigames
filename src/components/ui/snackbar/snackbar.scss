@@ -1,0 +1,59 @@
+@use "../../../styles/tokens";
+
+.snackbar-host {
+  position: fixed;
+  z-index: 20;
+  right: tokens.$size-3;
+  bottom: tokens.$size-3;
+  pointer-events: none;
+}
+
+.snackbar {
+  display: flex;
+  max-width: min(420px, calc(100vw - #{tokens.$size-4}));
+  align-items: center;
+  gap: tokens.$size-2;
+  padding: tokens.$size-2 tokens.$size-3;
+  border: tokens.$border-width-medium solid tokens.$on-primary;
+  border-radius: tokens.$corner-medium;
+  background: tokens.$bg-footer;
+  box-shadow: tokens.$level-2;
+  color: tokens.$white;
+  pointer-events: auto;
+
+  &[hidden] {
+    display: none;
+  }
+
+  &--success {
+    background: #1c6b43;
+  }
+
+  &--error {
+    background: tokens.$error;
+  }
+
+  &--warning {
+    background: #815800;
+  }
+
+  &__message {
+    flex: 1;
+    margin: 0;
+  }
+
+  &__close {
+    display: inline-grid;
+    width: tokens.$size-3;
+    height: tokens.$size-3;
+    flex: 0 0 tokens.$size-3;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: tokens.$headline-medium;
+    line-height: 1;
+  }
+}

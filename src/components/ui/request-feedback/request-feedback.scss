@@ -1,0 +1,110 @@
+@use "../../../styles/tokens";
+
+.request-skeleton {
+  display: grid;
+  gap: tokens.$size-2;
+
+  &__item {
+    min-height: tokens.$size-5;
+    border-radius: tokens.$corner-small;
+    background: linear-gradient(
+      90deg,
+      tokens.$outline 25%,
+      tokens.$bg 50%,
+      tokens.$outline 75%
+    );
+    background-size: 200% 100%;
+    animation: request-skeleton-shimmer 1.4s ease-in-out infinite;
+  }
+
+  &--cards {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    min-height: 384px;
+
+    .request-skeleton__item {
+      min-height: 384px;
+      border: tokens.$border-width-medium solid tokens.$on-primary;
+      border-radius: tokens.$corner-extra-large;
+    }
+  }
+
+  &--rows .request-skeleton__item {
+    min-height: tokens.$size-9;
+  }
+
+  &--table {
+    gap: 0;
+
+    .request-skeleton__item {
+      min-height: tokens.$size-9;
+      border-radius: 0;
+    }
+  }
+
+  &--dialog {
+    .request-skeleton__item {
+      min-height: tokens.$size-6;
+    }
+  }
+}
+
+.request-feedback {
+  display: flex;
+  min-height: tokens.$size-9;
+  align-items: center;
+  justify-content: center;
+  gap: tokens.$size-2;
+  padding: tokens.$size-3;
+  border: tokens.$border-width-medium solid tokens.$on-primary;
+  border-radius: tokens.$corner-medium;
+  color: tokens.$on-primary;
+  text-align: center;
+
+  p {
+    margin: 0;
+  }
+
+  &--empty {
+    background: tokens.$surface-low;
+  }
+
+  &--error {
+    flex-wrap: wrap;
+    background: #fff0ef;
+  }
+
+  &__retry {
+    min-height: tokens.$size-5;
+    padding: tokens.$size-1 tokens.$size-2;
+    border: tokens.$border-width-medium solid tokens.$on-primary;
+    border-radius: tokens.$corner-small;
+    background: tokens.$primary;
+    color: tokens.$on-primary;
+    cursor: pointer;
+    font-weight: tokens.$bold;
+  }
+}
+
+@keyframes request-skeleton-shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+@media (max-width: tokens.$breakpoint-compact-desktop) {
+  .request-skeleton--cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: tokens.$breakpoint-mobile) {
+  .request-skeleton--cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .request-skeleton__item {
+    animation: none;
+  }
+}
