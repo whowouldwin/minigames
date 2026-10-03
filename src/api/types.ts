@@ -14,6 +14,23 @@ export interface GameSummary {
   cardImage: string;
 }
 
+export type GameCategorySlug =
+  "all" | "puzzle" | "card" | "match" | "farm" | "strategy" | "arcade";
+
+export interface GameCategory {
+  slug: GameCategorySlug;
+  label: string;
+  isDefault: boolean;
+}
+
+export type GameSortValue =
+  "rating-desc" | "rating-asc" | "name-asc" | "name-desc";
+
+export interface LibraryGamesQuery {
+  category: GameCategorySlug;
+  sort: GameSortValue;
+}
+
 export interface LeaderboardPlayer {
   rank: number;
   playerName: string;
