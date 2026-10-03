@@ -15,7 +15,7 @@ export const createHomePage = (
   main.append(
     createHero(navigateTo),
     createCarousel(openGameDetails, snackbar),
-    createLeaderboard(),
+    createLeaderboard(snackbar),
     createGameDevelopment(),
   );
 
