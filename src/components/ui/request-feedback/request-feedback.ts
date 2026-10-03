@@ -1,6 +1,7 @@
 import "./request-feedback.scss";
 
-export type SkeletonKind = "cards" | "game-list" | "rows" | "table" | "dialog";
+export type SkeletonKind =
+  "cards" | "chips" | "game-list" | "rows" | "table" | "dialog";
 
 export const createRequestSkeleton = (
   label: string,

@@ -6,7 +6,7 @@ import type {
   LibraryGamesQuery,
 } from "./types";
 
-const defaultLibraryGamesQuery: LibraryGamesQuery = {
+export const DEFAULT_LIBRARY_GAMES_QUERY: LibraryGamesQuery = {
   category: "all",
   sort: "rating-desc",
 };
@@ -17,7 +17,7 @@ export const getFeaturedGames = (
   requestApi<GameSummary[]>("games?featured=true", signal);
 
 export const getLibraryGames = (
-  query: LibraryGamesQuery = defaultLibraryGamesQuery,
+  query: LibraryGamesQuery = DEFAULT_LIBRARY_GAMES_QUERY,
   signal?: AbortSignal,
 ): Promise<ApiResponse<GameSummary[]>> => {
   const search = new URLSearchParams({

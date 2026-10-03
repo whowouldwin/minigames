@@ -1,4 +1,5 @@
 import { getErrorMessage, getLibraryGames } from "../../api";
+import type { LibraryGamesQuery } from "../../api";
 import {
   createEmptyState,
   createErrorState,
@@ -12,10 +13,15 @@ import {
 
 import "./library-game-list.scss";
 
+interface LibraryGameListController {
+  element: HTMLElement;
+  load: (query: LibraryGamesQuery) => Promise<void>;
+}
+
 export const createLibraryGameList = (
   openDetails: () => void,
   snackbar: SnackbarController,
-): HTMLElement => {
+): LibraryGameListController => {
   const section: HTMLElement = document.createElement("section");
   section.className = "library-game-list";
   section.setAttribute("aria-label", "Games");
@@ -25,15 +31,21 @@ export const createLibraryGameList = (
 
   section.append(list);
 
-  const loadGames = async (): Promise<void> => {
+  let requestController: AbortController | undefined;
+
+  const loadGames = async (query: LibraryGamesQuery): Promise<void> => {
+    requestController?.abort();
+    const controller = new AbortController();
+    requestController = controller;
+
     showLibraryGameListState(
       list,
       createRequestSkeleton("Loading library games", "game-list", 6),
     );
 
     try {
-      const response = await getLibraryGames();
-      if (!section.isConnected) return;
+      const response = await getLibraryGames(query, controller.signal);
+      if (!section.isConnected || controller.signal.aborted) return;
 
       if (response.data.length === 0) {
         showLibraryGameListState(
@@ -45,7 +57,7 @@ export const createLibraryGameList = (
 
       renderLibraryGames(list, response.data, openDetails);
     } catch (error) {
-      if (!section.isConnected) return;
+      if (!section.isConnected || controller.signal.aborted) return;
 
       const message = getErrorMessage(
         error,
@@ -54,12 +66,10 @@ export const createLibraryGameList = (
       snackbar.show("The library games could not be loaded.", "error");
       showLibraryGameListState(
         list,
-        createErrorState(message, (): void => void loadGames()),
+        createErrorState(message, (): void => void loadGames(query)),
       );
     }
   };
 
-  void loadGames();
-
-  return section;
+  return { element: section, load: loadGames };
 };

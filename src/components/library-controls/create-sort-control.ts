@@ -1,21 +1,25 @@
+import type { GameSortValue } from "../../api";
 import { defaultSortOption, sortOptions } from "./sort-options";
+import type { SortOption } from "./sort-options";
 import sortArrowDown from "../../assets/icons/sort-arrow-down.svg";
 import sortArrowUp from "../../assets/icons/sort-arrow-up.svg";
 import sortOptionCheck from "../../assets/icons/sort-option-check.svg";
 
 const updateOptionStates = (
   options: HTMLButtonElement[],
-  selected: string,
+  selected: GameSortValue,
 ): void => {
   for (const option of options) {
     option.setAttribute(
       "aria-selected",
-      String(option.textContent === selected),
+      String(option.dataset.sortValue === selected),
     );
   }
 };
 
-export const createSortControl = (): HTMLDivElement => {
+export const createSortControl = (
+  onChange: (sort: GameSortValue) => void,
+): HTMLDivElement => {
   const container: HTMLDivElement = document.createElement("div");
   container.className = "library-controls__sort";
 
@@ -43,33 +47,37 @@ export const createSortControl = (): HTMLDivElement => {
   listbox.setAttribute("aria-label", "Sort games");
   listbox.hidden = true;
 
-  const options: HTMLButtonElement[] = sortOptions.map((label: string) => {
-    const option: HTMLButtonElement = document.createElement("button");
-    option.className = "library-controls__sort-option";
-    option.type = "button";
-    option.setAttribute("role", "option");
+  const options: HTMLButtonElement[] = sortOptions.map(
+    (sortOption: SortOption) => {
+      const option: HTMLButtonElement = document.createElement("button");
+      option.className = "library-controls__sort-option";
+      option.type = "button";
+      option.setAttribute("role", "option");
+      option.dataset.sortValue = sortOption.value;
 
-    const check: HTMLImageElement = document.createElement("img");
-    check.className = "library-controls__sort-check";
-    check.src = sortOptionCheck;
-    check.alt = "";
-    check.setAttribute("aria-hidden", "true");
+      const check: HTMLImageElement = document.createElement("img");
+      check.className = "library-controls__sort-check";
+      check.src = sortOptionCheck;
+      check.alt = "";
+      check.setAttribute("aria-hidden", "true");
 
-    const optionLabel: HTMLSpanElement = document.createElement("span");
-    optionLabel.textContent = label;
+      const optionLabel: HTMLSpanElement = document.createElement("span");
+      optionLabel.textContent = sortOption.label;
 
-    option.append(check, optionLabel);
+      option.append(check, optionLabel);
 
-    option.addEventListener("click", (): void => {
-      selectedLabel.textContent = `Sort by: ${label}`;
-      updateOptionStates(options, label);
-      closeListbox();
-      trigger.focus();
-    });
+      option.addEventListener("click", (): void => {
+        selectedLabel.textContent = `Sort by: ${sortOption.label}`;
+        updateOptionStates(options, sortOption.value);
+        onChange(sortOption.value);
+        closeListbox();
+        trigger.focus();
+      });
 
-    listbox.append(option);
-    return option;
-  });
+      listbox.append(option);
+      return option;
+    },
+  );
 
   const handleOutsideClick = (event: MouseEvent): void => {
     if (!container.contains(event.target as Node)) {
@@ -101,8 +109,8 @@ export const createSortControl = (): HTMLDivElement => {
       ?.focus();
   };
 
-  selectedLabel.textContent = `Sort by: ${defaultSortOption}`;
-  updateOptionStates(options, defaultSortOption);
+  selectedLabel.textContent = `Sort by: ${defaultSortOption.label}`;
+  updateOptionStates(options, defaultSortOption.value);
   updateArrow();
 
   trigger.addEventListener("click", (): void => {
