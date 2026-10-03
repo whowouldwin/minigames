@@ -1,16 +1,101 @@
-import data from "./leaderboard-data.json";
+import { getErrorMessage, getLeaderboard } from "../../api";
+import type { LeaderboardPlayer } from "../../api";
+import {
+  createEmptyState,
+  createErrorState,
+  createRequestSkeleton,
+} from "../ui/request-feedback";
 import "./leaderboard.scss";
 
-interface Player {
-  rank: number;
-  playerName: string;
-  gamesPlayed: number;
-  totalScore: number;
-  streakDays: number;
-  favoriteGameName: string;
-}
+const createCell = (text: string): HTMLTableCellElement => {
+  const cell: HTMLTableCellElement = document.createElement("td");
+  cell.textContent = text;
+  return cell;
+};
 
-const initials: readonly string[] = ["AP", "CG", "MM", "BP", "SG"];
+const getInitials = (name: string): string => {
+  const parts = name.split(/[\s_-]+/).filter(Boolean);
+  return parts.length > 1
+    ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+    : (parts[0] ?? "?").slice(0, 2).toUpperCase();
+};
+
+const createPlayerCell = (player: LeaderboardPlayer): HTMLTableCellElement => {
+  const cell: HTMLTableCellElement = document.createElement("td");
+  const playerElement: HTMLSpanElement = document.createElement("span");
+  playerElement.className = "leaderboard__player";
+
+  const avatar: HTMLSpanElement = document.createElement("span");
+  avatar.className = `leaderboard__avatar leaderboard__avatar--${player.rank}`;
+  avatar.setAttribute("aria-hidden", "true");
+  avatar.textContent = getInitials(player.playerName);
+
+  const name: HTMLSpanElement = document.createElement("span");
+  name.className = "leaderboard__name";
+  name.textContent = player.playerName;
+  playerElement.append(avatar, name);
+  cell.append(playerElement);
+
+  return cell;
+};
+
+const createScoreCell = (score: number): HTMLTableCellElement => {
+  const cell: HTMLTableCellElement = document.createElement("td");
+  const fullScore: HTMLSpanElement = document.createElement("span");
+  fullScore.className = "leaderboard__full-score";
+  fullScore.textContent = score.toLocaleString("en-US");
+
+  const compactScore: HTMLSpanElement = document.createElement("span");
+  compactScore.className = "leaderboard__compact-score";
+  compactScore.textContent = new Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(score);
+  cell.append(fullScore, compactScore);
+
+  return cell;
+};
+
+const createPlayerRow = (player: LeaderboardPlayer): HTMLTableRowElement => {
+  const row: HTMLTableRowElement = document.createElement("tr");
+  const rank: HTMLTableCellElement = createCell(`#${player.rank}`);
+  rank.classList.add("leaderboard__rank");
+
+  const games: HTMLTableCellElement = createCell(String(player.gamesPlayed));
+  games.classList.add("leaderboard__games");
+
+  const streak: HTMLTableCellElement = createCell(`🔥 ${player.streakDays}`);
+  streak.classList.add("leaderboard__streak");
+
+  const favorite: HTMLTableCellElement = createCell(player.favoriteGameName);
+  favorite.classList.add("leaderboard__favorite");
+  const badge: HTMLSpanElement = document.createElement("span");
+  badge.className = "leaderboard__badge";
+  badge.textContent = player.favoriteGameName;
+  favorite.replaceChildren(badge);
+
+  row.append(
+    rank,
+    createPlayerCell(player),
+    games,
+    createScoreCell(player.totalScore),
+    streak,
+    favorite,
+  );
+  return row;
+};
+
+const createStateRow = (content: HTMLElement): HTMLTableRowElement => {
+  const row: HTMLTableRowElement = document.createElement("tr");
+  row.className = "leaderboard__state-row";
+
+  const cell: HTMLTableCellElement = document.createElement("td");
+  cell.colSpan = 6;
+  cell.append(content);
+  row.append(cell);
+
+  return row;
+};
 
 export const createLeaderboard = (): HTMLElement => {
   const section: HTMLElement = document.createElement("section");
@@ -28,18 +113,50 @@ export const createLeaderboard = (): HTMLElement => {
         </tr></thead><tbody></tbody>
       </table>
     </div>`;
+
   const body: HTMLTableSectionElement | null = section.querySelector("tbody");
-  for (const player of data.data as Player[]) {
-    const row: HTMLTableRowElement = document.createElement("tr");
-    const compactScore: string = `${Math.floor(player.totalScore / 100) / 10}K`;
-    row.innerHTML = `
-      <td>#${player.rank}</td>
-      <td><span class="leaderboard__player"><span class="leaderboard__avatar leaderboard__avatar--${player.rank}" aria-hidden="true">${initials[player.rank - 1]}</span><span class="leaderboard__name">${player.playerName}</span></span></td>
-      <td class="leaderboard__games">${player.gamesPlayed}</td>
-      <td><span class="leaderboard__full-score">${player.totalScore.toLocaleString("en-US")}</span><span class="leaderboard__compact-score">${compactScore}</span></td>
-      <td>🔥 ${player.streakDays}<span class="leaderboard__desktop"> days</span><span class="leaderboard__compact">d</span></td>
-      <td class="leaderboard__favorite"><span class="leaderboard__badge">${player.favoriteGameName}</span></td>`;
-    body?.append(row);
-  }
+  if (!body) return section;
+
+  const loadPlayers = async (): Promise<void> => {
+    body.replaceChildren(
+      createStateRow(createRequestSkeleton("Loading leaderboard", "table", 5)),
+    );
+
+    try {
+      const response = await getLeaderboard();
+      if (!section.isConnected) return;
+
+      if (response.data.length === 0) {
+        body.replaceChildren(
+          createStateRow(
+            createEmptyState("No leaderboard players are available yet."),
+          ),
+        );
+        return;
+      }
+
+      body.replaceChildren(
+        ...response.data.map((player: LeaderboardPlayer) =>
+          createPlayerRow(player),
+        ),
+      );
+    } catch (error) {
+      if (!section.isConnected) return;
+
+      const message = getErrorMessage(
+        error,
+        "The leaderboard could not be loaded.",
+      );
+      body.replaceChildren(
+        createStateRow(
+          createErrorState(message, (): void => {
+            void loadPlayers();
+          }),
+        ),
+      );
+    }
+  };
+
+  void loadPlayers();
   return section;
 };
