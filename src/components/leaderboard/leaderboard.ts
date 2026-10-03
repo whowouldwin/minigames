@@ -5,6 +5,7 @@ import {
   createErrorState,
   createRequestSkeleton,
 } from "../ui/request-feedback";
+import type { SnackbarController } from "../ui/snackbar";
 import "./leaderboard.scss";
 
 const createCell = (text: string): HTMLTableCellElement => {
@@ -97,7 +98,9 @@ const createStateRow = (content: HTMLElement): HTMLTableRowElement => {
   return row;
 };
 
-export const createLeaderboard = (): HTMLElement => {
+export const createLeaderboard = (
+  snackbar: SnackbarController,
+): HTMLElement => {
   const section: HTMLElement = document.createElement("section");
   section.className = "leaderboard";
   section.setAttribute("aria-labelledby", "leaderboard-title");
@@ -147,6 +150,7 @@ export const createLeaderboard = (): HTMLElement => {
         error,
         "The leaderboard could not be loaded.",
       );
+      snackbar.show("The leaderboard could not be loaded.", "error");
       body.replaceChildren(
         createStateRow(
           createErrorState(message, (): void => {
