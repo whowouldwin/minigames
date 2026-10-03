@@ -28,6 +28,16 @@
     }
   }
 
+  &--game-list {
+    grid-template-columns: minmax(0, 1fr);
+
+    .request-skeleton__item {
+      min-height: tokens.$library-game-card-tablet-height;
+      border: tokens.$library-game-card-border-width solid tokens.$on-primary;
+      border-radius: tokens.$corner-large;
+    }
+  }
+
   &--rows .request-skeleton__item {
     min-height: tokens.$size-9;
   }
@@ -97,9 +107,21 @@
   }
 }
 
+@media (min-width: tokens.$library-game-card-grid-breakpoint) {
+  .request-skeleton--game-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: tokens.$breakpoint-mobile) {
   .request-skeleton--cards {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: tokens.$library-game-card-stacked-breakpoint) {
+  .request-skeleton--game-list .request-skeleton__item {
+    min-height: tokens.$library-game-card-mobile-height;
   }
 }
 

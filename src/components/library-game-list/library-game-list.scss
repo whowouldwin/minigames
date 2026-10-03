@@ -13,6 +13,10 @@
     padding: 0;
     list-style: none;
   }
+
+  &__state {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (min-width: tokens.$library-game-card-grid-breakpoint) {
