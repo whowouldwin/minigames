@@ -41,9 +41,20 @@ export const createLibraryGameCard = (
 
   const image: HTMLImageElement = document.createElement("img");
   image.className = "library-game-card__image";
-  image.src = game.image;
   image.alt = "";
   image.loading = "lazy";
+  image.addEventListener(
+    "error",
+    (): void => {
+      const placeholder: HTMLDivElement = document.createElement("div");
+      placeholder.className =
+        "library-game-card__image library-game-card__image--unavailable";
+      placeholder.textContent = "Image unavailable";
+      image.replaceWith(placeholder);
+    },
+    { once: true },
+  );
+  image.src = game.image;
 
   const content: HTMLDivElement = document.createElement("div");
   content.className = "library-game-card__content";
