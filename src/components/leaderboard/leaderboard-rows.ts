@@ -1,4 +1,5 @@
 import type { LeaderboardPlayer } from "../../api";
+import { getInitials } from "../../utils/get-initials";
 
 const COLUMN_COUNT = 6;
 const scoreFormatter = new Intl.NumberFormat("en-US");
@@ -19,13 +20,6 @@ const createSpan = (className: string, text: string): HTMLSpanElement => {
   span.className = className;
   span.textContent = text;
   return span;
-};
-
-const getInitials = (name: string): string => {
-  const parts = name.split(/[\s_-]+/).filter(Boolean);
-  return parts.length > 1
-    ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-    : (parts[0] ?? "?").slice(0, 2).toUpperCase();
 };
 
 const createPlayerCell = (player: LeaderboardPlayer): HTMLTableCellElement => {
