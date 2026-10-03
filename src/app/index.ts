@@ -23,7 +23,7 @@ export const createApp = (): HTMLDivElement => {
     const nextPage: HTMLElement =
       page === "home"
         ? createHomePage(gameDetails.open, navigateTo, snackbar)
-        : createLibraryPage(gameDetails.open);
+        : createLibraryPage(gameDetails.open, snackbar);
     pageOutlet.replaceChildren(nextPage);
     updateNavigationState(header, page);
   };

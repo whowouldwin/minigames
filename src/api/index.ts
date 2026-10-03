@@ -1,5 +1,5 @@
 export { appAssetUrl, getErrorMessage } from "./client";
-export { getFeaturedGames } from "./games";
+export { getFeaturedGames, getLibraryGames } from "./games";
 export { getLeaderboard } from "./leaderboard";
 export type {
   ApiResponse,

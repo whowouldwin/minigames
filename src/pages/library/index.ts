@@ -2,8 +2,12 @@ import "./library-page.scss";
 import { createLibraryControls } from "../../components/library-controls";
 import { createLibraryGameList } from "../../components/library-game-list";
 import { createLibraryPagination } from "../../components/library-pagination";
+import type { SnackbarController } from "../../components/ui/snackbar";
 
-export const createLibraryPage = (openGameDetails: () => void): HTMLElement => {
+export const createLibraryPage = (
+  openGameDetails: () => void,
+  snackbar: SnackbarController,
+): HTMLElement => {
   const main: HTMLElement = document.createElement("main");
   main.className = "library-page";
 
@@ -20,7 +24,7 @@ export const createLibraryPage = (openGameDetails: () => void): HTMLElement => {
   main.append(
     section,
     createLibraryControls(),
-    createLibraryGameList(openGameDetails),
+    createLibraryGameList(openGameDetails, snackbar),
     createLibraryPagination(),
   );
 
