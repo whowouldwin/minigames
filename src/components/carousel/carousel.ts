@@ -1,7 +1,7 @@
 import arrowBackIcon from "../../assets/icons/arrow-back.svg";
 import arrowForwardIcon from "../../assets/icons/arrow-forward.svg";
 
-import { getErrorMessage, getFeaturedGames, apiAssetUrl } from "../../api";
+import { appAssetUrl, getErrorMessage, getFeaturedGames } from "../../api";
 import type { GameSummary } from "../../api";
 import {
   createEmptyState,
@@ -22,7 +22,7 @@ const formatCompactCount = (count: number): string =>
 
 const toCardData = (game: GameSummary) => ({
   title: game.name,
-  image: apiAssetUrl(game.cardImage),
+  image: appAssetUrl(game.cardImage),
   rating: game.rating.toFixed(1),
   likes: formatCompactCount(game.likesCount),
 });
