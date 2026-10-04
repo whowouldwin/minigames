@@ -2,17 +2,22 @@ import type { GameSortValue } from "../../api";
 import { handleSortControlKeydown } from "./handle-sort-control-keydown";
 import { createSortControlListbox } from "./create-sort-control-listbox";
 import { createSortControlTrigger } from "./create-sort-control-trigger";
-import { defaultSortOption } from "./sort-options";
+import { defaultSortOption, sortOptions } from "./sort-options";
+
+interface SortControl {
+  element: HTMLDivElement;
+  setValue: (sort: GameSortValue) => void;
+  destroy: () => void;
+}
 
 export const createSortControl = (
   onChange: (sort: GameSortValue) => void,
-): HTMLDivElement => {
+): SortControl => {
   const container: HTMLDivElement = document.createElement("div");
   container.className = "library-controls__sort";
 
   const trigger = createSortControlTrigger();
   const listbox = createSortControlListbox((sortOption): void => {
-    trigger.setLabel(sortOption.label);
     onChange(sortOption.value);
     closeListbox();
     trigger.element.focus();
@@ -41,9 +46,15 @@ export const createSortControl = (
       ?.focus();
   };
 
-  trigger.setLabel(defaultSortOption.label);
+  const setValue = (sort: GameSortValue): void => {
+    const selectedOption =
+      sortOptions.find((option) => option.value === sort) ?? defaultSortOption;
+    trigger.setLabel(selectedOption.label);
+    listbox.setSelected(selectedOption.value);
+  };
+
+  setValue(defaultSortOption.value);
   trigger.setExpanded(false);
-  listbox.setSelected(defaultSortOption.value);
 
   trigger.element.addEventListener("click", (): void => {
     if (listbox.element.hidden) {
@@ -72,5 +83,5 @@ export const createSortControl = (
   });
 
   container.append(trigger.element, listbox.element);
-  return container;
+  return { element: container, setValue, destroy: closeListbox };
 };

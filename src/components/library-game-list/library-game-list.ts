@@ -16,6 +16,7 @@ import "./library-game-list.scss";
 interface LibraryGameListController {
   element: HTMLElement;
   load: (query: LibraryGamesQuery) => Promise<void>;
+  cancel: () => void;
 }
 
 export const createLibraryGameList = (
@@ -83,5 +84,12 @@ export const createLibraryGameList = (
     }
   };
 
-  return { element: section, load: loadGames };
+  return {
+    element: section,
+    load: loadGames,
+    cancel: (): void => {
+      requestController?.abort();
+      requestController = undefined;
+    },
+  };
 };

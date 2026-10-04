@@ -6,10 +6,25 @@ import { createLibraryGameList } from "../../components/library-game-list";
 import { createLibraryPagination } from "../../components/library-pagination";
 import type { SnackbarController } from "../../components/ui/snackbar";
 
+interface LibraryPage {
+  element: HTMLElement;
+  update: (query: LibraryGamesQuery) => void;
+  destroy: () => void;
+}
+
+const isSameQuery = (
+  first: LibraryGamesQuery,
+  second: LibraryGamesQuery,
+): boolean =>
+  first.category === second.category &&
+  first.sort === second.sort &&
+  first.page === second.page;
+
 export const createLibraryPage = (
   openGameDetails: (gameSlug: string) => void,
   snackbar: SnackbarController,
-): HTMLElement => {
+  onQueryChange: (query: LibraryGamesQuery) => void,
+): LibraryPage => {
   const main: HTMLElement = document.createElement("main");
   main.className = "library-page";
 
@@ -24,26 +39,24 @@ export const createLibraryPage = (
 
   section.append(heading, description);
 
-  let selectedQuery: LibraryGamesQuery = DEFAULT_LIBRARY_GAMES_QUERY;
+  let currentQuery: LibraryGamesQuery = DEFAULT_LIBRARY_GAMES_QUERY;
+  let totalPages: number = 1;
   let lastRequestedQuery: LibraryGamesQuery | undefined;
 
   const gameList = createLibraryGameList(
     openGameDetails,
     snackbar,
-    (meta): void => pagination.update(meta.page, meta.totalPages),
+    (meta): void => {
+      totalPages = meta.totalPages;
+      pagination.update(meta.page, totalPages);
+    },
   );
   const pagination = createLibraryPagination((page: number): void => {
-    selectedQuery = { ...selectedQuery, page };
-    loadGames(selectedQuery);
+    onQueryChange({ ...currentQuery, page });
   });
 
   const loadGames = (query: LibraryGamesQuery): void => {
-    if (
-      lastRequestedQuery &&
-      lastRequestedQuery.category === query.category &&
-      lastRequestedQuery.sort === query.sort &&
-      lastRequestedQuery.page === query.page
-    ) {
+    if (lastRequestedQuery && isSameQuery(lastRequestedQuery, query)) {
       return;
     }
 
@@ -53,21 +66,30 @@ export const createLibraryPage = (
 
   const controls = createLibraryControls(
     {
-      onFilterChange: (query: LibraryGamesQuery): void => {
-        selectedQuery = { ...query, page: 1 };
-        loadGames(selectedQuery);
+      onFilterChange: (category): void => {
+        onQueryChange({ ...currentQuery, category, page: 1 });
       },
       onSortChange: (sort): void => {
-        selectedQuery = { ...selectedQuery, sort, page: 1 };
-        loadGames(selectedQuery);
+        onQueryChange({ ...currentQuery, sort, page: 1 });
       },
     },
     snackbar,
   );
 
-  main.append(section, controls, gameList.element, pagination.element);
+  main.append(section, controls.element, gameList.element, pagination.element);
 
-  loadGames(DEFAULT_LIBRARY_GAMES_QUERY);
-
-  return main;
+  return {
+    element: main,
+    update: (query): void => {
+      currentQuery = query;
+      controls.update(query);
+      pagination.update(query.page, totalPages);
+      loadGames(query);
+    },
+    destroy: (): void => {
+      controls.destroy();
+      gameList.cancel();
+      pagination.destroy();
+    },
+  };
 };

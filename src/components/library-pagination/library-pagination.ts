@@ -10,6 +10,7 @@ const VISIBLE_PAGE_LIMIT_PROPERTY = "--library-pagination-page-limit";
 interface LibraryPaginationController {
   element: HTMLElement;
   update: (page: number, totalPages: number) => void;
+  destroy: () => void;
 }
 
 const getVisiblePageLimit = (element: HTMLElement): number => {
@@ -119,5 +120,9 @@ export const createLibraryPagination = (
 
   renderControls();
 
-  return { element: section, update };
+  return {
+    element: section,
+    update,
+    destroy: (): void => resizeObserver.disconnect(),
+  };
 };

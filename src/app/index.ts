@@ -1,35 +1,80 @@
 import { createHeader } from "../components/header";
 import { createFooter } from "../components/footer";
 import { createAuthDialog } from "../components/auth-dialog";
+import type { AuthMode } from "../components/auth-dialog";
 import { createGameDetailsDialog } from "../components/game-details-dialog";
 import { updateNavigationState } from "../components/navigation/create-navigation-list";
 import { createHomePage } from "../pages/home";
 import { createLibraryPage } from "../pages/library";
 import type { AppPage } from "../types/app-page";
 import { createSnackbar } from "../components/ui/snackbar";
+import { createAppRouter, createPageRoute } from "../router";
+import type { AppRoute } from "../router";
+import { createDialogRouteSync } from "./synchronize-dialog-route";
 
-export const createApp = (): HTMLDivElement => {
+interface AppController {
+  element: HTMLDivElement;
+  start: () => void;
+}
+
+export const createApp = (): AppController => {
   const app: HTMLDivElement = document.createElement("div");
   app.className = "app";
 
-  const auth: ReturnType<typeof createAuthDialog> = createAuthDialog();
+  const router = createAppRouter();
+  const openAuth = (mode: AuthMode): void => {
+    router.openDialog({ kind: "auth", mode });
+  };
+  const auth = createAuthDialog({
+    onClose: router.closeDialog,
+    onModeChange: openAuth,
+  });
   const snackbar = createSnackbar();
   const gameDetails: ReturnType<typeof createGameDetailsDialog> =
-    createGameDetailsDialog(snackbar);
+    createGameDetailsDialog(snackbar, router.closeDialog);
+  const synchronizeDialogs = createDialogRouteSync(auth, gameDetails);
   const pageOutlet: HTMLDivElement = document.createElement("div");
   pageOutlet.className = "app__page";
 
-  const navigateTo = (page: AppPage): void => {
-    const nextPage: HTMLElement =
-      page === "home"
-        ? createHomePage(gameDetails.open, navigateTo, snackbar)
-        : createLibraryPage(gameDetails.open, snackbar);
-    pageOutlet.replaceChildren(nextPage);
-    updateNavigationState(header, page);
+  const navigateTo = (page: AppPage): void =>
+    router.navigate(createPageRoute(page));
+  const openGameDetails = (gameSlug: string): void => {
+    router.openDialog({ kind: "game", gameSlug });
   };
 
-  const header: HTMLElement = createHeader(auth.open, "home", navigateTo);
-  pageOutlet.append(createHomePage(gameDetails.open, navigateTo, snackbar));
+  const header = createHeader(openAuth, router.getRoute().page, navigateTo);
+  let activePage: AppPage | undefined;
+  let library: ReturnType<typeof createLibraryPage> | undefined;
+
+  const renderRoute = (route: AppRoute): void => {
+    if (activePage !== route.page) {
+      library?.destroy();
+      library = undefined;
+
+      if (route.page === "library") {
+        library = createLibraryPage(
+          openGameDetails,
+          snackbar,
+          (query): void => {
+            router.navigate({ ...router.getRoute(), library: query });
+          },
+        );
+        pageOutlet.replaceChildren(library.element);
+      } else {
+        pageOutlet.replaceChildren(
+          createHomePage(openGameDetails, navigateTo, snackbar),
+        );
+      }
+
+      activePage = route.page;
+      updateNavigationState(header, route.page);
+    }
+
+    if (route.page === "library") library?.update(route.library);
+    synchronizeDialogs(route.dialog);
+  };
+
+  router.subscribe(renderRoute);
   app.append(
     header,
     pageOutlet,
@@ -39,5 +84,5 @@ export const createApp = (): HTMLDivElement => {
     snackbar.element,
   );
 
-  return app;
+  return { element: app, start: router.start };
 };
