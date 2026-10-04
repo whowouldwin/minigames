@@ -6,6 +6,7 @@ export {
   getLibraryGames,
   getGameDetails,
 } from "./games";
+export type { GameDetailsRequestOptions } from "./games";
 export { getLeaderboard } from "./leaderboard";
 export type {
   ApiResponse,

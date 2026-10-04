@@ -13,9 +13,9 @@ export const createApp = (): HTMLDivElement => {
   app.className = "app";
 
   const auth: ReturnType<typeof createAuthDialog> = createAuthDialog();
-  const gameDetails: ReturnType<typeof createGameDetailsDialog> =
-    createGameDetailsDialog();
   const snackbar = createSnackbar();
+  const gameDetails: ReturnType<typeof createGameDetailsDialog> =
+    createGameDetailsDialog(snackbar);
   const pageOutlet: HTMLDivElement = document.createElement("div");
   pageOutlet.className = "app__page";
 

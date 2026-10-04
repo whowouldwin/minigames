@@ -47,6 +47,28 @@ $game-details-dialog-animation-duration: 200ms;
     border-radius: tokens.$corner-extra-large tokens.$corner-extra-large 0 0;
   }
 
+  &__hero--feedback {
+    height: tokens.$size-7;
+  }
+
+  &__cover[hidden],
+  &__hero-skeleton[hidden] {
+    display: none;
+  }
+
+  &__hero-skeleton {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+
+    .request-skeleton__item {
+      height: 100%;
+      min-height: 100%;
+      border-radius: inherit;
+    }
+  }
+
   &__body {
     display: flex;
     flex-direction: column;

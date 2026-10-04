@@ -1,44 +1,31 @@
+import type { GameDetailsRecord } from "../../api";
+
+import { createEmptyState } from "../ui/request-feedback";
 import "./game-details-top-records.scss";
 
-interface GameRecord {
-  medal: string;
-  player: string;
-  score: string;
-  date: string;
-  daysAgo: number;
-}
-
-const topRecords: GameRecord[] = [
-  {
-    medal: "🥇",
-    player: "ForestSpirit",
-    score: "356,700 pts",
-    date: "2 days ago",
-    daysAgo: 2,
-  },
-  {
-    medal: "🥈",
-    player: "TeaBrewer",
-    score: "332,400pts",
-    date: "5 days ago",
-    daysAgo: 5,
-  },
-  {
-    medal: "🥉",
-    player: "HerbalistPath",
-    score: "308,900 pts",
-    date: "1 week ago",
-    daysAgo: 7,
-  },
-];
+const getMedal = (position: number): string => {
+  switch (position) {
+    case 1: {
+      return "🥇";
+    }
+    case 2: {
+      return "🥈";
+    }
+    case 3: {
+      return "🥉";
+    }
+    default: {
+      return String(position);
+    }
+  }
+};
 
 const createRecordRow = ({
-  medal,
-  player,
+  position,
+  playerName: recordPlayerName,
   score,
-  date,
-  daysAgo,
-}: GameRecord): HTMLLIElement => {
+  achievedAt,
+}: GameDetailsRecord): HTMLLIElement => {
   const row: HTMLLIElement = document.createElement("li");
   row.className = "game-details-records__row";
 
@@ -48,30 +35,32 @@ const createRecordRow = ({
   const medalIcon: HTMLSpanElement = document.createElement("span");
   medalIcon.className = "game-details-records__medal";
   medalIcon.setAttribute("aria-hidden", "true");
-  medalIcon.textContent = medal;
+  medalIcon.textContent = getMedal(position);
 
   const playerName: HTMLSpanElement = document.createElement("span");
   playerName.className = "game-details-records__player-name";
-  playerName.textContent = player;
+  playerName.textContent = recordPlayerName;
   playerInfo.append(medalIcon, playerName);
 
   const scoreLabel: HTMLSpanElement = document.createElement("span");
   scoreLabel.className = "game-details-records__score";
-  scoreLabel.textContent = score;
+  scoreLabel.textContent = `${score.toLocaleString("en-US")} pts`;
 
   const dateLabel: HTMLTimeElement = document.createElement("time");
   dateLabel.className = "game-details-records__date";
-  dateLabel.dateTime = new Date(
-    Date.now() - daysAgo * 24 * 60 * 60 * 1000,
-  ).toISOString();
-  dateLabel.textContent = date;
+  dateLabel.dateTime = achievedAt;
+  dateLabel.textContent = new Intl.DateTimeFormat("en", {
+    dateStyle: "medium",
+  }).format(new Date(achievedAt));
 
   row.append(playerInfo, scoreLabel, dateLabel);
 
   return row;
 };
 
-export const createGameDetailsTopRecords = (): HTMLElement => {
+export const createGameDetailsTopRecords = (
+  records: GameDetailsRecord[],
+): HTMLElement => {
   const section: HTMLElement = document.createElement("section");
   section.className = "game-details-records";
   section.setAttribute("aria-labelledby", "game-details-records-title");
@@ -92,8 +81,15 @@ export const createGameDetailsTopRecords = (): HTMLElement => {
   const recordList: HTMLOListElement = document.createElement("ol");
   recordList.className = "game-details-records__list";
 
-  for (const record of topRecords) {
-    recordList.append(createRecordRow(record));
+  if (records.length === 0) {
+    const emptyRow: HTMLLIElement = document.createElement("li");
+    emptyRow.className = "game-details-records__empty";
+    emptyRow.append(createEmptyState("No top records are available yet."));
+    recordList.append(emptyRow);
+  } else {
+    for (const record of records) {
+      recordList.append(createRecordRow(record));
+    }
   }
 
   section.append(heading, recordList);
