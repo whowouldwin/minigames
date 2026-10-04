@@ -42,6 +42,7 @@ export const createSortControl = (
   };
 
   trigger.setLabel(defaultSortOption.label);
+  trigger.setExpanded(false);
   listbox.setSelected(defaultSortOption.value);
 
   trigger.element.addEventListener("click", (): void => {
