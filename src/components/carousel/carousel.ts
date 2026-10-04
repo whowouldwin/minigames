@@ -21,6 +21,7 @@ const formatCompactCount = (count: number): string =>
   }).format(count);
 
 const toCardData = (game: GameSummary) => ({
+  slug: game.slug,
   title: game.name,
   image: appAssetUrl(game.cardImage),
   rating: game.rating.toFixed(1),
@@ -28,7 +29,7 @@ const toCardData = (game: GameSummary) => ({
 });
 
 export const createCarousel = (
-  openGameDetails: () => void,
+  openGameDetails: (gameSlug: string) => void,
   snackbar: SnackbarController,
 ): HTMLElement => {
   const section: HTMLElement = document.createElement("section");

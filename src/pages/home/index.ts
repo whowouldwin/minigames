@@ -6,7 +6,7 @@ import type { AppPage } from "../../types/app-page";
 import type { SnackbarController } from "../../components/ui/snackbar";
 
 export const createHomePage = (
-  openGameDetails: () => void,
+  openGameDetails: (gameSlug: string) => void,
   navigateTo: (page: AppPage) => void,
   snackbar: SnackbarController,
 ): HTMLElement => {

@@ -2,6 +2,7 @@ import { requestApi } from "./client";
 import type {
   ApiResponse,
   GameCategory,
+  GameDetails,
   GameSummary,
   LibraryGamesMeta,
   LibraryGamesQuery,
@@ -17,6 +18,12 @@ export const getFeaturedGames = (
   signal?: AbortSignal,
 ): Promise<ApiResponse<GameSummary[]>> =>
   requestApi<GameSummary[]>("games?featured=true", signal);
+
+export const getGameDetails = (
+  gameSlug: string,
+  signal?: AbortSignal,
+): Promise<ApiResponse<GameDetails>> =>
+  requestApi<GameDetails>(`games/${encodeURIComponent(gameSlug)}`, signal);
 
 export const getLibraryGames = (
   query: LibraryGamesQuery = DEFAULT_LIBRARY_GAMES_QUERY,

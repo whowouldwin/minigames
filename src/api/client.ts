@@ -25,13 +25,14 @@ const getResponseMessage = async (
 ): Promise<string> => {
   try {
     const body: unknown = await response.json();
-    if (
-      typeof body === "object" &&
-      body !== null &&
-      "message" in body &&
-      typeof body.message === "string"
-    ) {
-      return body.message;
+    if (typeof body === "object" && body !== null) {
+      if ("message" in body && typeof body.message === "string") {
+        return body.message;
+      }
+
+      if ("error" in body && typeof body.error === "string") {
+        return body.error;
+      }
     }
   } catch {
     return fallback;

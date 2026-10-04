@@ -4,6 +4,7 @@ import starIcon from "../../assets/icons/star.svg";
 import "./game-card.scss";
 
 export interface GameCardData {
+  slug: string;
   title: string;
   image: string;
   rating: string;

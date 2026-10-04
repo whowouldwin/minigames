@@ -7,7 +7,7 @@ import { createLibraryPagination } from "../../components/library-pagination";
 import type { SnackbarController } from "../../components/ui/snackbar";
 
 export const createLibraryPage = (
-  openGameDetails: () => void,
+  openGameDetails: (gameSlug: string) => void,
   snackbar: SnackbarController,
 ): HTMLElement => {
   const main: HTMLElement = document.createElement("main");

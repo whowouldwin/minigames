@@ -15,7 +15,7 @@ const wrapIndex = (index: number, length: number): number =>
 export interface CarouselControls {
   track: HTMLElement;
   games: readonly GameCardData[];
-  openGameDetails: () => void;
+  openGameDetails: (gameSlug: string) => void;
   previousButton: HTMLButtonElement;
   nextButton: HTMLButtonElement;
 }
@@ -33,7 +33,7 @@ export const setupCarouselController = ({
     card.setAttribute("aria-label", `Show details for ${game.title}`);
     card.tabIndex = 0;
 
-    card.addEventListener("click", openGameDetails);
+    card.addEventListener("click", (): void => openGameDetails(game.slug));
     card.addEventListener("keydown", (event: KeyboardEvent): void => {
       if (event.key !== "Enter" && event.key !== " ") return;
 

@@ -4,6 +4,7 @@ import starIcon from "../../assets/icons/star.svg";
 import "./library-game-card.scss";
 
 export interface LibraryGame {
+  slug: string;
   title: string;
   category: string;
   price: string;
@@ -33,7 +34,7 @@ const createMetric = (iconSource: string, value: string): HTMLDivElement => {
 export const createLibraryGameCard = (
   game: LibraryGame,
   index: number,
-  openDetails: () => void,
+  openDetails: (gameSlug: string) => void,
 ): HTMLElement => {
   const card: HTMLElement = document.createElement("article");
   card.className = "library-game-card";
@@ -94,7 +95,7 @@ export const createLibraryGameCard = (
   details.className = "library-game-card__details";
   details.type = "button";
   details.textContent = "Details";
-  details.addEventListener("click", openDetails);
+  details.addEventListener("click", (): void => openDetails(game.slug));
 
   header.append(identity, price);
 
