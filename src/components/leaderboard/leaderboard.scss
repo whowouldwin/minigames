@@ -229,6 +229,13 @@ $mobile-streak-width: 70px;
     gap: tokens.$size-2;
     padding: tokens.$size-2 tokens.$size-3;
   }
+  tr.leaderboard__state-row {
+    grid-template-columns: minmax(0, 1fr);
+
+    td {
+      grid-column: 1 / -1;
+    }
+  }
   thead tr {
     padding-block: tokens.$size-3;
     background: tokens.$tertiary;

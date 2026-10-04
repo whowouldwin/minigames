@@ -35,6 +35,18 @@ $library-game-card-category-border-width: 1.5px;
     object-fit: cover;
   }
 
+  &__image--unavailable {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: tokens.$size-2;
+
+    color: tokens.$on-bg;
+    background-color: tokens.$surface-low;
+    font-size: tokens.$label-large;
+    text-align: center;
+  }
+
   &__content {
     display: flex;
     flex: 1;

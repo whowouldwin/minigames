@@ -14,87 +14,16 @@
     line-height: normal;
   }
 
-  &__form {
-    display: flex;
+  &__content {
     width: 100%;
-    align-items: center;
-    gap: tokens.$size-2;
   }
 
-  &__form-avatar,
-  &__submit {
-    display: flex;
-    width: tokens.$size-5;
-    height: tokens.$size-5;
-    flex: 0 0 tokens.$size-5;
-    align-items: center;
-    justify-content: center;
-  }
+  &__skeleton {
+    grid-template-columns: minmax(0, 1fr);
 
-  &__form-avatar {
-    color: tokens.$on-primary;
-    background-color: tokens.$primary;
-    border: tokens.$game-details-comment-border-width solid tokens.$on-primary;
-    border-radius: tokens.$corner-full;
-    font-size: tokens.$label-large;
-    font-weight: tokens.$bold;
-    line-height: normal;
-  }
-
-  &__textarea {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    min-height: tokens.$size-6;
-    max-height: tokens.$size-11;
-    flex: 1 1 auto;
-    overflow-y: hidden;
-    padding: tokens.$size-1 tokens.$size-2;
-    color: tokens.$on-primary;
-    background-color: tokens.$white;
-    border: tokens.$border-width-thin solid tokens.$on-primary;
-    border-radius: tokens.$corner-small;
-
-    font-family: tokens.$Inter;
-    font-size: tokens.$body-small;
-    line-height: normal;
-    resize: none;
-
-    &::placeholder {
-      color: tokens.$on-bg-low;
-      opacity: 1;
-    }
-
-    &:focus-visible {
-      outline-offset: tokens.$size-05;
-    }
-  }
-
-  &__submit {
-    padding: 0;
-    background-color: tokens.$bg-footer-low;
-    border: tokens.$game-details-comment-border-width solid tokens.$on-primary;
-    border-radius: tokens.$corner-small;
-    cursor: pointer;
-
-    img {
-      display: block;
-      width: tokens.$size-3;
-      height: tokens.$size-3;
-    }
-
-    @media (hover: hover) {
-      &:hover {
-        background-color: tokens.$bg-footer-lowest;
-      }
-    }
-
-    &:active {
-      background-color: tokens.$bg-footer;
-    }
-
-    &:focus-visible {
-      outline-offset: tokens.$size-05;
+    .request-skeleton__item {
+      min-height: tokens.$size-8;
+      border-radius: tokens.$corner-medium;
     }
   }
 
@@ -155,14 +84,6 @@
     line-height: normal;
   }
 
-  &__avatar--blue {
-    background-color: tokens.$avatar-random-3;
-  }
-
-  &__avatar--neutral {
-    background-color: tokens.$avatar-random-1;
-  }
-
   &__author-name {
     overflow: hidden;
     margin: 0;
@@ -181,17 +102,12 @@
     white-space: nowrap;
   }
 
-  &__text,
-  &__text--compact {
+  &__text {
     width: 100%;
     margin: 0;
     color: tokens.$on-primary;
     font-size: tokens.$body-small;
     line-height: tokens.$game-details-comment-line-height;
-  }
-
-  &__text--compact {
-    display: none;
   }
 
   &__footer {
@@ -200,58 +116,29 @@
     align-items: center;
   }
 
-  &__like {
+  &__likes {
     display: inline-flex;
     min-height: tokens.$size-3;
     align-items: center;
     gap: tokens.$size-05;
-    padding: 0;
     color: tokens.$on-primary;
-    background: transparent;
-    border: 0;
-    border-radius: tokens.$corner-small;
-    cursor: pointer;
     font-size: tokens.$label-medium;
     font-weight: tokens.$bold;
     line-height: normal;
-
-    @media (hover: hover) {
-      &:hover {
-        background-color: tokens.$surface;
-      }
-    }
-
-    &:active {
-      background-color: tokens.$primary-low;
-    }
-
-    &:focus-visible {
-      outline-offset: tokens.$size-05;
-    }
 
     &--active {
       color: tokens.$like;
     }
   }
 
-  &__like-icon {
+  &__likes-icon {
     display: block;
     width: tokens.$size-2;
     height: auto;
     opacity: 0.72;
   }
 
-  &__like--active &__like-icon {
+  &__likes--active &__likes-icon {
     opacity: 1;
-  }
-}
-
-@media (max-width: tokens.$library-game-card-stacked-breakpoint) {
-  .game-details-comments__text--wide-only {
-    display: none;
-  }
-
-  .game-details-comments__text--compact {
-    display: block;
   }
 }

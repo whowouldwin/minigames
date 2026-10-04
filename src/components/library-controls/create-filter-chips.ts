@@ -1,28 +1,47 @@
-import { filterCategories } from "./filter-categories";
+import type { GameCategory, GameCategorySlug } from "../../api";
 
-export const createFilterChips = (): HTMLDivElement => {
-  const group: HTMLDivElement = document.createElement("div");
-  group.className = "library-controls__filters";
-  group.setAttribute("role", "group");
-  group.setAttribute("aria-label", "Filter games by category");
+interface FilterChips {
+  elements: HTMLButtonElement[];
+  setSelected: (category: GameCategorySlug) => void;
+}
 
-  for (const [index, category] of filterCategories.entries()) {
+export const createFilterChips = (
+  categories: GameCategory[],
+  initialCategory: GameCategorySlug,
+  onChange: (category: GameCategorySlug) => void,
+): FilterChips => {
+  const chips: HTMLButtonElement[] = [];
+  let selectedCategory = initialCategory;
+
+  const setSelected = (selected: GameCategorySlug): void => {
+    selectedCategory = selected;
+    for (const chip of chips) {
+      chip.setAttribute(
+        "aria-pressed",
+        String(chip.dataset.category === selected),
+      );
+    }
+  };
+
+  for (const category of categories) {
     const chip: HTMLButtonElement = document.createElement("button");
     chip.className = "library-controls__filter";
     chip.type = "button";
-    chip.textContent = category;
-    chip.setAttribute("aria-pressed", String(index === 0));
+    chip.dataset.category = category.slug;
+    chip.textContent = category.label;
+    chip.setAttribute(
+      "aria-pressed",
+      String(category.slug === selectedCategory),
+    );
 
     chip.addEventListener("click", (): void => {
-      for (const filter of group.querySelectorAll<HTMLButtonElement>(
-        ".library-controls__filter",
-      )) {
-        filter.setAttribute("aria-pressed", String(filter === chip));
-      }
+      if (selectedCategory === category.slug) return;
+
+      onChange(category.slug);
     });
 
-    group.append(chip);
+    chips.push(chip);
   }
 
-  return group;
+  return { elements: chips, setSelected };
 };

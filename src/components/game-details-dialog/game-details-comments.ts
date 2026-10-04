@@ -1,31 +1,29 @@
+import type { GameComment } from "../../api";
+import {
+  createEmptyState,
+  createErrorState,
+  createRequestSkeleton,
+} from "../ui/request-feedback";
 import { createGameDetailsCommentCard } from "./game-details-comments/comment-card";
-import type { GameDetailsCommentCard } from "./game-details-comments/comment-card";
-import { createGameDetailsCommentForm } from "./game-details-comments/comment-form";
-import { gameDetailsComments } from "./game-details-comments/comment-data";
 import "./game-details-comments.scss";
 
-interface GameDetailsComments {
+export interface GameDetailsComments {
   element: HTMLElement;
-  reset: () => void;
+  showLoading: () => void;
+  showError: (message: string, retry: () => void) => void;
+  showEmpty: () => void;
+  render: (comments: GameComment[], totalComments: number) => void;
 }
 
-interface CommentsList {
-  element: HTMLUListElement;
-  cards: GameDetailsCommentCard[];
-}
-
-const createCommentsList = (): CommentsList => {
+const createCommentList = (comments: GameComment[]): HTMLUListElement => {
   const list: HTMLUListElement = document.createElement("ul");
   list.className = "game-details-comments__list";
-  const cards: GameDetailsCommentCard[] = [];
 
-  for (const comment of gameDetailsComments) {
-    const card: GameDetailsCommentCard = createGameDetailsCommentCard(comment);
-    cards.push(card);
-    list.append(card.element);
+  for (const comment of comments) {
+    list.append(createGameDetailsCommentCard(comment));
   }
 
-  return { element: list, cards };
+  return list;
 };
 
 export const createGameDetailsComments = (): GameDetailsComments => {
@@ -36,20 +34,54 @@ export const createGameDetailsComments = (): GameDetailsComments => {
   const heading: HTMLHeadingElement = document.createElement("h3");
   heading.className = "game-details-comments__title";
   heading.id = "game-details-comments-title";
-  heading.textContent = `Comments (${gameDetailsComments.length})`;
+  heading.textContent = "Comments";
 
-  const commentForm = createGameDetailsCommentForm();
-  const commentList = createCommentsList();
-  section.append(heading, commentForm.element, commentList.element);
+  const content: HTMLDivElement = document.createElement("div");
+  content.className = "game-details-comments__content";
+  section.append(heading, content);
+
+  const showLoading = (): void => {
+    heading.textContent = "Comments";
+    section.setAttribute("aria-busy", "true");
+
+    const skeleton = createRequestSkeleton(
+      "Loading recent comments",
+      "dialog",
+      3,
+    );
+    skeleton.classList.add("game-details-comments__skeleton");
+    content.replaceChildren(skeleton);
+  };
+
+  const showError = (message: string, retry: () => void): void => {
+    section.setAttribute("aria-busy", "false");
+    content.replaceChildren(createErrorState(message, retry));
+  };
+
+  const showEmpty = (): void => {
+    section.setAttribute("aria-busy", "false");
+    content.replaceChildren(createEmptyState("No comments yet."));
+  };
+
+  const render = (comments: GameComment[], totalComments: number): void => {
+    heading.textContent = `Comments (${totalComments})`;
+    section.setAttribute("aria-busy", "false");
+
+    if (comments.length === 0) {
+      showEmpty();
+      return;
+    }
+
+    content.replaceChildren(createCommentList(comments));
+  };
+
+  showLoading();
 
   return {
     element: section,
-    reset: (): void => {
-      commentForm.reset();
-
-      for (const comment of commentList.cards) {
-        comment.resetLike();
-      }
-    },
+    showLoading,
+    showError,
+    showEmpty,
+    render,
   };
 };

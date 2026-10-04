@@ -4,6 +4,7 @@ import starIcon from "../../assets/icons/star.svg";
 import "./library-game-card.scss";
 
 export interface LibraryGame {
+  slug: string;
   title: string;
   category: string;
   price: string;
@@ -33,7 +34,7 @@ const createMetric = (iconSource: string, value: string): HTMLDivElement => {
 export const createLibraryGameCard = (
   game: LibraryGame,
   index: number,
-  openDetails: () => void,
+  openDetails: (gameSlug: string) => void,
 ): HTMLElement => {
   const card: HTMLElement = document.createElement("article");
   card.className = "library-game-card";
@@ -41,9 +42,20 @@ export const createLibraryGameCard = (
 
   const image: HTMLImageElement = document.createElement("img");
   image.className = "library-game-card__image";
-  image.src = game.image;
   image.alt = "";
   image.loading = "lazy";
+  image.addEventListener(
+    "error",
+    (): void => {
+      const placeholder: HTMLDivElement = document.createElement("div");
+      placeholder.className =
+        "library-game-card__image library-game-card__image--unavailable";
+      placeholder.textContent = "Image unavailable";
+      image.replaceWith(placeholder);
+    },
+    { once: true },
+  );
+  image.src = game.image;
 
   const content: HTMLDivElement = document.createElement("div");
   content.className = "library-game-card__content";
@@ -83,7 +95,7 @@ export const createLibraryGameCard = (
   details.className = "library-game-card__details";
   details.type = "button";
   details.textContent = "Details";
-  details.addEventListener("click", openDetails);
+  details.addEventListener("click", (): void => openDetails(game.slug));
 
   header.append(identity, price);
 

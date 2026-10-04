@@ -1,4 +1,6 @@
 import "./styles/globals.scss";
 import { createApp } from "./app";
 
-document.body.append(createApp());
+const app = createApp();
+document.body.append(app.element);
+app.start();

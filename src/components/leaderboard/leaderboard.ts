@@ -1,19 +1,17 @@
-import data from "./leaderboard-data.json";
+import { getErrorMessage, getLeaderboard } from "../../api";
+import {
+  createEmptyState,
+  createErrorState,
+  createRequestSkeleton,
+} from "../ui/request-feedback";
+import type { SnackbarController } from "../ui/snackbar";
+import { createPlayerRow, createStateRow } from "./leaderboard-rows";
 import "./leaderboard.scss";
 
-interface Player {
-  rank: number;
-  playerName: string;
-  gamesPlayed: number;
-  totalScore: number;
-  streakDays: number;
-  favoriteGameName: string;
-}
-
-const initials: readonly string[] = ["AP", "CG", "MM", "BP", "SG"];
-
-export const createLeaderboard = (): HTMLElement => {
-  const section: HTMLElement = document.createElement("section");
+export const createLeaderboard = (
+  snackbar: SnackbarController,
+): HTMLElement => {
+  const section = document.createElement("section");
   section.className = "leaderboard";
   section.setAttribute("aria-labelledby", "leaderboard-title");
   section.innerHTML = `
@@ -28,18 +26,44 @@ export const createLeaderboard = (): HTMLElement => {
         </tr></thead><tbody></tbody>
       </table>
     </div>`;
-  const body: HTMLTableSectionElement | null = section.querySelector("tbody");
-  for (const player of data.data as Player[]) {
-    const row: HTMLTableRowElement = document.createElement("tr");
-    const compactScore: string = `${Math.floor(player.totalScore / 100) / 10}K`;
-    row.innerHTML = `
-      <td>#${player.rank}</td>
-      <td><span class="leaderboard__player"><span class="leaderboard__avatar leaderboard__avatar--${player.rank}" aria-hidden="true">${initials[player.rank - 1]}</span><span class="leaderboard__name">${player.playerName}</span></span></td>
-      <td class="leaderboard__games">${player.gamesPlayed}</td>
-      <td><span class="leaderboard__full-score">${player.totalScore.toLocaleString("en-US")}</span><span class="leaderboard__compact-score">${compactScore}</span></td>
-      <td>🔥 ${player.streakDays}<span class="leaderboard__desktop"> days</span><span class="leaderboard__compact">d</span></td>
-      <td class="leaderboard__favorite"><span class="leaderboard__badge">${player.favoriteGameName}</span></td>`;
-    body?.append(row);
-  }
+
+  const body = section.querySelector("tbody");
+  if (!body) return section;
+
+  const showState = (content: HTMLElement): void => {
+    body.replaceChildren(createStateRow(content));
+  };
+
+  const loadPlayers = async (): Promise<void> => {
+    showState(createRequestSkeleton("Loading leaderboard", "table", 5));
+
+    try {
+      const response = await getLeaderboard();
+      if (!section.isConnected) return;
+
+      if (response.data.length === 0) {
+        showState(
+          createEmptyState("No leaderboard players are available yet."),
+        );
+        return;
+      }
+
+      body.replaceChildren();
+      for (const player of response.data) {
+        body.append(createPlayerRow(player));
+      }
+    } catch (error) {
+      if (!section.isConnected) return;
+
+      const message = getErrorMessage(
+        error,
+        "The leaderboard could not be loaded.",
+      );
+      snackbar.show("The leaderboard could not be loaded.", "error");
+      showState(createErrorState(message, () => void loadPlayers()));
+    }
+  };
+
+  void loadPlayers();
   return section;
 };
