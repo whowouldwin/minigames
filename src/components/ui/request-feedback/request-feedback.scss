@@ -38,6 +38,18 @@
     }
   }
 
+  &--chips {
+    display: flex;
+    align-items: center;
+
+    .request-skeleton__item {
+      width: tokens.$size-8;
+      min-height: tokens.$filter-chip-height;
+      flex: 0 0 tokens.$size-8;
+      border-radius: tokens.$corner-full;
+    }
+  }
+
   &--rows .request-skeleton__item {
     min-height: tokens.$size-9;
   }
