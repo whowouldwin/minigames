@@ -105,7 +105,7 @@ export const createGameDetailsDialog = (
       }
 
       if (!response.data) {
-        content.showEmpty();
+        content.showNotFound();
         return;
       }
 

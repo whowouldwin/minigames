@@ -16,7 +16,7 @@ export interface GameDetailsContent {
   body: HTMLElement;
   showLoading: () => void;
   showError: (message: string, retry: () => void) => void;
-  showEmpty: () => void;
+  showNotFound: () => void;
   renderGame: (game: GameDetails) => void;
   comments: GameDetailsComments;
 }
@@ -57,12 +57,12 @@ export const createGameDetailsContent = (
     );
   };
 
-  const showEmpty = (): void => {
+  const showNotFound = (): void => {
     hero.hideImage();
     body.setAttribute("aria-busy", "false");
     body.replaceChildren(
-      createTitle("Game details unavailable"),
-      createEmptyState("No details are available for this game yet."),
+      createTitle("Game Not Found"),
+      createEmptyState("This game doesn't exist or is no longer available."),
     );
   };
 
@@ -79,7 +79,7 @@ export const createGameDetailsContent = (
     body,
     showLoading,
     showError,
-    showEmpty,
+    showNotFound,
     renderGame,
     comments,
   };
