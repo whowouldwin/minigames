@@ -8,6 +8,7 @@ import "./game-details-dialog.scss";
 export interface GameDetailsDialog {
   element: HTMLDialogElement;
   open: (gameSlug: string) => void;
+  close: () => Promise<void>;
 }
 
 const lockPageScroll = (): (() => void) => {
@@ -34,6 +35,7 @@ const lockPageScroll = (): (() => void) => {
 
 export const createGameDetailsDialog = (
   snackbar: SnackbarController,
+  onClose: () => void,
 ): GameDetailsDialog => {
   const dialog: HTMLDialogElement = document.createElement("dialog");
   dialog.className = "game-details-dialog";
@@ -44,6 +46,7 @@ export const createGameDetailsDialog = (
   let restorePageScroll: (() => void) | undefined;
   let detailsRequest: AbortController | undefined;
   let requestId: number = 0;
+  let activeGameSlug: string | undefined;
 
   const cancelRequests = (): void => {
     detailsRequest?.abort();
@@ -59,15 +62,14 @@ export const createGameDetailsDialog = (
     isClosing = true;
     await closeDialogWithAnimation(dialog, "game-details-dialog--closing");
     isClosing = false;
+    activeGameSlug = undefined;
     restorePageScroll?.();
     restorePageScroll = undefined;
 
     if (trigger?.isConnected) trigger.focus();
   };
 
-  const content = createGameDetailsContent((): void => {
-    void close();
-  });
+  const content = createGameDetailsContent(onClose);
   dialog.append(content.hero, content.body);
 
   const isCurrentRequest = (currentRequestId: number): boolean =>
@@ -130,21 +132,23 @@ export const createGameDetailsDialog = (
     }
   };
 
-  setupDialogDismissal(dialog, (): void => {
-    void close();
-  });
+  setupDialogDismissal(dialog, onClose);
 
   return {
     element: dialog,
+    close,
     open: (gameSlug: string): void => {
-      if (isClosing || dialog.open) return;
+      if (isClosing || (activeGameSlug === gameSlug && dialog.open)) return;
 
-      trigger =
-        document.activeElement instanceof HTMLElement
-          ? document.activeElement
-          : undefined;
-      restorePageScroll = lockPageScroll();
-      dialog.showModal();
+      if (!dialog.open) {
+        trigger =
+          document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : undefined;
+        restorePageScroll = lockPageScroll();
+        dialog.showModal();
+      }
+      activeGameSlug = gameSlug;
       requestId += 1;
       void loadGameDetails(gameSlug, requestId);
       void commentsLoader.load(gameSlug);

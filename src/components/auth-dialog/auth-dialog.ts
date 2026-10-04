@@ -6,9 +6,18 @@ import "./auth-dialog.scss";
 export interface AuthDialog {
   element: HTMLDialogElement;
   open: (mode: AuthMode) => void;
+  close: () => Promise<void>;
 }
 
-export const createAuthDialog = (): AuthDialog => {
+interface AuthDialogCallbacks {
+  onClose: () => void;
+  onModeChange: (mode: AuthMode) => void;
+}
+
+export const createAuthDialog = ({
+  onClose,
+  onModeChange,
+}: AuthDialogCallbacks): AuthDialog => {
   const dialog: HTMLDialogElement = document.createElement("dialog");
   dialog.className = "auth-dialog";
   dialog.setAttribute("aria-labelledby", "auth-title");
@@ -32,7 +41,7 @@ export const createAuthDialog = (): AuthDialog => {
       tab.tabIndex = isSelected ? 0 : -1;
     }
     panel.setAttribute("aria-labelledby", `auth-tab-${mode}`);
-    panel.replaceChildren(createAuthForm(mode, setMode));
+    panel.replaceChildren(createAuthForm(mode, onModeChange));
     if (!globalThis.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       panel.animate(
         [
@@ -52,7 +61,7 @@ export const createAuthDialog = (): AuthDialog => {
     tab.setAttribute("role", "tab");
     tab.setAttribute("aria-controls", panel.id);
     tab.addEventListener("click", (): void => {
-      if (activeMode !== mode) setMode(mode);
+      if (activeMode !== mode) onModeChange(mode);
     });
     tab.addEventListener("keydown", (event: KeyboardEvent): void => {
       if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key))
@@ -61,7 +70,7 @@ export const createAuthDialog = (): AuthDialog => {
       let next: AuthMode = activeMode === "login" ? "register" : "login";
       if (event.key === "Home") next = "login";
       else if (event.key === "End") next = "register";
-      setMode(next);
+      onModeChange(next);
       tabs
         .querySelector<HTMLButtonElement>(`[data-mode="${CSS.escape(next)}"]`)
         ?.focus();
@@ -75,19 +84,20 @@ export const createAuthDialog = (): AuthDialog => {
     isClosing = false;
     trigger?.focus();
   };
-  setupDialogDismissal(dialog, (): void => {
-    void close();
-  });
+  setupDialogDismissal(dialog, onClose);
   dialog.append(tabs, panel);
   setMode("login");
   return {
     element: dialog,
+    close,
     open: (mode: AuthMode): void => {
-      if (isClosing) return;
-      trigger =
-        document.activeElement instanceof HTMLElement
-          ? document.activeElement
-          : undefined;
+      if (isClosing || (activeMode === mode && dialog.open)) return;
+      if (!dialog.open) {
+        trigger =
+          document.activeElement instanceof HTMLElement
+            ? document.activeElement
+            : undefined;
+      }
       setMode(mode);
       if (!dialog.open) dialog.showModal();
     },

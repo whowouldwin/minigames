@@ -32,7 +32,6 @@ export const createSortControlListbox = (
   for (const sortOption of sortOptions) {
     const option = createSortControlOption(sortOption);
     option.addEventListener("click", (): void => {
-      setSelected(sortOption.value);
       onSelect(sortOption);
     });
 
