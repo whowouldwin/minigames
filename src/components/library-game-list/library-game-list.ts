@@ -1,5 +1,5 @@
 import { getErrorMessage, getLibraryGames } from "../../api";
-import type { LibraryGamesQuery } from "../../api";
+import type { LibraryGamesMeta, LibraryGamesQuery } from "../../api";
 import {
   createEmptyState,
   createErrorState,
@@ -21,6 +21,7 @@ interface LibraryGameListController {
 export const createLibraryGameList = (
   openDetails: () => void,
   snackbar: SnackbarController,
+  onPaginationUpdate: (meta: LibraryGamesMeta) => void,
 ): LibraryGameListController => {
   const section: HTMLElement = document.createElement("section");
   section.className = "library-game-list";
@@ -46,6 +47,12 @@ export const createLibraryGameList = (
     try {
       const response = await getLibraryGames(query, controller.signal);
       if (!section.isConnected || controller.signal.aborted) return;
+
+      if (!response.meta) {
+        throw new Error("The game server did not return pagination metadata.");
+      }
+
+      onPaginationUpdate(response.meta);
 
       if (response.data.length === 0) {
         showLibraryGameListState(

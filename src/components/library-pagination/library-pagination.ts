@@ -3,19 +3,24 @@ import paginationChevronForward from "../../assets/icons/pagination-chevron-forw
 
 import "./library-pagination.scss";
 
-const TOTAL_PAGES: number = 10;
+const DEFAULT_PAGE_LIMIT: number = 4;
 const PAGE_LIMIT_PROPERTY: string = "--library-pagination-page-limit";
 
+interface LibraryPaginationController {
+  element: HTMLElement;
+  update: (page: number, totalPages: number) => void;
+}
+
 const getVisiblePageLimit = (element: HTMLElement): number => {
-  const pageLimitValue: string = globalThis
+  const value: string = globalThis
     .getComputedStyle(element)
     .getPropertyValue(PAGE_LIMIT_PROPERTY)
     .trim();
-  const pageLimit: number = Number(pageLimitValue);
+  const pageLimit: number = Number(value);
 
-  return !pageLimitValue || Number.isNaN(pageLimit)
-    ? TOTAL_PAGES
-    : Math.min(TOTAL_PAGES, Math.max(1, pageLimit));
+  return value && Number.isFinite(pageLimit) && pageLimit >= 1
+    ? Math.floor(pageLimit)
+    : DEFAULT_PAGE_LIMIT;
 };
 
 const createArrowButton = (
@@ -40,7 +45,33 @@ const createArrowButton = (
   return button;
 };
 
-export const createLibraryPagination = (): HTMLElement => {
+const createPageButton = (
+  page: number,
+  activePage: number,
+  onPageChange: (page: number) => void,
+): HTMLLIElement => {
+  const item: HTMLLIElement = document.createElement("li");
+  item.className = "library-pagination__item";
+
+  const button: HTMLButtonElement = document.createElement("button");
+  button.className = "library-pagination__page";
+  button.type = "button";
+  button.textContent = String(page);
+  button.setAttribute("aria-label", `Page ${page}`);
+
+  if (page === activePage) {
+    button.setAttribute("aria-current", "page");
+  }
+
+  button.addEventListener("click", (): void => onPageChange(page));
+
+  item.append(button);
+  return item;
+};
+
+export const createLibraryPagination = (
+  onPageChange: (page: number) => void,
+): LibraryPaginationController => {
   const section: HTMLElement = document.createElement("section");
   section.className = "library-pagination";
 
@@ -55,85 +86,71 @@ export const createLibraryPagination = (): HTMLElement => {
   const previousButton: HTMLButtonElement = createArrowButton("previous");
   previousItem.append(previousButton);
 
-  const pageItems: HTMLLIElement[] = [];
-  const pageButtons: HTMLButtonElement[] = [];
-
-  for (let page = 1; page <= TOTAL_PAGES; page += 1) {
-    const item: HTMLLIElement = document.createElement("li");
-    item.className = "library-pagination__item";
-
-    const button: HTMLButtonElement = document.createElement("button");
-    button.className = "library-pagination__page";
-    button.type = "button";
-    button.textContent = String(page);
-    button.setAttribute("aria-label", `Page ${page}`);
-
-    button.addEventListener("click", (): void => {
-      activePage = page;
-      updateControls();
-    });
-
-    item.append(button);
-    pageItems.push(item);
-    pageButtons.push(button);
-  }
-
   const nextItem: HTMLLIElement = document.createElement("li");
   const nextButton: HTMLButtonElement = createArrowButton("next");
   nextItem.append(nextButton);
 
   let activePage: number = 1;
+  let totalPages: number = 1;
   let visiblePageLimit: number = getVisiblePageLimit(section);
+  let pageItems: HTMLLIElement[] = [];
 
   const updateControls = (): void => {
+    const visiblePageCount: number = Math.min(visiblePageLimit, totalPages);
     const firstVisiblePage: number = Math.max(
       1,
       Math.min(
-        activePage - Math.floor(visiblePageLimit / 2),
-        TOTAL_PAGES - visiblePageLimit + 1,
+        activePage - Math.floor(visiblePageCount / 2),
+        totalPages - visiblePageCount + 1,
       ),
     );
-    const lastVisiblePage: number = Math.min(
-      TOTAL_PAGES,
-      firstVisiblePage + visiblePageLimit - 1,
-    );
+    const lastVisiblePage: number = firstVisiblePage + visiblePageCount - 1;
 
-    for (const [index, button] of pageButtons.entries()) {
-      const page: number = index + 1;
-      const item: HTMLLIElement = pageItems[index];
+    for (const item of pageItems) {
+      item.remove();
+    }
 
-      item.hidden = page < firstVisiblePage || page > lastVisiblePage;
+    pageItems = [];
 
-      button.toggleAttribute("aria-current", page === activePage);
-
-      if (page === activePage) {
-        button.setAttribute("aria-current", "page");
-      }
+    for (
+      let page: number = firstVisiblePage;
+      page <= lastVisiblePage;
+      page += 1
+    ) {
+      const item: HTMLLIElement = createPageButton(
+        page,
+        activePage,
+        onPageChange,
+      );
+      pageItems.push(item);
+      nextItem.before(item);
     }
 
     previousButton.disabled = activePage === 1;
-    nextButton.disabled = activePage === TOTAL_PAGES;
+    nextButton.disabled = activePage === totalPages;
+  };
+
+  const update = (page: number, pages: number): void => {
+    totalPages = Number.isFinite(pages) ? Math.max(1, Math.floor(pages)) : 1;
+    activePage = Number.isFinite(page)
+      ? Math.min(totalPages, Math.max(1, Math.floor(page)))
+      : 1;
+    updateControls();
   };
 
   previousButton.addEventListener("click", (): void => {
-    if (activePage === 1) {
-      return;
+    if (activePage > 1) {
+      onPageChange(activePage - 1);
     }
-
-    activePage -= 1;
-    updateControls();
   });
 
   nextButton.addEventListener("click", (): void => {
-    if (activePage === TOTAL_PAGES) {
-      return;
+    if (activePage < totalPages) {
+      onPageChange(activePage + 1);
     }
-
-    activePage += 1;
-    updateControls();
   });
 
-  list.append(previousItem, ...pageItems, nextItem);
+  list.append(previousItem, nextItem);
   navigation.append(list);
   section.append(navigation);
 
@@ -160,5 +177,5 @@ export const createLibraryPagination = (): HTMLElement => {
 
   updateControls();
 
-  return section;
+  return { element: section, update };
 };
