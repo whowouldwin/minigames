@@ -11,7 +11,7 @@ import "./header.scss";
 
 export const createHeader = (
   openAuth: (mode: AuthMode) => void,
-  activePage: AppPage,
+  activePage: AppPage | undefined,
   navigateTo: (page: AppPage) => void,
 ): HTMLElement => {
   const header: HTMLElement = document.createElement("header");

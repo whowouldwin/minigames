@@ -22,6 +22,9 @@ const getRoute = (): AppRoute =>
 const getCurrentUrl = (): string =>
   globalThis.location.pathname + globalThis.location.search;
 
+const getAbsoluteRouteUrl = (routeUrl: string): string =>
+  globalThis.location.origin + routeUrl;
+
 const restoreDeepLinkHistory = (): void => {
   const route = getRoute();
   const state = globalThis.history.state as DialogHistoryState | undefined;
@@ -29,8 +32,12 @@ const restoreDeepLinkHistory = (): void => {
 
   const dialogUrl: string = getCurrentUrl();
   const baseUrl: string = createRouteUrl({ ...route, dialog: undefined });
-  globalThis.history.replaceState(undefined, "", baseUrl);
-  globalThis.history.pushState({ miniGamesDialogBase: baseUrl }, "", dialogUrl);
+  globalThis.history.replaceState(undefined, "", getAbsoluteRouteUrl(baseUrl));
+  globalThis.history.pushState(
+    { miniGamesDialogBase: baseUrl },
+    "",
+    getAbsoluteRouteUrl(dialogUrl),
+  );
 };
 
 export const createAppRouter = (): AppRouter => {
@@ -54,9 +61,9 @@ export const createAppRouter = (): AppRouter => {
     if (url === currentUrl) return;
 
     if (shouldReplace) {
-      globalThis.history.replaceState(state, "", url);
+      globalThis.history.replaceState(state, "", getAbsoluteRouteUrl(url));
     } else {
-      globalThis.history.pushState(state, "", url);
+      globalThis.history.pushState(state, "", getAbsoluteRouteUrl(url));
     }
     notify();
   };

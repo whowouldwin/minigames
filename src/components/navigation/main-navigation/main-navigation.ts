@@ -4,7 +4,7 @@ import { createNavigationList } from "../create-navigation-list";
 import "./main-navigation.scss";
 
 export const createMainNavigation = (
-  activePage: AppPage,
+  activePage: AppPage | undefined,
   navigateTo: (page: AppPage) => void,
 ): HTMLElement => {
   const navigation: HTMLElement = document.createElement("nav");

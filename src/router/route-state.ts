@@ -6,11 +6,12 @@ import type { AppPage } from "../types/app-page";
 export type DialogRoute =
   { kind: "game"; gameSlug: string } | { kind: "auth"; mode: AuthMode };
 
-export interface AppRoute {
-  page: AppPage;
+export type PageRoute = { page: AppPage } | { page: "not-found"; path: string };
+
+export type AppRoute = PageRoute & {
   library: LibraryGamesQuery;
   dialog?: DialogRoute;
-}
+};
 
 export const createPageRoute = (page: AppPage): AppRoute => ({
   page,
