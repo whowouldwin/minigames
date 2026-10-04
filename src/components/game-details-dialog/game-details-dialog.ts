@@ -1,4 +1,4 @@
-import { getErrorMessage, getGameDetails } from "../../api";
+import { ApiError, getErrorMessage, getGameDetails } from "../../api";
 import type { SnackbarController } from "../ui/snackbar";
 import { closeDialogWithAnimation, setupDialogDismissal } from "../ui/dialog";
 import { createGameDetailsContent } from "./game-details-content";
@@ -116,6 +116,11 @@ export const createGameDetailsDialog = (
         controller.signal.aborted ||
         !isCurrentRequest(currentRequestId)
       ) {
+        return;
+      }
+
+      if (error instanceof ApiError && error.status === 404) {
+        content.showNotFound();
         return;
       }
 
