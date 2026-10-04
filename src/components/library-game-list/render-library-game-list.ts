@@ -15,7 +15,7 @@ export const showLibraryGameListState = (
 export const renderLibraryGames = (
   list: HTMLUListElement,
   games: GameSummary[],
-  openDetails: () => void,
+  openDetails: (gameSlug: string) => void,
 ): void => {
   list.replaceChildren();
 

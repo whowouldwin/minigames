@@ -9,6 +9,7 @@ const formatCompactCount = (count: number): string =>
   }).format(count);
 
 export const toLibraryGame = (game: GameSummary): LibraryGame => ({
+  slug: game.slug,
   title: game.name,
   category: game.category.slice(0, 1).toUpperCase() + game.category.slice(1),
   price: game.price,

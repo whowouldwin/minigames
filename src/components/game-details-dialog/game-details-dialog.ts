@@ -1,10 +1,12 @@
+import { getErrorMessage, getGameDetails } from "../../api";
+import type { SnackbarController } from "../ui/snackbar";
 import { closeDialogWithAnimation, setupDialogDismissal } from "../ui/dialog";
 import { createGameDetailsContent } from "./game-details-content";
 import "./game-details-dialog.scss";
 
 export interface GameDetailsDialog {
   element: HTMLDialogElement;
-  open: () => void;
+  open: (gameSlug: string) => void;
 }
 
 const lockPageScroll = (): (() => void) => {
@@ -29,7 +31,9 @@ const lockPageScroll = (): (() => void) => {
   };
 };
 
-export const createGameDetailsDialog = (): GameDetailsDialog => {
+export const createGameDetailsDialog = (
+  snackbar: SnackbarController,
+): GameDetailsDialog => {
   const dialog: HTMLDialogElement = document.createElement("dialog");
   dialog.className = "game-details-dialog";
   dialog.setAttribute("aria-labelledby", "game-details-title");
@@ -37,10 +41,17 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
   let isClosing: boolean = false;
   let trigger: HTMLElement | undefined;
   let restorePageScroll: (() => void) | undefined;
+  let requestController: AbortController | undefined;
+
+  const cancelRequest = (): void => {
+    requestController?.abort();
+    requestController = undefined;
+  };
 
   const close = async (): Promise<void> => {
     if (isClosing || !dialog.open) return;
 
+    cancelRequest();
     isClosing = true;
     await closeDialogWithAnimation(dialog, "game-details-dialog--closing");
     isClosing = false;
@@ -55,23 +66,69 @@ export const createGameDetailsDialog = (): GameDetailsDialog => {
   });
   dialog.append(content.hero, content.body);
 
+  const loadGameDetails = async (gameSlug: string): Promise<void> => {
+    cancelRequest();
+    const controller = new AbortController();
+    requestController = controller;
+    content.showLoading();
+
+    try {
+      const response = await getGameDetails(gameSlug, {
+        signal: controller.signal,
+      });
+      if (
+        requestController !== controller ||
+        controller.signal.aborted ||
+        !dialog.open
+      ) {
+        return;
+      }
+
+      if (!response.data) {
+        content.showEmpty();
+        return;
+      }
+
+      content.renderGame(response.data);
+    } catch (error) {
+      if (
+        requestController !== controller ||
+        controller.signal.aborted ||
+        !dialog.open
+      ) {
+        return;
+      }
+
+      const message: string = getErrorMessage(
+        error,
+        "Unable to load game details.",
+      );
+      content.showError(message, (): void => {
+        void loadGameDetails(gameSlug);
+      });
+      snackbar.show(message, "error");
+    } finally {
+      if (requestController === controller) requestController = undefined;
+    }
+  };
+
   setupDialogDismissal(dialog, (): void => {
     void close();
   });
 
   return {
     element: dialog,
-    open: (): void => {
+    open: (gameSlug: string): void => {
       if (isClosing || dialog.open) return;
 
-      content.resetFavorite();
-      content.resetComments();
       trigger =
         document.activeElement instanceof HTMLElement
           ? document.activeElement
           : undefined;
       restorePageScroll = lockPageScroll();
+      content.resetComments();
       dialog.showModal();
+      void loadGameDetails(gameSlug);
     },
   };
 };

@@ -19,7 +19,7 @@ interface LibraryGameListController {
 }
 
 export const createLibraryGameList = (
-  openDetails: () => void,
+  openDetails: (gameSlug: string) => void,
   snackbar: SnackbarController,
   onPaginationUpdate: (meta: LibraryGamesMeta) => void,
 ): LibraryGameListController => {

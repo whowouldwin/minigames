@@ -2,6 +2,7 @@ import { requestApi } from "./client";
 import type {
   ApiResponse,
   GameCategory,
+  GameDetails,
   GameSummary,
   LibraryGamesMeta,
   LibraryGamesQuery,
@@ -13,10 +14,27 @@ export const DEFAULT_LIBRARY_GAMES_QUERY: LibraryGamesQuery = {
   page: 1,
 };
 
+export interface GameDetailsRequestOptions {
+  signal?: AbortSignal;
+  userEmail?: string;
+}
+
 export const getFeaturedGames = (
   signal?: AbortSignal,
 ): Promise<ApiResponse<GameSummary[]>> =>
   requestApi<GameSummary[]>("games?featured=true", signal);
+
+export const getGameDetails = (
+  gameSlug: string,
+  { signal, userEmail }: GameDetailsRequestOptions = {},
+): Promise<ApiResponse<GameDetails>> => {
+  const query = new URLSearchParams();
+  if (userEmail) query.set("userEmail", userEmail);
+
+  const search: string = query.toString();
+  const path: string = `games/${encodeURIComponent(gameSlug)}${search ? `?${search}` : ""}`;
+  return requestApi<GameDetails>(path, signal);
+};
 
 export const getLibraryGames = (
   query: LibraryGamesQuery = DEFAULT_LIBRARY_GAMES_QUERY,

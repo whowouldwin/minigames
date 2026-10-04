@@ -14,6 +14,32 @@ export interface GameSummary {
   cardImage: string;
 }
 
+export interface GameDetailsRecord {
+  position: number;
+  playerName: string;
+  score: number;
+  achievedAt: string;
+}
+
+export interface GameDetailsSpecs {
+  genre: string;
+  players: string;
+  duration: string;
+  price: string;
+}
+
+export interface GameDetails {
+  slug: string;
+  name: string;
+  heroImage: string;
+  rating: number;
+  likesCount: number;
+  isLikedByCurrentUser: boolean;
+  fullDescription: string;
+  specs: GameDetailsSpecs;
+  topRecords: GameDetailsRecord[];
+}
+
 export type GameCategorySlug =
   "all" | "puzzle" | "card" | "match" | "farm" | "strategy" | "arcade";
 
