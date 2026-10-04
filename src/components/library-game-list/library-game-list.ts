@@ -48,17 +48,22 @@ export const createLibraryGameList = (
       const response = await getLibraryGames(query, controller.signal);
       if (!section.isConnected || controller.signal.aborted) return;
 
-      if (!response.meta) {
-        throw new Error("The game server did not return pagination metadata.");
+      if (
+        !response.meta ||
+        !Number.isSafeInteger(response.meta.page) ||
+        response.meta.page < 1 ||
+        !Number.isSafeInteger(response.meta.totalPages) ||
+        response.meta.totalPages < 0
+      ) {
+        throw new Error(
+          "The game server returned invalid pagination metadata.",
+        );
       }
 
       onPaginationUpdate(response.meta);
 
       if (response.data.length === 0) {
-        showLibraryGameListState(
-          list,
-          createEmptyState("No games are available yet."),
-        );
+        showLibraryGameListState(list, createEmptyState("Data Not Found"));
         return;
       }
 
