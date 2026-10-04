@@ -40,6 +40,21 @@ export interface GameDetails {
   topRecords: GameDetailsRecord[];
 }
 
+export interface GameComment {
+  commentId: string;
+  authorName: string;
+  text: string;
+  likesCount: number;
+  isLikedByCurrentUser: boolean;
+  createdAt: string;
+}
+
+export interface GameCommentsMeta {
+  totalComments: number;
+  returnedCount: number;
+  sort: string;
+}
+
 export type GameCategorySlug =
   "all" | "puzzle" | "card" | "match" | "farm" | "strategy" | "arcade";
 

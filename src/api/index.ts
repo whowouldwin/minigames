@@ -5,6 +5,7 @@ export {
   getLibraryCategories,
   getLibraryGames,
   getGameDetails,
+  getGameComments,
 } from "./games";
 export type { GameDetailsRequestOptions } from "./games";
 export { getLeaderboard } from "./leaderboard";
@@ -12,6 +13,8 @@ export type {
   ApiResponse,
   GameCategory,
   GameCategorySlug,
+  GameComment,
+  GameCommentsMeta,
   GameDetails,
   GameDetailsRecord,
   GameDetailsSpecs,

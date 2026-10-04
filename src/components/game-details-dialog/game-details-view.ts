@@ -83,10 +83,12 @@ const createGameInfo = (specs: GameDetailsSpecs): HTMLDListElement => {
   return gameInfo;
 };
 
-const createFavoriteButton = (isSelected: boolean): HTMLButtonElement => {
+const createFavoriteButton = (isFavorite: boolean): HTMLButtonElement => {
   const button: HTMLButtonElement = document.createElement("button");
   button.className = "game-details-dialog__favorite";
   button.type = "button";
+  button.disabled = true;
+  button.title = "Favorite changes aren't available yet.";
 
   const icon: HTMLImageElement = document.createElement("img");
   icon.className = "game-details-dialog__favorite-icon";
@@ -96,27 +98,16 @@ const createFavoriteButton = (isSelected: boolean): HTMLButtonElement => {
   const label: HTMLSpanElement = document.createElement("span");
   label.className = "game-details-dialog__favorite-label";
 
-  const update = (): void => {
-    const buttonLabel: string = isSelected
-      ? "Remove from Favorites"
-      : "Add to Favorites";
+  const buttonLabel: string = isFavorite
+    ? "Remove from Favorites"
+    : "Add to Favorites";
 
-    button.classList.toggle(
-      "game-details-dialog__favorite--active",
-      isSelected,
-    );
-    button.setAttribute("aria-label", buttonLabel);
-    button.setAttribute("aria-pressed", String(isSelected));
-    icon.src = isSelected ? favoriteFilledIcon : favoriteOutlineIcon;
-    label.textContent = buttonLabel;
-  };
-
-  button.addEventListener("click", (): void => {
-    isSelected = !isSelected;
-    update();
-  });
+  button.classList.toggle("game-details-dialog__favorite--active", isFavorite);
+  button.setAttribute("aria-label", buttonLabel);
+  button.setAttribute("aria-pressed", String(isFavorite));
+  icon.src = isFavorite ? favoriteFilledIcon : favoriteOutlineIcon;
+  label.textContent = buttonLabel;
   button.append(icon, label);
-  update();
 
   return button;
 };

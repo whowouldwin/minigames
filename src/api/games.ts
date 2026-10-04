@@ -2,6 +2,8 @@ import { requestApi } from "./client";
 import type {
   ApiResponse,
   GameCategory,
+  GameComment,
+  GameCommentsMeta,
   GameDetails,
   GameSummary,
   LibraryGamesMeta,
@@ -34,6 +36,16 @@ export const getGameDetails = (
   const search: string = query.toString();
   const path: string = `games/${encodeURIComponent(gameSlug)}${search ? `?${search}` : ""}`;
   return requestApi<GameDetails>(path, signal);
+};
+
+export const getGameComments = (
+  gameSlug: string,
+  signal?: AbortSignal,
+): Promise<ApiResponse<GameComment[], GameCommentsMeta>> => {
+  const query = new URLSearchParams({ limit: "3", sort: "newest" });
+  const path: string = `games/${encodeURIComponent(gameSlug)}/comments?${query}`;
+
+  return requestApi<GameComment[], GameCommentsMeta>(path, signal);
 };
 
 export const getLibraryGames = (
