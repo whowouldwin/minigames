@@ -30,6 +30,7 @@
 
   &--game-list {
     grid-template-columns: minmax(0, 1fr);
+    gap: tokens.$size-3;
 
     .request-skeleton__item {
       min-height: tokens.$library-game-card-tablet-height;
@@ -122,6 +123,10 @@
 @media (min-width: tokens.$library-game-card-grid-breakpoint) {
   .request-skeleton--game-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    .request-skeleton__item {
+      min-height: tokens.$library-game-card-desktop-height;
+    }
   }
 }
 
@@ -132,8 +137,12 @@
 }
 
 @media (max-width: tokens.$library-game-card-stacked-breakpoint) {
-  .request-skeleton--game-list .request-skeleton__item {
-    min-height: tokens.$library-game-card-mobile-height;
+  .request-skeleton--game-list {
+    gap: tokens.$size-2;
+
+    .request-skeleton__item {
+      min-height: tokens.$library-game-card-mobile-height;
+    }
   }
 }
 
