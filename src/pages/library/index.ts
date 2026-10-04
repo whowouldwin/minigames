@@ -26,22 +26,29 @@ export const createLibraryPage = (
 
   const gameList = createLibraryGameList(openGameDetails, snackbar);
   let selectedQuery: LibraryGamesQuery = DEFAULT_LIBRARY_GAMES_QUERY;
-  let lastRequestedQuery: LibraryGamesQuery = DEFAULT_LIBRARY_GAMES_QUERY;
+  let lastRequestedQuery: LibraryGamesQuery | undefined;
+  const loadGames = (query: LibraryGamesQuery): void => {
+    if (
+      lastRequestedQuery &&
+      lastRequestedQuery.category === query.category &&
+      lastRequestedQuery.sort === query.sort
+    ) {
+      return;
+    }
+
+    lastRequestedQuery = query;
+    void gameList.load(query);
+  };
+
   const controls = createLibraryControls(
     {
       onFilterChange: (query: LibraryGamesQuery): void => {
         selectedQuery = query;
-        const hasRequestChanged =
-          query.category !== lastRequestedQuery.category ||
-          query.sort !== lastRequestedQuery.sort;
-
-        if (!hasRequestChanged) return;
-
-        lastRequestedQuery = query;
-        void gameList.load(query);
+        loadGames(query);
       },
       onSortChange: (sort): void => {
         selectedQuery = { ...selectedQuery, sort };
+        loadGames(selectedQuery);
       },
     },
     snackbar,
@@ -49,7 +56,7 @@ export const createLibraryPage = (
 
   main.append(section, controls, gameList.element, createLibraryPagination());
 
-  void gameList.load(DEFAULT_LIBRARY_GAMES_QUERY);
+  loadGames(DEFAULT_LIBRARY_GAMES_QUERY);
 
   return main;
 };
