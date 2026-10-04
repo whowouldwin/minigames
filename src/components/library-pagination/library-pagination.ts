@@ -48,20 +48,14 @@ export const createLibraryPagination = (
   let currentPage = 1;
   let totalPages = 1;
   let visiblePageLimit = getVisiblePageLimit(section);
-  let pageItems: HTMLLIElement[] = [];
 
-  const renderPageButtons = (): void => {
-    for (const item of pageItems) {
-      item.remove();
-    }
-
-    pageItems = [];
-
+  const renderControls = (): void => {
     const pageWindow = getVisiblePageWindow(
       currentPage,
       totalPages,
       visiblePageLimit,
     );
+    const pageItems: HTMLLIElement[] = [];
 
     for (
       let page = pageWindow.firstPage;
@@ -70,18 +64,11 @@ export const createLibraryPagination = (
     ) {
       const item = createPaginationPageItem(page, currentPage, onPageChange);
       pageItems.push(item);
-      nextItem.before(item);
     }
-  };
 
-  const updateArrowButtons = (): void => {
     previousButton.disabled = currentPage === 1;
     nextButton.disabled = currentPage === totalPages;
-  };
-
-  const renderControls = (): void => {
-    renderPageButtons();
-    updateArrowButtons();
+    list.replaceChildren(previousItem, ...pageItems, nextItem);
   };
 
   const update = (page: number, pages: number): void => {
@@ -92,19 +79,22 @@ export const createLibraryPagination = (
     renderControls();
   };
 
-  previousButton.addEventListener("click", (): void => {
-    if (currentPage > 1) {
-      onPageChange(currentPage - 1);
+  const requestPageChange = (page: number): void => {
+    if (page < 1 || page > totalPages) {
+      return;
     }
+
+    onPageChange(page);
+  };
+
+  previousButton.addEventListener("click", (): void => {
+    requestPageChange(currentPage - 1);
   });
 
   nextButton.addEventListener("click", (): void => {
-    if (currentPage < totalPages) {
-      onPageChange(currentPage + 1);
-    }
+    requestPageChange(currentPage + 1);
   });
 
-  list.append(previousItem, nextItem);
   navigation.append(list);
   section.append(navigation);
 
@@ -121,7 +111,7 @@ export const createLibraryPagination = (
     }
 
     visiblePageLimit = nextLimit;
-    renderPageButtons();
+    renderControls();
   };
 
   const resizeObserver = new ResizeObserver(updateVisiblePageLimit);
