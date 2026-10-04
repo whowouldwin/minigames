@@ -14,5 +14,6 @@ export type {
   GameSummary,
   LeaderboardMeta,
   LeaderboardPlayer,
+  LibraryGamesMeta,
   LibraryGamesQuery,
 } from "./types";

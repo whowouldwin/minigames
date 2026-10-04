@@ -67,13 +67,14 @@ export const createLibraryControls = (
           response.data,
           defaultCategory.slug,
           (category: GameCategorySlug): void => {
-            callbacks.onFilterChange({ category, sort: selectedSort });
+            callbacks.onFilterChange({ category, sort: selectedSort, page: 1 });
           },
         ),
       );
       callbacks.onFilterChange({
         category: defaultCategory.slug,
         sort: selectedSort,
+        page: 1,
       });
     } catch (error) {
       if (!section.isConnected) return;

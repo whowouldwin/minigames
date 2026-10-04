@@ -23,12 +23,18 @@ export interface GameCategory {
   isDefault: boolean;
 }
 
+export interface LibraryGamesMeta {
+  page: number;
+  totalPages: number;
+}
+
 export type GameSortValue =
   "rating-desc" | "rating-asc" | "name-asc" | "name-desc";
 
 export interface LibraryGamesQuery {
   category: GameCategorySlug;
   sort: GameSortValue;
+  page: number;
 }
 
 export interface LeaderboardPlayer {
