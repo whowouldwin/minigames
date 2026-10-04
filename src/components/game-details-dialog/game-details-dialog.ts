@@ -1,4 +1,4 @@
-import { getErrorMessage, getGameDetails } from "../../api";
+import { getErrorMessage, getGameComments, getGameDetails } from "../../api";
 import type { SnackbarController } from "../ui/snackbar";
 import { closeDialogWithAnimation, setupDialogDismissal } from "../ui/dialog";
 import { createGameDetailsContent } from "./game-details-content";
@@ -41,17 +41,22 @@ export const createGameDetailsDialog = (
   let isClosing: boolean = false;
   let trigger: HTMLElement | undefined;
   let restorePageScroll: (() => void) | undefined;
-  let requestController: AbortController | undefined;
+  let detailsRequest: AbortController | undefined;
+  let commentsRequest: AbortController | undefined;
+  let requestId: number = 0;
 
-  const cancelRequest = (): void => {
-    requestController?.abort();
-    requestController = undefined;
+  const cancelRequests = (): void => {
+    detailsRequest?.abort();
+    commentsRequest?.abort();
+    detailsRequest = undefined;
+    commentsRequest = undefined;
+    requestId += 1;
   };
 
   const close = async (): Promise<void> => {
     if (isClosing || !dialog.open) return;
 
-    cancelRequest();
+    cancelRequests();
     isClosing = true;
     await closeDialogWithAnimation(dialog, "game-details-dialog--closing");
     isClosing = false;
@@ -66,10 +71,18 @@ export const createGameDetailsDialog = (
   });
   dialog.append(content.hero, content.body);
 
-  const loadGameDetails = async (gameSlug: string): Promise<void> => {
-    cancelRequest();
+  const isCurrentRequest = (currentRequestId: number): boolean =>
+    currentRequestId === requestId && dialog.open;
+
+  const loadGameDetails = async (
+    gameSlug: string,
+    currentRequestId: number,
+  ): Promise<void> => {
+    if (!isCurrentRequest(currentRequestId)) return;
+
+    detailsRequest?.abort();
     const controller = new AbortController();
-    requestController = controller;
+    detailsRequest = controller;
     content.showLoading();
 
     try {
@@ -77,9 +90,9 @@ export const createGameDetailsDialog = (
         signal: controller.signal,
       });
       if (
-        requestController !== controller ||
+        detailsRequest !== controller ||
         controller.signal.aborted ||
-        !dialog.open
+        !isCurrentRequest(currentRequestId)
       ) {
         return;
       }
@@ -92,9 +105,9 @@ export const createGameDetailsDialog = (
       content.renderGame(response.data);
     } catch (error) {
       if (
-        requestController !== controller ||
+        detailsRequest !== controller ||
         controller.signal.aborted ||
-        !dialog.open
+        !isCurrentRequest(currentRequestId)
       ) {
         return;
       }
@@ -104,11 +117,62 @@ export const createGameDetailsDialog = (
         "Unable to load game details.",
       );
       content.showError(message, (): void => {
-        void loadGameDetails(gameSlug);
+        void loadGameDetails(gameSlug, currentRequestId);
       });
       snackbar.show(message, "error");
     } finally {
-      if (requestController === controller) requestController = undefined;
+      if (detailsRequest === controller) detailsRequest = undefined;
+    }
+  };
+
+  const loadGameComments = async (
+    gameSlug: string,
+    currentRequestId: number,
+  ): Promise<void> => {
+    if (!isCurrentRequest(currentRequestId)) return;
+
+    commentsRequest?.abort();
+    const controller = new AbortController();
+    commentsRequest = controller;
+    content.comments.showLoading();
+
+    try {
+      const response = await getGameComments(gameSlug, controller.signal);
+      if (
+        commentsRequest !== controller ||
+        controller.signal.aborted ||
+        !isCurrentRequest(currentRequestId)
+      ) {
+        return;
+      }
+
+      const totalComments: number | undefined = response.meta?.totalComments;
+      if (typeof totalComments !== "number" || !Array.isArray(response.data)) {
+        throw new TypeError(
+          "The game server returned an invalid comments response.",
+        );
+      }
+
+      content.comments.render(response.data, totalComments);
+    } catch (error) {
+      if (
+        commentsRequest !== controller ||
+        controller.signal.aborted ||
+        !isCurrentRequest(currentRequestId)
+      ) {
+        return;
+      }
+
+      const message: string = getErrorMessage(
+        error,
+        "Unable to load comments.",
+      );
+      content.comments.showError(message, (): void => {
+        void loadGameComments(gameSlug, currentRequestId);
+      });
+      snackbar.show(message, "error");
+    } finally {
+      if (commentsRequest === controller) commentsRequest = undefined;
     }
   };
 
@@ -126,9 +190,10 @@ export const createGameDetailsDialog = (
           ? document.activeElement
           : undefined;
       restorePageScroll = lockPageScroll();
-      content.resetComments();
       dialog.showModal();
-      void loadGameDetails(gameSlug);
+      requestId += 1;
+      void loadGameDetails(gameSlug, requestId);
+      void loadGameComments(gameSlug, requestId);
     },
   };
 };

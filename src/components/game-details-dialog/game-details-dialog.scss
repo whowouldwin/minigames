@@ -245,13 +245,17 @@ $game-details-dialog-animation-duration: 200ms;
     border: tokens.$border-width-thin solid tokens.$outline-variant;
 
     @media (hover: hover) {
-      &:hover {
+      &:not(:disabled):hover {
         background-color: tokens.$surface;
       }
     }
 
-    &:active {
+    &:not(:disabled):active {
       background-color: tokens.$primary-low;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
     }
 
     &:focus-visible {

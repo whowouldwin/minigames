@@ -4,7 +4,10 @@ import {
   createErrorState,
   createRequestSkeleton,
 } from "../ui/request-feedback";
-import { createGameDetailsComments } from "./game-details-comments";
+import {
+  createGameDetailsComments,
+  type GameDetailsComments,
+} from "./game-details-comments";
 import { createGameDetailsHero } from "./game-details-hero";
 import { createGameDetailsView } from "./game-details-view";
 
@@ -15,7 +18,7 @@ export interface GameDetailsContent {
   showError: (message: string, retry: () => void) => void;
   showEmpty: () => void;
   renderGame: (game: GameDetails) => void;
-  resetComments: () => void;
+  comments: GameDetailsComments;
 }
 
 const createTitle = (text: string): HTMLHeadingElement => {
@@ -78,6 +81,6 @@ export const createGameDetailsContent = (
     showError,
     showEmpty,
     renderGame,
-    resetComments: comments.reset,
+    comments,
   };
 };
