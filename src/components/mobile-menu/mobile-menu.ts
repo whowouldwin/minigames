@@ -7,7 +7,7 @@ import { createSiteLogo } from "../ui/site-logo";
 import "./mobile-menu.scss";
 
 export const createMobileMenu = (
-  activePage: AppPage,
+  activePage: AppPage | undefined,
   navigateTo: (page: AppPage) => void,
 ): HTMLElement => {
   const menu: HTMLElement = document.createElement("div");

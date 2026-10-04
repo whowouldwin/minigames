@@ -4,7 +4,7 @@ import { navigationItems } from "./navigation-items";
 
 export const createNavigationList = (
   blockName: string,
-  activePage: AppPage,
+  activePage: AppPage | undefined,
   navigateTo: (page: AppPage) => void,
 ): HTMLUListElement => {
   const list: HTMLUListElement = document.createElement("ul");
@@ -26,7 +26,7 @@ export const createNavigationList = (
     link.dataset.navigationBlock = blockName;
     if (navigationPage) link.dataset.page = navigationPage;
 
-    if (navigationPage === activePage) {
+    if (navigationPage && navigationPage === activePage) {
       link.classList.add(`${blockName}__link--active`);
       link.setAttribute("aria-current", "page");
     }
@@ -42,7 +42,7 @@ export const createNavigationList = (
 
 export const updateNavigationState = (
   root: ParentNode,
-  activePage: AppPage,
+  activePage: AppPage | undefined,
 ): void => {
   for (const link of root.querySelectorAll<HTMLAnchorElement>("a[data-page]")) {
     const blockName: string | undefined = link.dataset.navigationBlock;

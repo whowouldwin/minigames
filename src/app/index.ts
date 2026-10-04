@@ -6,6 +6,7 @@ import { createGameDetailsDialog } from "../components/game-details-dialog";
 import { updateNavigationState } from "../components/navigation/create-navigation-list";
 import { createHomePage } from "../pages/home";
 import { createLibraryPage } from "../pages/library";
+import { createNotFoundPage } from "../pages/not-found";
 import type { AppPage } from "../types/app-page";
 import { createSnackbar } from "../components/ui/snackbar";
 import { createAppRouter, createPageRoute } from "../router";
@@ -42,8 +43,13 @@ export const createApp = (): AppController => {
     router.openDialog({ kind: "game", gameSlug });
   };
 
-  const header = createHeader(openAuth, router.getRoute().page, navigateTo);
-  let activePage: AppPage | undefined;
+  const initialPage = router.getRoute().page;
+  const header = createHeader(
+    openAuth,
+    initialPage === "not-found" ? undefined : initialPage,
+    navigateTo,
+  );
+  let activePage: AppRoute["page"] | undefined;
   let library: ReturnType<typeof createLibraryPage> | undefined;
 
   const renderRoute = (route: AppRoute): void => {
@@ -60,6 +66,10 @@ export const createApp = (): AppController => {
           },
         );
         pageOutlet.replaceChildren(library.element);
+      } else if (route.page === "not-found") {
+        pageOutlet.replaceChildren(
+          createNotFoundPage((): void => navigateTo("home")),
+        );
       } else {
         pageOutlet.replaceChildren(
           createHomePage(openGameDetails, navigateTo, snackbar),
@@ -67,7 +77,10 @@ export const createApp = (): AppController => {
       }
 
       activePage = route.page;
-      updateNavigationState(header, route.page);
+      updateNavigationState(
+        header,
+        route.page === "not-found" ? undefined : route.page,
+      );
     }
 
     if (route.page === "library") library?.update(route.library);
