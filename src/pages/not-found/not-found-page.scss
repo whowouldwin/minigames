@@ -1,0 +1,71 @@
+@use "../../styles/mixins";
+@use "../../styles/tokens";
+
+.not-found-page {
+  @include mixins.responsive-inline-padding(tokens.$size-15);
+
+  display: grid;
+  place-items: center;
+  min-height: 55vh;
+  padding-block: tokens.$size-8;
+  background-color: tokens.$bg;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: tokens.$size-2;
+    width: min(100%, 600px);
+    padding: tokens.$size-5;
+    border: tokens.$border-width-medium solid tokens.$on-primary;
+    border-radius: tokens.$corner-extra-large;
+    background-color: tokens.$surface-low;
+    box-shadow: tokens.$level-2;
+    text-align: center;
+  }
+
+  &__code {
+    margin: 0;
+    color: tokens.$on-primary;
+    font-size: clamp(72px, 12vw, 120px);
+    font-weight: tokens.$extra-bold;
+    line-height: 1;
+  }
+
+  & h1 {
+    margin: 0;
+    color: tokens.$on-primary;
+    font-size: tokens.$headline-large;
+    font-weight: tokens.$bold;
+  }
+
+  &__message {
+    max-width: 38ch;
+    margin: 0;
+    font-size: tokens.$body-large;
+    line-height: 1.5;
+  }
+
+  &__home {
+    max-width: 100%;
+    white-space: normal;
+  }
+}
+
+@include mixins.tablet {
+  .not-found-page {
+    padding-block: tokens.$size-5;
+
+    &__content {
+      padding: tokens.$size-3;
+    }
+
+    & h1 {
+      font-size: tokens.$headline-medium;
+    }
+
+    &__message {
+      font-size: tokens.$body-medium;
+    }
+  }
+}
