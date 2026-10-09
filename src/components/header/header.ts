@@ -7,6 +7,7 @@ import { createMobileMenu, setupMobileMenu } from "../mobile-menu";
 import type { AuthMode } from "../auth-dialog";
 import type { AppSession } from "../../auth";
 import type { AppPage } from "../../types/app-page";
+import { createProfileIdentity } from "./profile-identity";
 
 import "./header.scss";
 
@@ -14,18 +15,6 @@ export interface HeaderController {
   element: HTMLElement;
   setAuthenticated: (session: AppSession) => void;
 }
-
-const createAccountLabel = (
-  className: string,
-  displayName: string,
-): HTMLSpanElement => {
-  const label: HTMLSpanElement = document.createElement("span");
-  label.className = className;
-  label.setAttribute("role", "status");
-  label.textContent = "Hi, " + displayName;
-
-  return label;
-};
 
 export const createHeader = (
   openAuth: (mode: AuthMode) => void,
@@ -74,12 +63,15 @@ export const createHeader = (
     element: header,
     setAuthenticated: (session: AppSession): void => {
       buttons.replaceChildren(
-        createAccountLabel("header__account", session.displayName),
+        createProfileIdentity(session, "header__account profile-identity"),
       );
       mobileMenu
         .querySelector(".mobile-menu__actions")
         ?.replaceChildren(
-          createAccountLabel("mobile-menu__account", session.displayName),
+          createProfileIdentity(
+            session,
+            "mobile-menu__account profile-identity",
+          ),
         );
     },
   };
