@@ -5,9 +5,10 @@ export {
 } from "./app-session";
 export type { AppSession } from "./app-session";
 export {
-  authenticateWithEmailPassword,
   AuthenticationNotConfiguredError,
-} from "./email-password-auth";
+  getAuthenticationErrorMessage,
+} from "./auth-errors";
+export { authenticateWithEmailPassword } from "./email-password-auth";
 export type {
   EmailPasswordCredentials,
   EmailPasswordMode,
