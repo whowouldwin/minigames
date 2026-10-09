@@ -14,23 +14,30 @@ const setupModeSwitch = (
 };
 
 const setupPasswordVisibility = (form: HTMLFormElement): void => {
-  const password: HTMLInputElement | null =
-    form.querySelector("#auth-password");
-  const visibilityButton: HTMLButtonElement | null = form.querySelector(
-    ".auth-dialog__visibility",
-  );
+  const visibilityButtons: HTMLButtonElement[] = [
+    ...form.querySelectorAll<HTMLButtonElement>(".auth-dialog__visibility"),
+  ];
 
-  if (!password || !visibilityButton) return;
+  for (const visibilityButton of visibilityButtons) {
+    const passwordId: string =
+      visibilityButton.getAttribute("aria-controls") ?? "";
+    const password: HTMLInputElement | undefined = passwordId
+      ? (form.querySelector<HTMLInputElement>(`#${CSS.escape(passwordId)}`) ??
+        undefined)
+      : undefined;
 
-  visibilityButton.addEventListener("click", (): void => {
-    const isVisible: boolean = password.type === "password";
-    password.type = isVisible ? "text" : "password";
-    visibilityButton.setAttribute("aria-pressed", String(isVisible));
-    visibilityButton.setAttribute(
-      "aria-label",
-      isVisible ? "Hide password" : "Show password",
-    );
-  });
+    if (!password) continue;
+
+    visibilityButton.addEventListener("click", (): void => {
+      const isVisible: boolean = password.type === "password";
+      password.type = isVisible ? "text" : "password";
+      visibilityButton.setAttribute("aria-pressed", String(isVisible));
+      visibilityButton.setAttribute(
+        "aria-label",
+        isVisible ? "Hide password" : "Show password",
+      );
+    });
+  }
 };
 
 export const setupAuthFormControls = (
