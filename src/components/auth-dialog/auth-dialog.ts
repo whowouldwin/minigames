@@ -1,6 +1,8 @@
 import { createAuthForm } from "./auth-form";
+import { setupAuthFormSubmission } from "./auth-form-submission";
 import { closeDialogWithAnimation, setupDialogDismissal } from "../ui/dialog";
 import type { AuthMode } from "./auth-form";
+import type { EmailPasswordCredentials } from "../../auth";
 import "./auth-dialog.scss";
 
 export interface AuthDialog {
@@ -12,11 +14,16 @@ export interface AuthDialog {
 interface AuthDialogCallbacks {
   onClose: () => void;
   onModeChange: (mode: AuthMode) => void;
+  onAuthenticate: (
+    mode: AuthMode,
+    credentials: EmailPasswordCredentials,
+  ) => Promise<void>;
 }
 
 export const createAuthDialog = ({
   onClose,
   onModeChange,
+  onAuthenticate,
 }: AuthDialogCallbacks): AuthDialog => {
   const dialog: HTMLDialogElement = document.createElement("dialog");
   dialog.className = "auth-dialog";
@@ -31,7 +38,16 @@ export const createAuthDialog = ({
   panel.setAttribute("role", "tabpanel");
   let activeMode: AuthMode = "login";
   let isClosing: boolean = false;
+  let isAuthenticationPending: boolean = false;
   let trigger: HTMLElement | undefined;
+  const closeButton: HTMLButtonElement = document.createElement("button");
+  closeButton.className = "auth-dialog__close";
+  closeButton.type = "button";
+  closeButton.setAttribute("aria-label", "Close sign-in dialog");
+  closeButton.textContent = "×";
+  closeButton.addEventListener("click", (): void => {
+    if (!isAuthenticationPending) onClose();
+  });
 
   const setMode = (mode: AuthMode): void => {
     activeMode = mode;
@@ -41,7 +57,18 @@ export const createAuthDialog = ({
       tab.tabIndex = isSelected ? 0 : -1;
     }
     panel.setAttribute("aria-labelledby", `auth-tab-${mode}`);
-    panel.replaceChildren(createAuthForm(mode, onModeChange));
+    const form: HTMLFormElement = createAuthForm(mode, onModeChange);
+    setupAuthFormSubmission({
+      form,
+      mode,
+      tabs,
+      closeButton,
+      authenticate: onAuthenticate,
+      onPendingChange: (isPending: boolean): void => {
+        isAuthenticationPending = isPending;
+      },
+    });
+    panel.replaceChildren(form);
     if (!globalThis.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       panel.animate(
         [
@@ -78,14 +105,18 @@ export const createAuthDialog = ({
     tabs.append(tab);
   }
   const close = async (): Promise<void> => {
-    if (isClosing || !dialog.open) return;
+    if (isClosing || isAuthenticationPending || !dialog.open) return;
     isClosing = true;
     await closeDialogWithAnimation(dialog, "auth-dialog--closing");
     isClosing = false;
     trigger?.focus();
   };
-  setupDialogDismissal(dialog, onClose);
-  dialog.append(tabs, panel);
+  setupDialogDismissal(
+    dialog,
+    onClose,
+    (): boolean => !isAuthenticationPending,
+  );
+  dialog.append(closeButton, tabs, panel);
   setMode("login");
   return {
     element: dialog,

@@ -27,7 +27,7 @@ const signOutAfterFailure = async (auth: Auth): Promise<void> => {
   try {
     await signOut(auth);
   } catch {
-    // Firebase identity must not become the app's source of truth by itself.
+    // App session state is created explicitly, never inferred from Firebase auth.
   }
 };
 
