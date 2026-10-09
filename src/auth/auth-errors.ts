@@ -5,6 +5,16 @@ export class AuthenticationNotConfiguredError extends Error {
   }
 }
 
+export class AuthenticationCleanupError extends AggregateError {
+  constructor(authenticationError: unknown, cleanupError: unknown) {
+    super(
+      [authenticationError, cleanupError],
+      "Authentication failed and Firebase sign-out cleanup also failed.",
+    );
+    this.name = "AuthenticationCleanupError";
+  }
+}
+
 const firebaseAuthErrorMessages: Record<string, string> = {
   "auth/email-already-in-use": "An account with this email already exists.",
   "auth/invalid-credential": "Email or password is incorrect.",
@@ -23,6 +33,10 @@ const firebaseAuthErrorMessages: Record<string, string> = {
 const fallbackMessage: string = "Authentication failed. Please try again.";
 
 export const getAuthenticationErrorMessage = (error: unknown): string => {
+  if (error instanceof AuthenticationCleanupError) {
+    return "Authentication could not be completed. Please try again.";
+  }
+
   if (error instanceof AuthenticationNotConfiguredError) {
     return "Authentication is not configured. Please try again later.";
   }
