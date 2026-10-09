@@ -7,6 +7,7 @@ $dialog-shadow: 8px 8px 0 #111;
 $dialog-backdrop: rgba(tokens.$bg-footer, 0.65);
 
 .auth-dialog {
+  position: relative;
   --auth-emphasis-border: 2.5px;
 
   width: min($dialog-width, calc(100% - tokens.$size-4));
@@ -14,6 +15,7 @@ $dialog-backdrop: rgba(tokens.$bg-footer, 0.65);
   max-height: calc(100dvh - tokens.$size-4);
   margin: auto;
   padding: tokens.$size-4;
+  padding-top: tokens.$size-6;
   border: 0;
   border-radius: tokens.$corner-extra-large;
   background: tokens.$bg;
@@ -64,8 +66,32 @@ $dialog-backdrop: rgba(tokens.$bg-footer, 0.65);
     }
   }
 
+  &__close {
+    position: absolute;
+    top: tokens.$size-2;
+    right: tokens.$size-2;
+    display: grid;
+    width: tokens.$size-4;
+    height: tokens.$size-4;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: tokens.$corner-small;
+    background: transparent;
+    color: tokens.$on-bg;
+    font-size: tokens.$headline-small;
+    line-height: 1;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
   @media (max-width: tokens.$breakpoint-mobile) {
     padding: tokens.$size-3;
+    padding-top: tokens.$size-6;
   }
 }
 

@@ -12,6 +12,9 @@ import { createSnackbar } from "../components/ui/snackbar";
 import { createAppRouter, createPageRoute } from "../router";
 import type { AppRoute } from "../router";
 import { createDialogRouteSync } from "./synchronize-dialog-route";
+import { authenticateWithEmailPassword } from "../auth";
+import type { EmailPasswordCredentials } from "../auth";
+import { auth as firebaseAuth } from "../firebase";
 
 interface AppController {
   element: HTMLDivElement;
@@ -29,6 +32,19 @@ export const createApp = (): AppController => {
   const auth = createAuthDialog({
     onClose: router.closeDialog,
     onModeChange: openAuth,
+    onAuthenticate: async (
+      mode: AuthMode,
+      credentials: EmailPasswordCredentials,
+    ): Promise<void> => {
+      await authenticateWithEmailPassword(firebaseAuth, mode, credentials);
+      snackbar.show(
+        mode === "register"
+          ? "Account created successfully."
+          : "Signed in successfully.",
+        "success",
+      );
+      router.closeDialog();
+    },
   });
   const snackbar = createSnackbar();
   const gameDetails: ReturnType<typeof createGameDetailsDialog> =

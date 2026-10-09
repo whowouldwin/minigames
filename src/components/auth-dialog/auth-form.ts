@@ -80,6 +80,7 @@ export const createAuthForm = (
 
   form.innerHTML = `
     <div class="auth-dialog__heading"><h2 id="auth-title">${isRegistration ? "Create Account" : "Welcome Back!"}</h2><p>${isRegistration ? "Join MiniGames to track your score &amp; streak." : "Sign in to resume your games and progress."}</p></div>
+    <p class="auth-dialog__form-status" role="alert" hidden></p>
     <div class="auth-dialog__fields">${fields
       .map(
         (field: AuthField): string => `

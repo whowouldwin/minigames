@@ -54,6 +54,15 @@ $line-width: 1px;
     font-size: tokens.$body-small;
   }
 
+  &__form-status {
+    margin: 0;
+    padding: tokens.$size-1 tokens.$size-2;
+    border-radius: tokens.$corner-small;
+    background: tokens.$error;
+    color: tokens.$white;
+    font-size: tokens.$body-small;
+  }
+
   &__input {
     display: flex;
     align-items: center;
