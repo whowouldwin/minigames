@@ -93,9 +93,11 @@
   }
 
   &__account {
-    color: tokens.$white;
-    font-weight: tokens.$bold;
-    text-align: center;
+    justify-content: center;
+
+    .profile-identity__name {
+      color: tokens.$white;
+    }
   }
 
   &__login-button {

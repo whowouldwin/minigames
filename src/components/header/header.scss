@@ -1,5 +1,6 @@
 @use "../../styles/mixins";
 @use "../../styles/tokens";
+@use "./profile-identity";
 
 .header {
   position: relative;
@@ -37,11 +38,6 @@
     display: flex;
     align-items: center;
     gap: tokens.$size-2;
-  }
-
-  &__account {
-    color: tokens.$on-bg;
-    font-weight: tokens.$bold;
   }
 
   @include mixins.compact-desktop {
