@@ -1,3 +1,4 @@
+import { getAuthenticationErrorMessage } from "../../auth";
 import type { EmailPasswordCredentials } from "../../auth";
 import type { AuthMode } from "./auth-types";
 
@@ -62,10 +63,7 @@ export const setupAuthFormSubmission = ({
     void authenticate(mode, credentials)
       .catch((error: unknown): void => {
         if (!status) return;
-        status.textContent =
-          error instanceof Error
-            ? error.message
-            : "Authentication failed. Please try again.";
+        status.textContent = getAuthenticationErrorMessage(error);
         status.hidden = false;
       })
       .finally((): void => {

@@ -12,7 +12,10 @@ import { createSnackbar } from "../components/ui/snackbar";
 import { createAppRouter, createPageRoute } from "../router";
 import type { AppRoute } from "../router";
 import { createDialogRouteSync } from "./synchronize-dialog-route";
-import { authenticateWithEmailPassword } from "../auth";
+import {
+  authenticateWithEmailPassword,
+  getAuthenticationErrorMessage,
+} from "../auth";
 import type { EmailPasswordCredentials } from "../auth";
 import { auth as firebaseAuth } from "../firebase";
 
@@ -36,7 +39,12 @@ export const createApp = (): AppController => {
       mode: AuthMode,
       credentials: EmailPasswordCredentials,
     ): Promise<void> => {
-      await authenticateWithEmailPassword(firebaseAuth, mode, credentials);
+      try {
+        await authenticateWithEmailPassword(firebaseAuth, mode, credentials);
+      } catch (error: unknown) {
+        snackbar.show(getAuthenticationErrorMessage(error), "error");
+        throw error;
+      }
       snackbar.show(
         mode === "register"
           ? "Account created successfully."

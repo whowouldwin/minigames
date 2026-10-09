@@ -7,6 +7,7 @@ import {
 import type { Auth, User } from "firebase/auth";
 import { createAppSession } from "./app-session";
 import type { AppSession } from "./app-session";
+import { AuthenticationNotConfiguredError } from "./auth-errors";
 
 export type EmailPasswordMode = "login" | "register";
 
@@ -14,13 +15,6 @@ export interface EmailPasswordCredentials {
   email: string;
   password: string;
   username?: string;
-}
-
-export class AuthenticationNotConfiguredError extends Error {
-  constructor() {
-    super("Firebase Authentication is not configured.");
-    this.name = "AuthenticationNotConfiguredError";
-  }
 }
 
 const signOutAfterFailure = async (auth: Auth): Promise<void> => {
