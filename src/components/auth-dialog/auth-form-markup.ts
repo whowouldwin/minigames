@@ -41,7 +41,7 @@ const getAuthFields = (mode: AuthMode): AuthField[] => {
           label: "Confirm Password",
           type: "password",
           placeholder: "Repeat your password",
-          autocomplete: "off",
+          autocomplete: "new-password",
           icon: lockIcon,
         },
       ]
@@ -72,15 +72,12 @@ const getAuthFields = (mode: AuthMode): AuthField[] => {
   ];
 };
 
-const renderPasswordVisibilityButton = (): string => `
-  <button class="auth-dialog__visibility" type="button" aria-label="Show password" aria-pressed="false">
+const renderPasswordVisibilityButton = (fieldId: string): string => `
+  <button class="auth-dialog__visibility" type="button" aria-label="Show password" aria-controls="${fieldId}" aria-pressed="false">
     <img src="${visibilityIcon}" alt="" />
   </button>`;
 
-const renderField = (
-  field: AuthField,
-  isPasswordVisibilityShown: boolean,
-): string => {
+const renderField = (field: AuthField): string => {
   const minLength: string = field.minLength
     ? ` minlength="${field.minLength}"`
     : "";
@@ -88,17 +85,17 @@ const renderField = (
     ? ` maxlength="${field.maxLength}"`
     : "";
   const pattern: string = field.pattern ? ` pattern="${field.pattern}"` : "";
-  const visibilityButton: string = isPasswordVisibilityShown
-    ? renderPasswordVisibilityButton()
-    : "";
+  const fieldId: string = `auth-${field.name}`;
+  const visibilityButton: string =
+    field.type === "password" ? renderPasswordVisibilityButton(fieldId) : "";
 
   return `
     <div class="auth-dialog__field">
-      <label for="auth-${field.name}">${field.label}</label>
+      <label for="${fieldId}">${field.label}</label>
       <div class="auth-dialog__input">
         <img src="${field.icon}" alt="" />
         <input
-          id="auth-${field.name}"
+          id="${fieldId}"
           name="${field.name}"
           type="${field.type}"
           placeholder="${field.placeholder}"
@@ -151,9 +148,7 @@ export const renderAuthFormMarkup = (mode: AuthMode): string => {
     ? "Join MiniGames to track your score &amp; streak."
     : "Sign in to resume your games and progress.";
   const fields: string = getAuthFields(mode)
-    .map((field: AuthField): string =>
-      renderField(field, !isRegistration && field.name === "password"),
-    )
+    .map((field: AuthField): string => renderField(field))
     .join("");
 
   return `
