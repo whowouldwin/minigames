@@ -5,15 +5,33 @@ import { createSiteLogo } from "../ui/site-logo";
 import { createMobileMenu, setupMobileMenu } from "../mobile-menu";
 
 import type { AuthMode } from "../auth-dialog";
+import type { AppSession } from "../../auth";
 import type { AppPage } from "../../types/app-page";
 
 import "./header.scss";
+
+export interface HeaderController {
+  element: HTMLElement;
+  setAuthenticated: (session: AppSession) => void;
+}
+
+const createAccountLabel = (
+  className: string,
+  displayName: string,
+): HTMLSpanElement => {
+  const label: HTMLSpanElement = document.createElement("span");
+  label.className = className;
+  label.setAttribute("role", "status");
+  label.textContent = "Hi, " + displayName;
+
+  return label;
+};
 
 export const createHeader = (
   openAuth: (mode: AuthMode) => void,
   activePage: AppPage | undefined,
   navigateTo: (page: AppPage) => void,
-): HTMLElement => {
+): HeaderController => {
   const header: HTMLElement = document.createElement("header");
 
   header.className = "header";
@@ -52,5 +70,17 @@ export const createHeader = (
 
   header.append(createSiteLogo(navigateTo), actions, mobileMenu);
 
-  return header;
+  return {
+    element: header,
+    setAuthenticated: (session: AppSession): void => {
+      buttons.replaceChildren(
+        createAccountLabel("header__account", session.displayName),
+      );
+      mobileMenu
+        .querySelector(".mobile-menu__actions")
+        ?.replaceChildren(
+          createAccountLabel("mobile-menu__account", session.displayName),
+        );
+    },
+  };
 };

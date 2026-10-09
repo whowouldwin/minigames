@@ -39,6 +39,11 @@
     gap: tokens.$size-2;
   }
 
+  &__account {
+    color: tokens.$on-bg;
+    font-weight: tokens.$bold;
+  }
+
   @include mixins.compact-desktop {
     padding-inline: tokens.$size-4;
 

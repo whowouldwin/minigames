@@ -32,6 +32,17 @@ export const createApp = (): AppController => {
   const openAuth = (mode: AuthMode): void => {
     router.openDialog({ kind: "auth", mode });
   };
+  const navigateTo = (page: AppPage): void =>
+    router.navigate(createPageRoute(page));
+  const openGameDetails = (gameSlug: string): void => {
+    router.openDialog({ kind: "game", gameSlug });
+  };
+  const initialPage = router.getRoute().page;
+  const header = createHeader(
+    openAuth,
+    initialPage === "not-found" ? undefined : initialPage,
+    navigateTo,
+  );
   const auth = createAuthDialog({
     onClose: router.closeDialog,
     onModeChange: openAuth,
@@ -39,12 +50,18 @@ export const createApp = (): AppController => {
       mode: AuthMode,
       credentials: EmailPasswordCredentials,
     ): Promise<void> => {
+      let session: Awaited<ReturnType<typeof authenticateWithEmailPassword>>;
       try {
-        await authenticateWithEmailPassword(firebaseAuth, mode, credentials);
+        session = await authenticateWithEmailPassword(
+          firebaseAuth,
+          mode,
+          credentials,
+        );
       } catch (error: unknown) {
         snackbar.show(getAuthenticationErrorMessage(error), "error");
         throw error;
       }
+      header.setAuthenticated(session);
       snackbar.show(
         mode === "register"
           ? "Account created successfully."
@@ -61,18 +78,6 @@ export const createApp = (): AppController => {
   const pageOutlet: HTMLDivElement = document.createElement("div");
   pageOutlet.className = "app__page";
 
-  const navigateTo = (page: AppPage): void =>
-    router.navigate(createPageRoute(page));
-  const openGameDetails = (gameSlug: string): void => {
-    router.openDialog({ kind: "game", gameSlug });
-  };
-
-  const initialPage = router.getRoute().page;
-  const header = createHeader(
-    openAuth,
-    initialPage === "not-found" ? undefined : initialPage,
-    navigateTo,
-  );
   let activePage: AppRoute["page"] | undefined;
   let library: ReturnType<typeof createLibraryPage> | undefined;
 
@@ -102,7 +107,7 @@ export const createApp = (): AppController => {
 
       activePage = route.page;
       updateNavigationState(
-        header,
+        header.element,
         route.page === "not-found" ? undefined : route.page,
       );
     }
@@ -113,7 +118,7 @@ export const createApp = (): AppController => {
 
   router.subscribe(renderRoute);
   app.append(
-    header,
+    header.element,
     pageOutlet,
     createFooter(navigateTo),
     auth.element,
