@@ -1,0 +1,208 @@
+@use "../../styles/tokens";
+
+$input-border: 2px;
+$submit-height: 52px;
+$google-height: 50px;
+$line-width: 1px;
+
+.auth-dialog {
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$size-3;
+    margin: 0;
+  }
+
+  &__heading {
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$size-1;
+
+    h2 {
+      margin: 0;
+      color: tokens.$on-primary;
+      font-size: tokens.$display-small;
+    }
+
+    p {
+      margin: 0;
+      font-size: tokens.$body-small;
+    }
+  }
+
+  &__fields,
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$size-2;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: tokens.$size-1;
+
+    label {
+      color: tokens.$on-primary;
+      font-size: tokens.$label-large;
+      font-weight: tokens.$bold;
+    }
+  }
+
+  &__error {
+    color: tokens.$error;
+    font-size: tokens.$body-small;
+  }
+
+  &__input {
+    display: flex;
+    align-items: center;
+    gap: tokens.$size-2;
+    height: tokens.$size-6;
+    padding: 0 tokens.$size-2;
+    background: tokens.$white;
+    border-radius: tokens.$corner-small;
+    box-shadow: inset 0 0 0 $input-border tokens.$on-primary;
+
+    img {
+      width: tokens.$headline-small;
+      height: tokens.$headline-small;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    &:focus-within {
+      box-shadow:
+        inset 0 0 0 $input-border tokens.$tertiary,
+        0 0 0 $input-border tokens.$primary;
+    }
+
+    &--invalid {
+      box-shadow: inset 0 0 0 $input-border tokens.$error;
+    }
+  }
+
+  input {
+    min-width: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    outline: none;
+    background: transparent;
+    font-size: tokens.$body-small;
+    font-weight: tokens.$medium;
+
+    &::placeholder {
+      color: tokens.$on-bg;
+      opacity: 1;
+    }
+  }
+
+  &__visibility {
+    display: flex;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  &__link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: tokens.$on-primary;
+    font-size: tokens.$label-large;
+    font-weight: tokens.$bold;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  &__forgot {
+    align-self: flex-end;
+  }
+
+  &__submit,
+  &__google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: tokens.$size-2;
+    width: 100%;
+    padding: 0 tokens.$size-2;
+    border: 0;
+    border-radius: tokens.$corner-medium;
+    font-size: tokens.$body-medium;
+    font-weight: tokens.$bold;
+    color: tokens.$on-primary;
+    cursor: pointer;
+  }
+
+  &__submit {
+    height: $submit-height;
+    background: tokens.$primary;
+    box-shadow:
+      inset 0 0 0 var(--auth-emphasis-border) tokens.$on-primary,
+      0 tokens.$size-05 0 tokens.$on-primary;
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  &__google {
+    height: $google-height;
+    background: tokens.$white;
+    box-shadow: inset 0 0 0 $input-border tokens.$on-primary;
+
+    img {
+      width: tokens.$size-3;
+      height: tokens.$size-3;
+    }
+  }
+
+  &__divider {
+    display: flex;
+    align-items: center;
+    gap: tokens.$size-2;
+    font-size: tokens.$label-medium;
+    font-weight: tokens.$bold;
+
+    &::before,
+    &::after {
+      content: "";
+      flex: 1;
+      height: $line-width;
+      background: tokens.$outline-variant;
+    }
+  }
+
+  &__footer {
+    margin: 0;
+    text-align: center;
+    font-size: tokens.$body-small;
+  }
+
+  @media (hover: hover) {
+    &__submit:not(:disabled):hover {
+      background: tokens.$primary-high;
+    }
+
+    &__google:hover {
+      background: tokens.$surface;
+    }
+
+    &__link:hover {
+      color: tokens.$tertiary;
+    }
+
+    &__tabs button[aria-selected="false"]:hover {
+      background: tokens.$secondary;
+    }
+  }
+
+  button:active:not(:disabled) {
+    filter: brightness(0.9);
+  }
+}

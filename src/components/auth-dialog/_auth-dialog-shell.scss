@@ -1,0 +1,114 @@
+@use "../../styles/tokens";
+
+$dialog-width: 420px;
+$dialog-border: 3px;
+$dialog-duration: 200ms;
+$dialog-shadow: 8px 8px 0 #111;
+$dialog-backdrop: rgba(tokens.$bg-footer, 0.65);
+
+.auth-dialog {
+  --auth-emphasis-border: 2.5px;
+
+  width: min($dialog-width, calc(100% - tokens.$size-4));
+  max-width: none;
+  max-height: calc(100dvh - tokens.$size-4);
+  margin: auto;
+  padding: tokens.$size-4;
+  border: 0;
+  border-radius: tokens.$corner-extra-large;
+  background: tokens.$bg;
+  color: tokens.$on-bg;
+  box-shadow:
+    inset 0 0 0 $dialog-border tokens.$on-primary,
+    $dialog-shadow;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  &[open] {
+    animation: auth-enter $dialog-duration ease-out;
+  }
+
+  &::backdrop {
+    background: $dialog-backdrop;
+    animation: backdrop-enter $dialog-duration ease-out;
+  }
+
+  &--closing[open] {
+    animation: auth-leave $dialog-duration ease-in forwards;
+  }
+
+  &--closing::backdrop {
+    animation: backdrop-leave $dialog-duration ease-in forwards;
+  }
+
+  &__tabs {
+    display: flex;
+    height: tokens.$size-6;
+    margin-bottom: tokens.$size-3;
+    border-radius: tokens.$corner-medium;
+    background: tokens.$white;
+    box-shadow: inset 0 0 0 var(--auth-emphasis-border) tokens.$on-primary;
+
+    button {
+      flex: 1;
+      border: 0;
+      border-radius: tokens.$corner-small;
+      background: transparent;
+      font-weight: tokens.$bold;
+      cursor: pointer;
+    }
+
+    [aria-selected="true"] {
+      color: tokens.$white;
+      background: tokens.$bg-footer-low;
+    }
+  }
+
+  @media (max-width: tokens.$breakpoint-mobile) {
+    padding: tokens.$size-3;
+  }
+}
+
+body:has(.auth-dialog[open]) {
+  overflow: hidden;
+}
+
+@keyframes auth-enter {
+  from {
+    opacity: 0;
+    transform: translateY(tokens.$size-2);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes auth-leave {
+  to {
+    opacity: 0;
+    transform: translateY(tokens.$size-2);
+  }
+}
+
+@keyframes backdrop-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes backdrop-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-dialog[open],
+  .auth-dialog::backdrop {
+    animation: none;
+  }
+}
