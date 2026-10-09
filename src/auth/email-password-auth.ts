@@ -7,7 +7,10 @@ import {
 import type { Auth, User } from "firebase/auth";
 import { createAppSession } from "./app-session";
 import type { AppSession } from "./app-session";
-import { AuthenticationNotConfiguredError } from "./auth-errors";
+import {
+  AuthenticationCleanupError,
+  AuthenticationNotConfiguredError,
+} from "./auth-errors";
 
 export type EmailPasswordMode = "login" | "register";
 
@@ -17,11 +20,14 @@ export interface EmailPasswordCredentials {
   username?: string;
 }
 
-const signOutAfterFailure = async (auth: Auth): Promise<void> => {
+const signOutAfterFailure = async (
+  auth: Auth,
+  authenticationError: unknown,
+): Promise<void> => {
   try {
     await signOut(auth);
-  } catch {
-    // App session state is created explicitly, never inferred from Firebase auth.
+  } catch (cleanupError: unknown) {
+    throw new AuthenticationCleanupError(authenticationError, cleanupError);
   }
 };
 
@@ -55,7 +61,7 @@ export const authenticateWithEmailPassword = async (
 
     return createAppSession(user);
   } catch (error: unknown) {
-    await signOutAfterFailure(auth);
+    await signOutAfterFailure(auth, error);
     throw error;
   }
 };

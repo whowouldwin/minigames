@@ -5,6 +5,7 @@ export {
 } from "./app-session";
 export type { AppSession } from "./app-session";
 export {
+  AuthenticationCleanupError,
   AuthenticationNotConfiguredError,
   getAuthenticationErrorMessage,
 } from "./auth-errors";
