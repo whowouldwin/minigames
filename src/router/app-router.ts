@@ -1,5 +1,11 @@
 import type { AppRoute, DialogRoute } from "./route-state";
-import { createRouteUrl, readRouteUrl } from "./route-url";
+import { createRouteUrl } from "./route-url";
+import {
+  getCurrentRouteUrl,
+  readCurrentAppRoute,
+  removeAuthDialogFromCurrentUrl,
+  writeRouteToHistory,
+} from "./route-history";
 import {
   createDialogHistoryState,
   restoreDialogHistory,
@@ -16,31 +22,32 @@ export interface AppRouter {
   openDialog: (dialog: DialogRoute) => void;
   closeDialog: () => void;
   setNavigationGuard: (guard: () => void) => void;
+  setAuthDialogGuard: (shouldBlockAuthDialog: () => boolean) => void;
   start: () => void;
 }
-
-const getRoute = (): AppRoute =>
-  readRouteUrl(new URL(globalThis.location.href));
-
-const getCurrentUrl = (): string =>
-  globalThis.location.pathname + globalThis.location.search;
-
-const getAbsoluteUrl = (routeUrl: string): string =>
-  globalThis.location.origin + routeUrl;
 
 export const createAppRouter = (): AppRouter => {
   const listeners = new Set<RouteListener>();
   let isStarted: boolean = false;
   let isDialogClosePending: boolean = false;
   let navigationGuard: (() => void) | undefined;
+  let authDialogGuard: (() => boolean) | undefined;
 
   const checkNavigation = (): void => {
     navigationGuard?.();
   };
 
+  const getRouteAfterAuthGuard = (): AppRoute => {
+    const route = readCurrentAppRoute();
+    if (route.dialog?.kind !== "auth" || !authDialogGuard?.()) return route;
+
+    removeAuthDialogFromCurrentUrl();
+    return readCurrentAppRoute();
+  };
+
   const notify = (): void => {
     isDialogClosePending = false;
-    const route = getRoute();
+    const route = getRouteAfterAuthGuard();
     for (const listener of listeners) listener(route);
   };
 
@@ -55,20 +62,23 @@ export const createAppRouter = (): AppRouter => {
     state?: DialogHistoryState,
   ): void => {
     checkNavigation();
-    const url: string = createRouteUrl(route);
-    const currentUrl: string = getCurrentUrl();
-    if (url === currentUrl) return;
-
-    if (shouldReplace) {
-      globalThis.history.replaceState(state, "", getAbsoluteUrl(url));
-    } else {
-      globalThis.history.pushState(state, "", getAbsoluteUrl(url));
+    if (route.dialog?.kind === "auth" && authDialogGuard?.()) {
+      if (readCurrentAppRoute().dialog?.kind === "auth") {
+        removeAuthDialogFromCurrentUrl();
+        notify();
+      }
+      return;
     }
+
+    const url: string = createRouteUrl(route);
+    if (url === getCurrentRouteUrl()) return;
+
+    writeRouteToHistory(url, shouldReplace, state);
     notify();
   };
 
   const openDialog = (dialog: DialogRoute): void => {
-    const route = getRoute();
+    const route = readCurrentAppRoute();
     const hasOpenDialog: boolean = route.dialog !== undefined;
     const state: DialogHistoryState | undefined =
       createDialogHistoryState(hasOpenDialog);
@@ -76,7 +86,7 @@ export const createAppRouter = (): AppRouter => {
   };
 
   const closeDialog = (): void => {
-    const route = getRoute();
+    const route = readCurrentAppRoute();
     if (isDialogClosePending || !route.dialog) return;
 
     if (closeDialogUsingHistory(checkNavigation) === "back") {
@@ -88,7 +98,7 @@ export const createAppRouter = (): AppRouter => {
   };
 
   return {
-    getRoute,
+    getRoute: readCurrentAppRoute,
     subscribe: (listener): void => {
       listeners.add(listener);
     },
@@ -98,11 +108,15 @@ export const createAppRouter = (): AppRouter => {
     setNavigationGuard: (guard): void => {
       navigationGuard = guard;
     },
+    setAuthDialogGuard: (shouldBlockAuthDialog): void => {
+      authDialogGuard = shouldBlockAuthDialog;
+    },
     start: (): void => {
       if (isStarted) return;
       isStarted = true;
       checkNavigation();
-      restoreDialogHistory(getRoute());
+      getRouteAfterAuthGuard();
+      restoreDialogHistory(readCurrentAppRoute());
       globalThis.addEventListener("popstate", notifyAfterPopState);
       notify();
     },
