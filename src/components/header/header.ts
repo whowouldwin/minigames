@@ -21,6 +21,7 @@ export const createHeader = (
   openAuth: (mode: AuthMode) => void,
   activePage: AppPage | undefined,
   navigateTo: (page: AppPage) => void,
+  onLogout: () => void,
 ): HeaderController => {
   const header: HTMLElement = document.createElement("header");
 
@@ -34,9 +35,11 @@ export const createHeader = (
 
   const loginButton: HTMLButtonElement = createButton("Log In", "outlined");
   const signupButton: HTMLButtonElement = createButton("Sign Up", "filled");
+  const logoutButton: HTMLButtonElement = createButton("Log Out", "outlined");
 
   loginButton.classList.add("header__login-button");
   signupButton.classList.add("header__signup-button");
+  logoutButton.classList.add("header__logout-button");
 
   loginButton.addEventListener("click", (): void => {
     openAuth("login");
@@ -44,6 +47,7 @@ export const createHeader = (
   signupButton.addEventListener("click", (): void => {
     openAuth("register");
   });
+  logoutButton.addEventListener("click", onLogout);
   buttons.append(loginButton, signupButton);
 
   const menuToggle: HTMLButtonElement = createMenuToggle();
@@ -55,6 +59,9 @@ export const createHeader = (
   );
 
   const mobileMenu: HTMLElement = createMobileMenu(activePage, navigateTo);
+  const mobileMenuLogoutButton = mobileMenu.querySelector<HTMLButtonElement>(
+    ".mobile-menu__logout-button",
+  );
   const mobileMenuActions = mobileMenu.querySelector<HTMLElement>(
     ".mobile-menu__actions",
   );
@@ -65,21 +72,27 @@ export const createHeader = (
     ".mobile-menu__signup-button",
   );
 
-  setupMobileMenu(menuToggle, mobileMenu, openAuth);
+  setupMobileMenu(menuToggle, mobileMenu, openAuth, onLogout);
 
   header.append(createSiteLogo(navigateTo), actions, mobileMenu);
 
   return {
     element: header,
     setAuthenticated: (session: AppSession): void => {
+      logoutButton.hidden = false;
       buttons.replaceChildren(
         createProfileIdentity(session, "header__account profile-identity"),
+        logoutButton,
       );
+      if (mobileMenuLogoutButton) mobileMenuLogoutButton.hidden = false;
       mobileMenuActions?.replaceChildren(
         createProfileIdentity(session, "mobile-menu__account profile-identity"),
+        ...(mobileMenuLogoutButton ? [mobileMenuLogoutButton] : []),
       );
     },
     setGuest: (): void => {
+      logoutButton.hidden = true;
+      if (mobileMenuLogoutButton) mobileMenuLogoutButton.hidden = true;
       buttons.replaceChildren(loginButton, signupButton);
       if (mobileMenuLoginButton && mobileMenuSignupButton) {
         mobileMenuActions?.replaceChildren(
