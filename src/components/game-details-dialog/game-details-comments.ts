@@ -4,6 +4,7 @@ import {
   createErrorState,
   createRequestSkeleton,
 } from "../ui/request-feedback";
+import { createCommentAvatarColorPicker } from "./game-details-comments/comment-avatar";
 import { createGameDetailsCommentCard } from "./game-details-comments/comment-card";
 import "./game-details-comments.scss";
 
@@ -16,18 +17,23 @@ export interface GameDetailsComments {
   render: (comments: GameComment[], totalComments: number) => void;
 }
 
-const createCommentList = (comments: GameComment[]): HTMLUListElement => {
+const createCommentList = (
+  comments: GameComment[],
+  getAvatarColor: ReturnType<typeof createCommentAvatarColorPicker>,
+): HTMLUListElement => {
   const list: HTMLUListElement = document.createElement("ul");
   list.className = "game-details-comments__list";
 
   for (const comment of comments) {
-    list.append(createGameDetailsCommentCard(comment));
+    list.append(createGameDetailsCommentCard(comment, getAvatarColor));
   }
 
   return list;
 };
 
 export const createGameDetailsComments = (): GameDetailsComments => {
+  const getAvatarColor = createCommentAvatarColorPicker();
+
   const section: HTMLElement = document.createElement("section");
   section.className = "game-details-comments";
   section.setAttribute("aria-labelledby", "game-details-comments-title");
@@ -74,7 +80,7 @@ export const createGameDetailsComments = (): GameDetailsComments => {
       return;
     }
 
-    content.replaceChildren(createCommentList(comments));
+    content.replaceChildren(createCommentList(comments, getAvatarColor));
   };
 
   showLoading();

@@ -84,6 +84,21 @@
     line-height: normal;
   }
 
+  @each $index,
+    $color
+      in (
+        1: tokens.$avatar-random-1,
+        2: tokens.$avatar-random-2,
+        3: tokens.$avatar-random-3,
+        4: tokens.$avatar-random-4,
+        5: tokens.$avatar-random-5
+      )
+  {
+    &__avatar--random-#{$index} {
+      background-color: $color;
+    }
+  }
+
   &__author-name {
     overflow: hidden;
     margin: 0;
