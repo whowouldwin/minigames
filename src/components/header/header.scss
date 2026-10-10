@@ -48,7 +48,8 @@
     }
 
     &__login-button,
-    &__signup-button {
+    &__signup-button,
+    &__logout-button {
       padding: tokens.$btn-small-y tokens.$btn-small-x;
     }
   }
@@ -67,7 +68,8 @@
       display: none;
     }
 
-    &__signup-button {
+    &__signup-button,
+    &__logout-button {
       padding: tokens.$btn-small-y tokens.$btn-small-x;
     }
   }

@@ -1,25 +1,15 @@
 import { createHeader } from "../components/header";
 import { createFooter } from "../components/footer";
-import { createAuthDialog } from "../components/auth-dialog";
 import type { AuthMode } from "../components/auth-dialog";
 import { createGameDetailsDialog } from "../components/game-details-dialog";
-import { updateNavigationState } from "../components/navigation/create-navigation-list";
-import { createHomePage } from "../pages/home";
-import { createLibraryPage } from "../pages/library";
-import { createNotFoundPage } from "../pages/not-found";
 import type { AppPage } from "../types/app-page";
 import { createSnackbar } from "../components/ui/snackbar";
 import { createAppRouter, createPageRoute } from "../router";
-import type { AppRoute } from "../router";
 import { createAppSessionController } from "./app-session-controller";
 import { createProtectedActionGuard } from "./protected-action-guard";
 import { createDialogRouteSync } from "./synchronize-dialog-route";
-import {
-  authenticateWithEmailPassword,
-  authenticateWithGoogle,
-  getAuthenticationErrorMessage,
-} from "../auth";
-import type { EmailPasswordCredentials } from "../auth";
+import { createAppAuthDialog } from "./create-auth-dialog";
+import { createPageRenderer } from "./create-page-renderer";
 import { auth as firebaseAuth } from "../firebase";
 
 interface AppController {
@@ -41,11 +31,25 @@ export const createApp = (): AppController => {
   const openGameDetails = (gameSlug: string): void => {
     router.openDialog({ kind: "game", gameSlug });
   };
+  const handleLogout = async (): Promise<void> => {
+    try {
+      await sessionController.logout();
+      snackbar.show("Signed out successfully.", "success");
+    } catch {
+      snackbar.show(
+        "You are in Guest Mode, but Firebase sign-out failed.",
+        "error",
+      );
+    }
+  };
   const initialPage = router.getRoute().page;
   const header = createHeader(
     openAuth,
     initialPage === "not-found" ? undefined : initialPage,
     navigateTo,
+    (): void => {
+      void handleLogout();
+    },
   );
   const sessionController = createAppSessionController(
     firebaseAuth,
@@ -57,43 +61,12 @@ export const createApp = (): AppController => {
     router,
     sessionController.hasActiveSession,
   );
-  const auth = createAuthDialog({
-    onClose: router.closeDialog,
-    onModeChange: openAuth,
-    onAuthenticate: async (
-      mode: AuthMode,
-      credentials: EmailPasswordCredentials,
-    ): Promise<void> => {
-      let session: Awaited<ReturnType<typeof authenticateWithEmailPassword>>;
-      try {
-        session = await authenticateWithEmailPassword(
-          firebaseAuth,
-          mode,
-          credentials,
-        );
-      } catch (error: unknown) {
-        snackbar.show(getAuthenticationErrorMessage(error), "error");
-        throw error;
-      }
-      sessionController.activate(session);
-      snackbar.show(
-        mode === "register"
-          ? "Account created successfully."
-          : "Signed in successfully.",
-        "success",
-      );
-    },
-    onGoogleAuthenticate: async (): Promise<void> => {
-      let session: Awaited<ReturnType<typeof authenticateWithGoogle>>;
-      try {
-        session = await authenticateWithGoogle(firebaseAuth);
-      } catch (error: unknown) {
-        snackbar.show(getAuthenticationErrorMessage(error), "error");
-        throw error;
-      }
-      sessionController.activate(session);
-      snackbar.show("Signed in with Google.", "success");
-    },
+  const auth = createAppAuthDialog({
+    auth: firebaseAuth,
+    router,
+    sessionController,
+    snackbar,
+    openAuth,
   });
   const gameDetails: ReturnType<typeof createGameDetailsDialog> =
     createGameDetailsDialog(
@@ -102,51 +75,19 @@ export const createApp = (): AppController => {
       requireAuthenticatedSession,
     );
   const synchronizeDialogs = createDialogRouteSync(auth, gameDetails);
-  const pageOutlet: HTMLDivElement = document.createElement("div");
-  pageOutlet.className = "app__page";
+  const pageRenderer = createPageRenderer({
+    router,
+    headerElement: header.element,
+    snackbar,
+    navigateTo,
+    openGameDetails,
+    synchronizeDialogs,
+  });
 
-  let activePage: AppRoute["page"] | undefined;
-  let library: ReturnType<typeof createLibraryPage> | undefined;
-
-  const renderRoute = (route: AppRoute): void => {
-    if (activePage !== route.page) {
-      library?.destroy();
-      library = undefined;
-
-      if (route.page === "library") {
-        library = createLibraryPage(
-          openGameDetails,
-          snackbar,
-          (query): void => {
-            router.navigate({ ...router.getRoute(), library: query });
-          },
-        );
-        pageOutlet.replaceChildren(library.element);
-      } else if (route.page === "not-found") {
-        pageOutlet.replaceChildren(
-          createNotFoundPage((): void => navigateTo("home")),
-        );
-      } else {
-        pageOutlet.replaceChildren(
-          createHomePage(openGameDetails, navigateTo, snackbar),
-        );
-      }
-
-      activePage = route.page;
-      updateNavigationState(
-        header.element,
-        route.page === "not-found" ? undefined : route.page,
-      );
-    }
-
-    if (route.page === "library") library?.update(route.library);
-    synchronizeDialogs(route.dialog);
-  };
-
-  router.subscribe(renderRoute);
+  router.subscribe(pageRenderer.render);
   app.append(
     header.element,
-    pageOutlet,
+    pageRenderer.element,
     createFooter(navigateTo),
     auth.element,
     gameDetails.element,

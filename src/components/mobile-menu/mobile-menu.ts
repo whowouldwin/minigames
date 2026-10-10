@@ -41,11 +41,14 @@ export const createMobileMenu = (
 
   const loginButton: HTMLButtonElement = createButton("Log In", "outlined");
   const signupButton: HTMLButtonElement = createButton("Sign Up", "filled");
+  const logoutButton: HTMLButtonElement = createButton("Log Out", "outlined");
 
   loginButton.classList.add("mobile-menu__login-button");
   signupButton.classList.add("mobile-menu__signup-button");
+  logoutButton.classList.add("mobile-menu__logout-button");
+  logoutButton.hidden = true;
 
-  actions.append(loginButton, signupButton);
+  actions.append(loginButton, signupButton, logoutButton);
 
   menu.append(top, navigation, actions);
 

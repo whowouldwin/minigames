@@ -4,6 +4,7 @@ export const setupMobileMenu = (
   menuToggle: HTMLButtonElement,
   mobileMenu: HTMLElement,
   openAuth: (mode: AuthMode) => void,
+  onLogout: () => void,
 ): void => {
   mobileMenu.id = "mobile-menu";
   mobileMenu.inert = true;
@@ -83,6 +84,12 @@ export const setupMobileMenu = (
     .querySelector(".mobile-menu__signup-button")
     ?.addEventListener("click", (): void => {
       openAuthFromMenu("register");
+    });
+  mobileMenu
+    .querySelector(".mobile-menu__logout-button")
+    ?.addEventListener("click", (): void => {
+      setOpen(false);
+      onLogout();
     });
   document.addEventListener("keydown", handleKeydown);
 

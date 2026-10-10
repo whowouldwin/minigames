@@ -9,6 +9,7 @@ export interface AppSessionController {
   start: () => void;
   activate: (session: AppSession) => void;
   hasActiveSession: () => boolean;
+  logout: () => Promise<void>;
 }
 
 export const createAppSessionController = (
@@ -43,5 +44,6 @@ export const createAppSessionController = (
       header.setAuthenticated(session);
     },
     hasActiveSession: (): boolean => lifecycle.check() !== undefined,
+    logout: lifecycle.logout,
   };
 };
