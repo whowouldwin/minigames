@@ -14,6 +14,7 @@ import "./header.scss";
 export interface HeaderController {
   element: HTMLElement;
   setAuthenticated: (session: AppSession) => void;
+  setGuest: () => void;
 }
 
 export const createHeader = (
@@ -54,6 +55,15 @@ export const createHeader = (
   );
 
   const mobileMenu: HTMLElement = createMobileMenu(activePage, navigateTo);
+  const mobileMenuActions = mobileMenu.querySelector<HTMLElement>(
+    ".mobile-menu__actions",
+  );
+  const mobileMenuLoginButton = mobileMenu.querySelector<HTMLButtonElement>(
+    ".mobile-menu__login-button",
+  );
+  const mobileMenuSignupButton = mobileMenu.querySelector<HTMLButtonElement>(
+    ".mobile-menu__signup-button",
+  );
 
   setupMobileMenu(menuToggle, mobileMenu, openAuth);
 
@@ -65,14 +75,18 @@ export const createHeader = (
       buttons.replaceChildren(
         createProfileIdentity(session, "header__account profile-identity"),
       );
-      mobileMenu
-        .querySelector(".mobile-menu__actions")
-        ?.replaceChildren(
-          createProfileIdentity(
-            session,
-            "mobile-menu__account profile-identity",
-          ),
+      mobileMenuActions?.replaceChildren(
+        createProfileIdentity(session, "mobile-menu__account profile-identity"),
+      );
+    },
+    setGuest: (): void => {
+      buttons.replaceChildren(loginButton, signupButton);
+      if (mobileMenuLoginButton && mobileMenuSignupButton) {
+        mobileMenuActions?.replaceChildren(
+          mobileMenuLoginButton,
+          mobileMenuSignupButton,
         );
+      }
     },
   };
 };

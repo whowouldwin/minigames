@@ -1,4 +1,5 @@
 import { getErrorMessage, getGameComments } from "../../api";
+import { createLatestRequest } from "../../utils/latest-request";
 import type { SnackbarController } from "../ui/snackbar";
 import type { GameDetailsComments } from "./game-details-comments";
 
@@ -18,33 +19,17 @@ export const createGameDetailsCommentsLoader = ({
   snackbar,
   isDialogOpen,
 }: GameDetailsCommentsLoaderOptions): GameDetailsCommentsLoader => {
-  let requestController: AbortController | undefined;
-  let requestId: number = 0;
-
-  const cancel = (): void => {
-    requestController?.abort();
-    requestController = undefined;
-    requestId += 1;
-  };
+  const request = createLatestRequest(isDialogOpen);
 
   const load = async (gameSlug: string): Promise<void> => {
     if (!isDialogOpen()) return;
 
-    cancel();
-    const currentRequestId: number = requestId;
-    const controller = new AbortController();
-    requestController = controller;
+    const controller = request.start();
     comments.showLoading();
-
-    const isCurrentRequest = (): boolean =>
-      requestController === controller &&
-      !controller.signal.aborted &&
-      requestId === currentRequestId &&
-      isDialogOpen();
 
     try {
       const response = await getGameComments(gameSlug, controller.signal);
-      if (!isCurrentRequest()) return;
+      if (!request.isCurrent(controller)) return;
 
       const totalComments: number | undefined = response.meta?.totalComments;
       if (typeof totalComments !== "number" || !Array.isArray(response.data)) {
@@ -55,7 +40,7 @@ export const createGameDetailsCommentsLoader = ({
 
       comments.render(response.data, totalComments);
     } catch (error) {
-      if (!isCurrentRequest()) return;
+      if (!request.isCurrent(controller)) return;
 
       const message: string = getErrorMessage(
         error,
@@ -66,9 +51,9 @@ export const createGameDetailsCommentsLoader = ({
       });
       snackbar.show(message, "error");
     } finally {
-      if (requestController === controller) requestController = undefined;
+      request.finish(controller);
     }
   };
 
-  return { load, cancel };
+  return { load, cancel: request.cancel };
 };

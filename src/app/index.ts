@@ -11,6 +11,8 @@ import type { AppPage } from "../types/app-page";
 import { createSnackbar } from "../components/ui/snackbar";
 import { createAppRouter, createPageRoute } from "../router";
 import type { AppRoute } from "../router";
+import { createAppSessionController } from "./app-session-controller";
+import { createProtectedActionGuard } from "./protected-action-guard";
 import { createDialogRouteSync } from "./synchronize-dialog-route";
 import {
   authenticateWithEmailPassword,
@@ -30,6 +32,7 @@ export const createApp = (): AppController => {
   app.className = "app";
 
   const router = createAppRouter();
+  const snackbar = createSnackbar();
   const openAuth = (mode: AuthMode): void => {
     router.openDialog({ kind: "auth", mode });
   };
@@ -43,6 +46,16 @@ export const createApp = (): AppController => {
     openAuth,
     initialPage === "not-found" ? undefined : initialPage,
     navigateTo,
+  );
+  const sessionController = createAppSessionController(
+    firebaseAuth,
+    router,
+    header,
+    snackbar,
+  );
+  const requireAuthenticatedSession = createProtectedActionGuard(
+    router,
+    sessionController.hasActiveSession,
   );
   const auth = createAuthDialog({
     onClose: router.closeDialog,
@@ -62,7 +75,7 @@ export const createApp = (): AppController => {
         snackbar.show(getAuthenticationErrorMessage(error), "error");
         throw error;
       }
-      header.setAuthenticated(session);
+      sessionController.activate(session);
       snackbar.show(
         mode === "register"
           ? "Account created successfully."
@@ -78,13 +91,16 @@ export const createApp = (): AppController => {
         snackbar.show(getAuthenticationErrorMessage(error), "error");
         throw error;
       }
-      header.setAuthenticated(session);
+      sessionController.activate(session);
       snackbar.show("Signed in with Google.", "success");
     },
   });
-  const snackbar = createSnackbar();
   const gameDetails: ReturnType<typeof createGameDetailsDialog> =
-    createGameDetailsDialog(snackbar, router.closeDialog);
+    createGameDetailsDialog(
+      snackbar,
+      router.closeDialog,
+      requireAuthenticatedSession,
+    );
   const synchronizeDialogs = createDialogRouteSync(auth, gameDetails);
   const pageOutlet: HTMLDivElement = document.createElement("div");
   pageOutlet.className = "app__page";
@@ -137,5 +153,11 @@ export const createApp = (): AppController => {
     snackbar.element,
   );
 
-  return { element: app, start: router.start };
+  return {
+    element: app,
+    start: (): void => {
+      sessionController.start();
+      router.start();
+    },
+  };
 };
