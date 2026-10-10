@@ -6,8 +6,9 @@ export {
   getLibraryGames,
   getGameDetails,
   getGameComments,
+  toggleGameFavorite,
 } from "./games";
-export type { GameDetailsRequestOptions } from "./games";
+export type { FavoriteResponse, GameDetailsRequestOptions } from "./games";
 export { getLeaderboard } from "./leaderboard";
 export type {
   ApiResponse,
