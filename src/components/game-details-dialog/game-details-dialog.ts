@@ -1,4 +1,5 @@
 import type { SnackbarController } from "../ui/snackbar";
+import type { AppSession } from "../../auth";
 import { closeDialogWithAnimation, setupDialogDismissal } from "../ui/dialog";
 import { createGameDetailsContent } from "./game-details-content";
 import { createGameDetailsCommentsLoader } from "./game-details-comments-loader";
@@ -9,8 +10,9 @@ export interface GameDetailsDialog {
   element: HTMLDialogElement;
   open: (gameSlug: string) => void;
   close: () => Promise<void>;
-  hasAuthenticatedSession: () => boolean;
 }
+
+type AuthenticatedActionGuard = (message?: string) => boolean;
 
 const lockPageScroll = (): (() => void) => {
   const body: HTMLElement = document.body;
@@ -37,7 +39,8 @@ const lockPageScroll = (): (() => void) => {
 export const createGameDetailsDialog = (
   snackbar: SnackbarController,
   onClose: () => void,
-  hasAuthenticatedSession: () => boolean,
+  getActiveSession: () => AppSession | undefined,
+  canContinueWithSession: AuthenticatedActionGuard,
 ): GameDetailsDialog => {
   const dialog: HTMLDialogElement = document.createElement("dialog");
   dialog.className = "game-details-dialog";
@@ -48,7 +51,11 @@ export const createGameDetailsDialog = (
   let restorePageScroll: (() => void) | undefined;
   let activeGameSlug: string | undefined;
 
-  const content = createGameDetailsContent(onClose);
+  const content = createGameDetailsContent(onClose, {
+    getActiveSession,
+    canContinueWithSession,
+    snackbar,
+  });
   dialog.append(content.hero, content.body);
 
   const isDialogOpen = (): boolean => dialog.open;
@@ -87,7 +94,6 @@ export const createGameDetailsDialog = (
   return {
     element: dialog,
     close,
-    hasAuthenticatedSession,
     open: (gameSlug: string): void => {
       if (isClosing || (activeGameSlug === gameSlug && dialog.open)) return;
 
@@ -100,7 +106,7 @@ export const createGameDetailsDialog = (
         dialog.showModal();
       }
       activeGameSlug = gameSlug;
-      void detailsLoader.load(gameSlug);
+      void detailsLoader.load(gameSlug, getActiveSession()?.email);
       void commentsLoader.load(gameSlug);
     },
   };

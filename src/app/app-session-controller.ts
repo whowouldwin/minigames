@@ -8,6 +8,7 @@ import type { AppRouter } from "../router";
 export interface AppSessionController {
   start: () => void;
   activate: (session: AppSession) => void;
+  getActiveSession: () => AppSession | undefined;
   hasActiveSession: () => boolean;
   logout: () => Promise<void>;
 }
@@ -43,6 +44,7 @@ export const createAppSessionController = (
       lifecycle.activate(session);
       header.setAuthenticated(session);
     },
+    getActiveSession: lifecycle.check,
     hasActiveSession: (): boolean => lifecycle.check() !== undefined,
     logout: lifecycle.logout,
   };

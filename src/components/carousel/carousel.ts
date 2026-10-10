@@ -9,16 +9,11 @@ import {
   createRequestSkeleton,
 } from "../ui/request-feedback";
 import type { SnackbarController } from "../ui/snackbar";
+import { formatCompactCount } from "../../utils/format-compact-count";
 import { setupCarouselController } from "./carousel-controller";
 import { createNavigationButton } from "./create-navigation-button";
 
 import "./carousel.scss";
-
-const formatCompactCount = (count: number): string =>
-  new Intl.NumberFormat("en-US", {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(count);
 
 const toCardData = (game: GameSummary) => ({
   slug: game.slug,

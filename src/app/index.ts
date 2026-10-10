@@ -64,6 +64,7 @@ export const createApp = (): AppController => {
   const requireAuthenticatedSession = createProtectedActionGuard(
     router,
     sessionController.hasActiveSession,
+    snackbar,
   );
   const auth = createAppAuthDialog({
     auth: firebaseAuth,
@@ -76,6 +77,7 @@ export const createApp = (): AppController => {
     createGameDetailsDialog(
       snackbar,
       router.closeDialog,
+      sessionController.getActiveSession,
       requireAuthenticatedSession,
     );
   const synchronizeDialogs = createDialogRouteSync(auth, gameDetails);
