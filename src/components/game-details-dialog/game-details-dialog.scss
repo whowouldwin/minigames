@@ -272,6 +272,15 @@ $game-details-dialog-animation-duration: 200ms;
     display: block;
     flex: 0 0 auto;
   }
+
+  &__favorite-loader {
+    width: tokens.$size-2;
+    height: tokens.$size-2;
+    border: tokens.$border-width-medium solid currentColor;
+    border-top-color: transparent;
+    border-radius: tokens.$corner-full;
+    animation: game-details-favorite-spin 700ms linear infinite;
+  }
 }
 
 @media (max-width: tokens.$library-game-card-stacked-breakpoint) {
@@ -314,6 +323,12 @@ $game-details-dialog-animation-duration: 200ms;
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes game-details-favorite-spin {
+  to {
+    transform: rotate(1turn);
   }
 }
 

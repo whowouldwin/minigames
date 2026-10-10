@@ -13,7 +13,7 @@ interface GameDetailsLoaderOptions {
 }
 
 interface GameDetailsLoader {
-  load: (gameSlug: string) => Promise<void>;
+  load: (gameSlug: string, userEmail?: string) => Promise<void>;
   cancel: () => void;
 }
 
@@ -24,7 +24,7 @@ export const createGameDetailsLoader = ({
 }: GameDetailsLoaderOptions): GameDetailsLoader => {
   const request = createLatestRequest(isDialogOpen);
 
-  const load = async (gameSlug: string): Promise<void> => {
+  const load = async (gameSlug: string, userEmail?: string): Promise<void> => {
     if (!isDialogOpen()) return;
 
     const controller = request.start();
@@ -33,6 +33,7 @@ export const createGameDetailsLoader = ({
     try {
       const response = await getGameDetails(gameSlug, {
         signal: controller.signal,
+        userEmail,
       });
       if (!request.isCurrent(controller)) return;
 
@@ -52,7 +53,7 @@ export const createGameDetailsLoader = ({
 
       const message = getErrorMessage(error, "Unable to load game details.");
       content.showError(message, (): void => {
-        void load(gameSlug);
+        void load(gameSlug, userEmail);
       });
       snackbar.show(message, "error");
     } finally {

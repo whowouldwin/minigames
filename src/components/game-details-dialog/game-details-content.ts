@@ -10,6 +10,8 @@ import {
 } from "./game-details-comments";
 import { createGameDetailsHero } from "./game-details-hero";
 import { createGameDetailsView } from "./game-details-view";
+import type { GameDetailsViewOptions } from "./game-details-view-actions";
+import { createGameDetailsTitle } from "./game-details-title";
 
 export interface GameDetailsContent {
   hero: HTMLElement;
@@ -21,16 +23,9 @@ export interface GameDetailsContent {
   comments: GameDetailsComments;
 }
 
-const createTitle = (text: string): HTMLHeadingElement => {
-  const title: HTMLHeadingElement = document.createElement("h2");
-  title.className = "game-details-dialog__title";
-  title.id = "game-details-title";
-  title.textContent = text;
-  return title;
-};
-
 export const createGameDetailsContent = (
   close: () => void,
+  viewOptions: GameDetailsViewOptions,
 ): GameDetailsContent => {
   const body: HTMLElement = document.createElement("section");
   body.className = "game-details-dialog__body";
@@ -43,7 +38,7 @@ export const createGameDetailsContent = (
     hero.showLoading();
     body.setAttribute("aria-busy", "true");
     body.replaceChildren(
-      createTitle("Loading game details"),
+      createGameDetailsTitle("Loading game details"),
       createRequestSkeleton("Loading game details", "dialog", 7),
     );
   };
@@ -52,7 +47,7 @@ export const createGameDetailsContent = (
     hero.hideImage();
     body.setAttribute("aria-busy", "false");
     body.replaceChildren(
-      createTitle("Game details unavailable"),
+      createGameDetailsTitle("Game details unavailable"),
       createErrorState(message, retry),
     );
   };
@@ -61,7 +56,7 @@ export const createGameDetailsContent = (
     hero.hideImage();
     body.setAttribute("aria-busy", "false");
     body.replaceChildren(
-      createTitle("Game Not Found"),
+      createGameDetailsTitle("Game Not Found"),
       createEmptyState("This game doesn't exist or is no longer available."),
     );
   };
@@ -69,7 +64,9 @@ export const createGameDetailsContent = (
   const renderGame = (game: GameDetails): void => {
     hero.showImage(game);
     body.setAttribute("aria-busy", "false");
-    body.replaceChildren(createGameDetailsView(game, comments.element));
+    body.replaceChildren(
+      createGameDetailsView(game, comments.element, viewOptions),
+    );
   };
 
   showLoading();

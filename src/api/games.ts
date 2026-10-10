@@ -21,10 +21,15 @@ export interface GameDetailsRequestOptions {
   userEmail?: string;
 }
 
+export interface FavoriteResponse {
+  isFavorited: boolean;
+  likesCount: number;
+}
+
 export const getFeaturedGames = (
   signal?: AbortSignal,
 ): Promise<ApiResponse<GameSummary[]>> =>
-  requestApi<GameSummary[]>("games?featured=true", signal);
+  requestApi<GameSummary[]>("games?featured=true", { signal });
 
 export const getGameDetails = (
   gameSlug: string,
@@ -35,8 +40,17 @@ export const getGameDetails = (
 
   const search: string = query.toString();
   const path: string = `games/${encodeURIComponent(gameSlug)}${search ? `?${search}` : ""}`;
-  return requestApi<GameDetails>(path, signal);
+  return requestApi<GameDetails>(path, { signal });
 };
+
+export const toggleGameFavorite = (
+  gameSlug: string,
+  userEmail: string,
+): Promise<ApiResponse<FavoriteResponse>> =>
+  requestApi<FavoriteResponse>(
+    `games/${encodeURIComponent(gameSlug)}/favorite`,
+    { method: "POST", body: { userEmail } },
+  );
 
 export const getGameComments = (
   gameSlug: string,
@@ -45,7 +59,7 @@ export const getGameComments = (
   const query = new URLSearchParams({ limit: "3", sort: "newest" });
   const path: string = `games/${encodeURIComponent(gameSlug)}/comments?${query}`;
 
-  return requestApi<GameComment[], GameCommentsMeta>(path, signal);
+  return requestApi<GameComment[], GameCommentsMeta>(path, { signal });
 };
 
 export const getLibraryGames = (
@@ -59,10 +73,12 @@ export const getLibraryGames = (
     limit: "6",
   });
 
-  return requestApi<GameSummary[], LibraryGamesMeta>(`games?${search}`, signal);
+  return requestApi<GameSummary[], LibraryGamesMeta>(`games?${search}`, {
+    signal,
+  });
 };
 
 export const getLibraryCategories = (
   signal?: AbortSignal,
 ): Promise<ApiResponse<GameCategory[]>> =>
-  requestApi<GameCategory[]>("categories", signal);
+  requestApi<GameCategory[]>("categories", { signal });
