@@ -1,15 +1,10 @@
 import type { AppRoute } from "./route-state";
 import { createRouteUrl } from "./route-url";
+import { getAbsoluteRouteUrl, getCurrentRouteUrl } from "./route-history";
 
 export interface DialogHistoryState {
   miniGamesDialogBase?: string;
 }
-
-const getCurrentUrl = (): string =>
-  globalThis.location.pathname + globalThis.location.search;
-
-const getAbsoluteUrl = (routeUrl: string): string =>
-  globalThis.location.origin + routeUrl;
 
 const getHistoryState = (): DialogHistoryState | undefined =>
   globalThis.history.state as DialogHistoryState | undefined;
@@ -17,7 +12,9 @@ const getHistoryState = (): DialogHistoryState | undefined =>
 export const createDialogHistoryState = (
   hasOpenDialog: boolean,
 ): DialogHistoryState | undefined =>
-  hasOpenDialog ? getHistoryState() : { miniGamesDialogBase: getCurrentUrl() };
+  hasOpenDialog
+    ? getHistoryState()
+    : { miniGamesDialogBase: getCurrentRouteUrl() };
 
 export const closeDialogUsingHistory = (
   beforeBack: () => void,
@@ -33,12 +30,12 @@ export const restoreDialogHistory = (route: AppRoute): void => {
   const state = getHistoryState();
   if (!route.dialog || state?.miniGamesDialogBase) return;
 
-  const dialogUrl = getCurrentUrl();
+  const dialogUrl = getCurrentRouteUrl();
   const baseUrl = createRouteUrl({ ...route, dialog: undefined });
-  globalThis.history.replaceState(undefined, "", getAbsoluteUrl(baseUrl));
+  globalThis.history.replaceState(undefined, "", getAbsoluteRouteUrl(baseUrl));
   globalThis.history.pushState(
     { miniGamesDialogBase: baseUrl },
     "",
-    getAbsoluteUrl(dialogUrl),
+    getAbsoluteRouteUrl(dialogUrl),
   );
 };

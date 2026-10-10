@@ -10,6 +10,7 @@ import { createProtectedActionGuard } from "./protected-action-guard";
 import { createDialogRouteSync } from "./synchronize-dialog-route";
 import { createAppAuthDialog } from "./create-auth-dialog";
 import { createPageRenderer } from "./create-page-renderer";
+import { createAuthDialogUrlGuard } from "./create-auth-dialog-url-guard";
 import { auth as firebaseAuth } from "../firebase";
 
 interface AppController {
@@ -56,6 +57,9 @@ export const createApp = (): AppController => {
     router,
     header,
     snackbar,
+  );
+  router.setAuthDialogGuard(
+    createAuthDialogUrlGuard(sessionController, snackbar),
   );
   const requireAuthenticatedSession = createProtectedActionGuard(
     router,
