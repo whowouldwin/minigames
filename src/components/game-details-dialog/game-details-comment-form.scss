@@ -1,0 +1,101 @@
+@use "../../styles/tokens";
+
+.game-details-comment-form {
+  display: grid;
+  grid-template-columns: tokens.$size-5 minmax(0, 1fr) tokens.$size-5;
+  align-items: center;
+  column-gap: tokens.$size-2;
+  width: 100%;
+
+  &[hidden] {
+    display: none;
+  }
+
+  &__avatar {
+    display: flex;
+    width: tokens.$size-5;
+    height: tokens.$size-5;
+    align-items: center;
+    justify-content: center;
+    color: tokens.$on-primary;
+    background-color: tokens.$primary;
+    border: tokens.$border-width-thin solid tokens.$on-primary;
+    border-radius: tokens.$corner-full;
+    font-size: tokens.$label-large;
+    font-weight: tokens.$bold;
+    line-height: normal;
+  }
+
+  &__textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: tokens.$size-6;
+    max-height: tokens.$size-11;
+    padding: tokens.$size-1 tokens.$size-2;
+    overflow-y: auto;
+    color: tokens.$on-primary;
+    background-color: tokens.$white;
+    border: tokens.$border-width-thin solid tokens.$on-primary;
+    border-radius: tokens.$corner-small;
+    font-size: tokens.$label-large;
+    line-height: normal;
+    resize: none;
+
+    &::placeholder {
+      color: tokens.$on-bg-low;
+      opacity: 1;
+    }
+
+    &:disabled {
+      color: tokens.$on-bg;
+      background-color: tokens.$surface;
+      cursor: not-allowed;
+    }
+  }
+
+  &__send {
+    display: flex;
+    width: tokens.$size-5;
+    height: tokens.$size-5;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0;
+    padding: tokens.$size-1;
+    background-color: tokens.$bg-footer-low;
+    border: tokens.$border-width-thin solid tokens.$on-primary;
+    border-radius: tokens.$corner-small;
+    cursor: pointer;
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (hover: hover) {
+      &:not(:disabled):hover {
+        background-color: tokens.$primary-high;
+      }
+    }
+
+    &:active:not(:disabled) {
+      background-color: tokens.$primary-low;
+    }
+
+    &:disabled {
+      background-color: tokens.$outline-variant;
+      cursor: not-allowed;
+    }
+  }
+
+  &__message {
+    grid-column: 2 / 4;
+    margin: 0;
+    color: tokens.$on-bg;
+    font-size: tokens.$label-medium;
+    line-height: normal;
+
+    &--error {
+      color: tokens.$error;
+    }
+  }
+}

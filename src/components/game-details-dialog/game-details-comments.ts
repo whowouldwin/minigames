@@ -9,6 +9,7 @@ import "./game-details-comments.scss";
 
 export interface GameDetailsComments {
   element: HTMLElement;
+  setComposer: (composer: HTMLElement) => void;
   showLoading: () => void;
   showError: (message: string, retry: () => void) => void;
   showEmpty: () => void;
@@ -38,6 +39,7 @@ export const createGameDetailsComments = (): GameDetailsComments => {
 
   const content: HTMLDivElement = document.createElement("div");
   content.className = "game-details-comments__content";
+
   section.append(heading, content);
 
   const showLoading = (): void => {
@@ -79,6 +81,9 @@ export const createGameDetailsComments = (): GameDetailsComments => {
 
   return {
     element: section,
+    setComposer: (form): void => {
+      content.before(form);
+    },
     showLoading,
     showError,
     showEmpty,

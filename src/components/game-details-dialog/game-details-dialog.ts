@@ -3,6 +3,7 @@ import type { AppSession } from "../../auth";
 import { closeDialogWithAnimation, setupDialogDismissal } from "../ui/dialog";
 import { createGameDetailsContent } from "./game-details-content";
 import { createGameDetailsCommentsLoader } from "./game-details-comments-loader";
+import { createGameDetailsCommentForm } from "./game-details-comment-form";
 import { createGameDetailsLoader } from "./game-details-loader";
 import "./game-details-dialog.scss";
 
@@ -69,6 +70,16 @@ export const createGameDetailsDialog = (
     snackbar,
     isDialogOpen,
   });
+  const commentForm = createGameDetailsCommentForm({
+    getActiveSession,
+    canContinueWithSession,
+    snackbar,
+    onCommentCreated: async (gameSlug, userEmail): Promise<void> => {
+      if (activeGameSlug !== gameSlug || !isDialogOpen()) return;
+      await commentsLoader.load(gameSlug, userEmail);
+    },
+  });
+  content.comments.setComposer(commentForm.element);
 
   const cancelRequests = (): void => {
     detailsLoader.cancel();
@@ -106,8 +117,10 @@ export const createGameDetailsDialog = (
         dialog.showModal();
       }
       activeGameSlug = gameSlug;
-      void detailsLoader.load(gameSlug, getActiveSession()?.email);
-      void commentsLoader.load(gameSlug);
+      const session = getActiveSession();
+      commentForm.prepareForOpen(gameSlug, session);
+      void detailsLoader.load(gameSlug, session?.email);
+      void commentsLoader.load(gameSlug, session?.email);
     },
   };
 };
