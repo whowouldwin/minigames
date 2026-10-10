@@ -10,7 +10,7 @@ interface GameDetailsCommentsLoaderOptions {
 }
 
 interface GameDetailsCommentsLoader {
-  load: (gameSlug: string) => Promise<void>;
+  load: (gameSlug: string, userEmail?: string) => Promise<void>;
   cancel: () => void;
 }
 
@@ -21,14 +21,17 @@ export const createGameDetailsCommentsLoader = ({
 }: GameDetailsCommentsLoaderOptions): GameDetailsCommentsLoader => {
   const request = createLatestRequest(isDialogOpen);
 
-  const load = async (gameSlug: string): Promise<void> => {
+  const load = async (gameSlug: string, userEmail?: string): Promise<void> => {
     if (!isDialogOpen()) return;
 
     const controller = request.start();
     comments.showLoading();
 
     try {
-      const response = await getGameComments(gameSlug, controller.signal);
+      const response = await getGameComments(gameSlug, {
+        signal: controller.signal,
+        userEmail,
+      });
       if (!request.isCurrent(controller)) return;
 
       const totalComments: number | undefined = response.meta?.totalComments;
@@ -47,7 +50,7 @@ export const createGameDetailsCommentsLoader = ({
         "Unable to load comments.",
       );
       comments.showError(message, (): void => {
-        void load(gameSlug);
+        void load(gameSlug, userEmail);
       });
       snackbar.show(message, "error");
     } finally {
