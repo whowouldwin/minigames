@@ -2,6 +2,7 @@ import type { GameComment } from "../../../api";
 import favoriteFilledIcon from "../../../assets/icons/favorite-filled.svg";
 import favoriteOutlineIcon from "../../../assets/icons/favorite-outline.svg";
 import { createCommentAvatar } from "./comment-avatar";
+import type { CommentAvatarColorPicker } from "./comment-avatar";
 import { formatCommentRelativeTime } from "./comment-relative-time";
 
 const getAuthorInitial = (authorName: string): string => {
@@ -10,13 +11,17 @@ const getAuthorInitial = (authorName: string): string => {
   return firstLetter ? firstLetter.toUpperCase() : "?";
 };
 
-const createCommentHeader = (comment: GameComment): HTMLDivElement => {
+const createCommentHeader = (
+  comment: GameComment,
+  getAvatarColor: CommentAvatarColorPicker,
+): HTMLDivElement => {
   const author: HTMLDivElement = document.createElement("div");
   author.className = "game-details-comments__author";
   author.append(
     createCommentAvatar(
       getAuthorInitial(comment.authorName),
       "game-details-comments__avatar",
+      getAvatarColor(comment.authorName),
     ),
   );
 
@@ -71,6 +76,7 @@ const createCommentLikes = (comment: GameComment): HTMLSpanElement => {
 
 export const createGameDetailsCommentCard = (
   comment: GameComment,
+  getAvatarColor: CommentAvatarColorPicker,
 ): HTMLLIElement => {
   const card: HTMLLIElement = document.createElement("li");
   card.className = "game-details-comments__card";
@@ -85,7 +91,7 @@ export const createGameDetailsCommentCard = (
   footer.append(createCommentLikes(comment));
 
   article.append(
-    createCommentHeader(comment),
+    createCommentHeader(comment, getAvatarColor),
     createCommentText(comment.text),
     footer,
   );
