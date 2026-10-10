@@ -10,6 +10,7 @@ export {
   getAuthenticationErrorMessage,
 } from "./auth-errors";
 export { authenticateWithEmailPassword } from "./email-password-auth";
+export { authenticateWithGoogle } from "./google-auth";
 export type {
   EmailPasswordCredentials,
   EmailPasswordMode,
