@@ -21,8 +21,11 @@ const firebaseAuthErrorMessages: Record<string, string> = {
   "auth/invalid-email": "Enter a valid email address.",
   "auth/network-request-failed":
     "Connection failed. Check your internet and try again.",
-  "auth/operation-not-allowed":
-    "Email and password authentication is unavailable.",
+  "auth/operation-not-allowed": "This sign-in method is unavailable.",
+  "auth/popup-blocked":
+    "The sign-in window was blocked. Allow pop-ups and try again.",
+  "auth/popup-closed-by-user": "Google sign-in was canceled.",
+  "auth/cancelled-popup-request": "Google sign-in was canceled.",
   "auth/too-many-requests": "Too many attempts. Wait a moment and try again.",
   "auth/user-disabled": "This account is disabled.",
   "auth/user-not-found": "Email or password is incorrect.",
