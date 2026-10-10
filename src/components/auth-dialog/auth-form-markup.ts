@@ -124,7 +124,7 @@ const renderFormActions = (mode: AuthMode): string => {
       <button class="auth-dialog__submit" type="submit" disabled>${submitLabel}</button>
       <div class="auth-dialog__divider">OR</div>
       <button type="button" class="auth-dialog__google">
-        <img src="${googleIcon}" alt="" />${googleLabel}
+        <img src="${googleIcon}" alt="" /><span>${googleLabel}</span>
       </button>
     </div>`;
 };

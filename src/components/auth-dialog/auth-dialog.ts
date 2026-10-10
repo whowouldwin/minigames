@@ -18,12 +18,14 @@ interface AuthDialogCallbacks {
     mode: AuthMode,
     credentials: EmailPasswordCredentials,
   ) => Promise<void>;
+  onGoogleAuthenticate: () => Promise<void>;
 }
 
 export const createAuthDialog = ({
   onClose,
   onModeChange,
   onAuthenticate,
+  onGoogleAuthenticate,
 }: AuthDialogCallbacks): AuthDialog => {
   const dialog: HTMLDialogElement = document.createElement("dialog");
   dialog.className = "auth-dialog";
@@ -64,6 +66,8 @@ export const createAuthDialog = ({
       tabs,
       closeButton,
       authenticate: onAuthenticate,
+      authenticateWithGoogle: onGoogleAuthenticate,
+      onSuccess: onClose,
       onPendingChange: (isPending: boolean): void => {
         isAuthenticationPending = isPending;
       },
