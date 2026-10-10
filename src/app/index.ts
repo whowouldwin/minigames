@@ -14,6 +14,7 @@ import type { AppRoute } from "../router";
 import { createDialogRouteSync } from "./synchronize-dialog-route";
 import {
   authenticateWithEmailPassword,
+  authenticateWithGoogle,
   getAuthenticationErrorMessage,
 } from "../auth";
 import type { EmailPasswordCredentials } from "../auth";
@@ -68,7 +69,17 @@ export const createApp = (): AppController => {
           : "Signed in successfully.",
         "success",
       );
-      router.closeDialog();
+    },
+    onGoogleAuthenticate: async (): Promise<void> => {
+      let session: Awaited<ReturnType<typeof authenticateWithGoogle>>;
+      try {
+        session = await authenticateWithGoogle(firebaseAuth);
+      } catch (error: unknown) {
+        snackbar.show(getAuthenticationErrorMessage(error), "error");
+        throw error;
+      }
+      header.setAuthenticated(session);
+      snackbar.show("Signed in with Google.", "success");
     },
   });
   const snackbar = createSnackbar();
