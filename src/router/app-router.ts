@@ -1,11 +1,13 @@
 import type { AppRoute, DialogRoute } from "./route-state";
 import { createRouteUrl, readRouteUrl } from "./route-url";
+import {
+  createDialogHistoryState,
+  restoreDialogHistory,
+  closeDialogUsingHistory,
+} from "./dialog-history";
+import type { DialogHistoryState } from "./dialog-history";
 
 type RouteListener = (route: AppRoute) => void;
-
-interface DialogHistoryState {
-  miniGamesDialogBase?: string;
-}
 
 export interface AppRouter {
   getRoute: () => AppRoute;
@@ -13,6 +15,7 @@ export interface AppRouter {
   navigate: (route: AppRoute) => void;
   openDialog: (dialog: DialogRoute) => void;
   closeDialog: () => void;
+  setNavigationGuard: (guard: () => void) => void;
   start: () => void;
 }
 
@@ -22,28 +25,18 @@ const getRoute = (): AppRoute =>
 const getCurrentUrl = (): string =>
   globalThis.location.pathname + globalThis.location.search;
 
-const getAbsoluteRouteUrl = (routeUrl: string): string =>
+const getAbsoluteUrl = (routeUrl: string): string =>
   globalThis.location.origin + routeUrl;
-
-const restoreDeepLinkHistory = (): void => {
-  const route = getRoute();
-  const state = globalThis.history.state as DialogHistoryState | undefined;
-  if (!route.dialog || state?.miniGamesDialogBase) return;
-
-  const dialogUrl: string = getCurrentUrl();
-  const baseUrl: string = createRouteUrl({ ...route, dialog: undefined });
-  globalThis.history.replaceState(undefined, "", getAbsoluteRouteUrl(baseUrl));
-  globalThis.history.pushState(
-    { miniGamesDialogBase: baseUrl },
-    "",
-    getAbsoluteRouteUrl(dialogUrl),
-  );
-};
 
 export const createAppRouter = (): AppRouter => {
   const listeners = new Set<RouteListener>();
   let isStarted: boolean = false;
   let isDialogClosePending: boolean = false;
+  let navigationGuard: (() => void) | undefined;
+
+  const checkNavigation = (): void => {
+    navigationGuard?.();
+  };
 
   const notify = (): void => {
     isDialogClosePending = false;
@@ -51,19 +44,25 @@ export const createAppRouter = (): AppRouter => {
     for (const listener of listeners) listener(route);
   };
 
+  const notifyAfterPopState = (): void => {
+    checkNavigation();
+    notify();
+  };
+
   const writeRoute = (
     route: AppRoute,
     shouldReplace: boolean = false,
     state?: DialogHistoryState,
   ): void => {
+    checkNavigation();
     const url: string = createRouteUrl(route);
     const currentUrl: string = getCurrentUrl();
     if (url === currentUrl) return;
 
     if (shouldReplace) {
-      globalThis.history.replaceState(state, "", getAbsoluteRouteUrl(url));
+      globalThis.history.replaceState(state, "", getAbsoluteUrl(url));
     } else {
-      globalThis.history.pushState(state, "", getAbsoluteRouteUrl(url));
+      globalThis.history.pushState(state, "", getAbsoluteUrl(url));
     }
     notify();
   };
@@ -71,11 +70,8 @@ export const createAppRouter = (): AppRouter => {
   const openDialog = (dialog: DialogRoute): void => {
     const route = getRoute();
     const hasOpenDialog: boolean = route.dialog !== undefined;
-    const state: DialogHistoryState | undefined = hasOpenDialog
-      ? globalThis.history.state
-      : {
-          miniGamesDialogBase: getCurrentUrl(),
-        };
+    const state: DialogHistoryState | undefined =
+      createDialogHistoryState(hasOpenDialog);
     writeRoute({ ...route, dialog }, hasOpenDialog, state);
   };
 
@@ -83,10 +79,8 @@ export const createAppRouter = (): AppRouter => {
     const route = getRoute();
     if (isDialogClosePending || !route.dialog) return;
 
-    const state = globalThis.history.state as DialogHistoryState | undefined;
-    if (state?.miniGamesDialogBase) {
+    if (closeDialogUsingHistory(checkNavigation) === "back") {
       isDialogClosePending = true;
-      globalThis.history.back();
       return;
     }
 
@@ -101,11 +95,15 @@ export const createAppRouter = (): AppRouter => {
     navigate: (route): void => writeRoute(route),
     openDialog,
     closeDialog,
+    setNavigationGuard: (guard): void => {
+      navigationGuard = guard;
+    },
     start: (): void => {
       if (isStarted) return;
       isStarted = true;
-      restoreDeepLinkHistory();
-      globalThis.addEventListener("popstate", notify);
+      checkNavigation();
+      restoreDialogHistory(getRoute());
+      globalThis.addEventListener("popstate", notifyAfterPopState);
       notify();
     },
   };

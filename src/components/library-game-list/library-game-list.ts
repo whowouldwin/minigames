@@ -1,5 +1,6 @@
 import { getErrorMessage, getLibraryGames } from "../../api";
 import type { LibraryGamesMeta, LibraryGamesQuery } from "../../api";
+import { createLatestRequest } from "../../utils/latest-request";
 import {
   createEmptyState,
   createErrorState,
@@ -33,12 +34,10 @@ export const createLibraryGameList = (
 
   section.append(list);
 
-  let requestController: AbortController | undefined;
+  const request = createLatestRequest((): boolean => section.isConnected);
 
   const loadGames = async (query: LibraryGamesQuery): Promise<void> => {
-    requestController?.abort();
-    const controller = new AbortController();
-    requestController = controller;
+    const controller = request.start();
 
     showLibraryGameListState(
       list,
@@ -47,7 +46,7 @@ export const createLibraryGameList = (
 
     try {
       const response = await getLibraryGames(query, controller.signal);
-      if (!section.isConnected || controller.signal.aborted) return;
+      if (!request.isCurrent(controller)) return;
 
       if (
         !response.meta ||
@@ -70,7 +69,7 @@ export const createLibraryGameList = (
 
       renderLibraryGames(list, response.data, openDetails);
     } catch (error) {
-      if (!section.isConnected || controller.signal.aborted) return;
+      if (!request.isCurrent(controller)) return;
 
       const message = getErrorMessage(
         error,
@@ -81,15 +80,14 @@ export const createLibraryGameList = (
         list,
         createErrorState(message, (): void => void loadGames(query)),
       );
+    } finally {
+      request.finish(controller);
     }
   };
 
   return {
     element: section,
     load: loadGames,
-    cancel: (): void => {
-      requestController?.abort();
-      requestController = undefined;
-    },
+    cancel: request.cancel,
   };
 };

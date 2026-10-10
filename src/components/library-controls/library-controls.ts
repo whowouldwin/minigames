@@ -9,6 +9,7 @@ import type {
   GameSortValue,
   LibraryGamesQuery,
 } from "../../api";
+import { createLatestRequest } from "../../utils/latest-request";
 import {
   createEmptyState,
   createErrorState,
@@ -44,20 +45,18 @@ export const createLibraryControls = (
 
   let currentQuery: LibraryGamesQuery = DEFAULT_LIBRARY_GAMES_QUERY;
   let chips: ReturnType<typeof createFilterChips> | undefined;
-  let requestController: AbortController | undefined;
+  const request = createLatestRequest((): boolean => section.isConnected);
   const sortControl = createSortControl(callbacks.onSortChange);
 
   const loadCategories = async (): Promise<void> => {
-    requestController?.abort();
-    const controller = new AbortController();
-    requestController = controller;
+    const controller = request.start();
     filters.replaceChildren(
       createRequestSkeleton("Loading game categories", "chips", 7),
     );
 
     try {
       const response = await getLibraryCategories(controller.signal);
-      if (!section.isConnected || controller.signal.aborted) return;
+      if (!request.isCurrent(controller)) return;
 
       if (response.data.length === 0) {
         filters.replaceChildren(
@@ -80,7 +79,7 @@ export const createLibraryControls = (
       );
       filters.replaceChildren(...chips.elements);
     } catch (error) {
-      if (!section.isConnected || controller.signal.aborted) return;
+      if (!request.isCurrent(controller)) return;
 
       const message = getErrorMessage(
         error,
@@ -90,6 +89,8 @@ export const createLibraryControls = (
       filters.replaceChildren(
         createErrorState(message, (): void => void loadCategories()),
       );
+    } finally {
+      request.finish(controller);
     }
   };
 
@@ -104,7 +105,7 @@ export const createLibraryControls = (
       sortControl.setValue(query.sort);
     },
     destroy: (): void => {
-      requestController?.abort();
+      request.cancel();
       sortControl.destroy();
     },
   };
