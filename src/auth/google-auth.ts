@@ -1,6 +1,6 @@
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import type { Auth } from "firebase/auth";
-import { createAppSession } from "./app-session";
+import { createAppSession } from "./create-app-session";
 import type { AppSession } from "./app-session";
 import {
   AuthenticationCleanupError,

@@ -1,9 +1,15 @@
+export { APP_SESSION_DURATION_MS } from "./app-session";
+export type { AppSession } from "./app-session";
+export { createAppSession } from "./create-app-session";
 export {
   APP_SESSION_STORAGE_KEY,
-  createAppSession,
+  clearAppSession,
   getActiveAppSession,
-} from "./app-session";
-export type { AppSession } from "./app-session";
+  restoreAppSession,
+} from "./app-session-storage";
+export type { AppSessionRestoreResult } from "./app-session-storage";
+export { createAppSessionLifecycle } from "./app-session-lifecycle";
+export type { AppSessionLifecycle } from "./app-session-lifecycle";
 export {
   AuthenticationCleanupError,
   AuthenticationNotConfiguredError,
