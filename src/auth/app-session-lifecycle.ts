@@ -8,9 +8,10 @@ export interface AppSessionLifecycle {
   restore: () => AppSession | undefined;
   check: () => AppSession | undefined;
   activate: (session: AppSession) => void;
+  logout: () => Promise<void>;
 }
 
-type SessionEndReason = "expired" | "invalid";
+type SessionEndReason = "expired" | "invalid" | "logout";
 
 export const createAppSessionLifecycle = (
   auth: Auth | undefined,
@@ -30,12 +31,16 @@ export const createAppSessionLifecycle = (
     void signOut(auth).catch((): undefined => undefined);
   };
 
-  const endSession = (reason: SessionEndReason): void => {
+  const clearSession = (reason: SessionEndReason): void => {
     stopExpirationTimer();
     activeSession = undefined;
     clearAppSession();
-    signOutFirebase();
     onSessionEnd(reason);
+  };
+
+  const endSession = (reason: SessionEndReason): void => {
+    clearSession(reason);
+    signOutFirebase();
   };
 
   const scheduleExpiration = (session: AppSession): void => {
@@ -73,6 +78,10 @@ export const createAppSessionLifecycle = (
     activate: (session: AppSession): void => {
       activeSession = session;
       scheduleExpiration(session);
+    },
+    logout: async (): Promise<void> => {
+      clearSession("logout");
+      if (auth) await signOut(auth);
     },
   };
 };
