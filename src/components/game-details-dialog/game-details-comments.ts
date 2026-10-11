@@ -1,32 +1,55 @@
 import type { GameComment } from "../../api";
+import type { AppSession } from "../../auth";
+import type { SnackbarController } from "../ui/snackbar";
 import {
   createEmptyState,
   createErrorState,
   createRequestSkeleton,
 } from "../ui/request-feedback";
+import { createCommentAvatarColorPicker } from "./game-details-comments/comment-avatar";
 import { createGameDetailsCommentCard } from "./game-details-comments/comment-card";
 import "./game-details-comments.scss";
 
 export interface GameDetailsComments {
   element: HTMLElement;
+  setComposer: (composer: HTMLElement) => void;
   showLoading: () => void;
   showError: (message: string, retry: () => void) => void;
   showEmpty: () => void;
   render: (comments: GameComment[], totalComments: number) => void;
 }
 
-const createCommentList = (comments: GameComment[]): HTMLUListElement => {
+interface GameDetailsCommentsOptions {
+  getActiveSession: () => AppSession | undefined;
+  canContinueWithSession: (message?: string) => boolean;
+  snackbar: SnackbarController;
+}
+
+const createCommentList = (
+  comments: GameComment[],
+  getAvatarColor: ReturnType<typeof createCommentAvatarColorPicker>,
+  options: GameDetailsCommentsOptions,
+): HTMLUListElement => {
   const list: HTMLUListElement = document.createElement("ul");
   list.className = "game-details-comments__list";
 
   for (const comment of comments) {
-    list.append(createGameDetailsCommentCard(comment));
+    list.append(
+      createGameDetailsCommentCard(comment, {
+        ...options,
+        getAvatarColor,
+      }),
+    );
   }
 
   return list;
 };
 
-export const createGameDetailsComments = (): GameDetailsComments => {
+export const createGameDetailsComments = (
+  options: GameDetailsCommentsOptions,
+): GameDetailsComments => {
+  const getAvatarColor = createCommentAvatarColorPicker();
+
   const section: HTMLElement = document.createElement("section");
   section.className = "game-details-comments";
   section.setAttribute("aria-labelledby", "game-details-comments-title");
@@ -38,6 +61,7 @@ export const createGameDetailsComments = (): GameDetailsComments => {
 
   const content: HTMLDivElement = document.createElement("div");
   content.className = "game-details-comments__content";
+
   section.append(heading, content);
 
   const showLoading = (): void => {
@@ -72,13 +96,18 @@ export const createGameDetailsComments = (): GameDetailsComments => {
       return;
     }
 
-    content.replaceChildren(createCommentList(comments));
+    content.replaceChildren(
+      createCommentList(comments, getAvatarColor, options),
+    );
   };
 
   showLoading();
 
   return {
     element: section,
+    setComposer: (form): void => {
+      content.before(form);
+    },
     showLoading,
     showError,
     showEmpty,

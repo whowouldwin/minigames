@@ -19,6 +19,12 @@ export class ApiError extends Error {
   }
 }
 
+export interface ApiRequestOptions {
+  method?: "GET" | "POST";
+  signal?: AbortSignal;
+  body?: unknown;
+}
+
 const getResponseMessage = async (
   response: Response,
   fallback: string,
@@ -43,13 +49,18 @@ const getResponseMessage = async (
 
 export const requestApi = async <TData, TMeta = undefined>(
   path: string,
-  signal?: AbortSignal,
+  { method = "GET", signal, body }: ApiRequestOptions = {},
 ): Promise<ApiResponse<TData, TMeta>> => {
   let response: Response;
 
   try {
     response = await fetch(new URL(path, `${API_BASE_URL}/`), {
-      headers: { Accept: "application/json" },
+      method,
+      headers: {
+        Accept: "application/json",
+        ...(body !== undefined && { "Content-Type": "application/json" }),
+      },
+      ...(body !== undefined && { body: JSON.stringify(body) }),
       signal,
     });
   } catch (error) {

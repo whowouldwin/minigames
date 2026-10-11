@@ -15,10 +15,11 @@ export const closeDialogWithAnimation = async (
 export const setupDialogDismissal = (
   dialog: HTMLDialogElement,
   close: () => void,
+  canDismiss: () => boolean = (): boolean => true,
 ): void => {
   dialog.addEventListener("cancel", (event: Event): void => {
     event.preventDefault();
-    close();
+    if (canDismiss()) close();
   });
 
   let isBackdropDown: boolean = false;
@@ -36,6 +37,6 @@ export const setupDialogDismissal = (
     isBackdropDown = isOutsideDialog(event);
   });
   dialog.addEventListener("click", (event: MouseEvent): void => {
-    if (isBackdropDown && isOutsideDialog(event)) close();
+    if (isBackdropDown && isOutsideDialog(event) && canDismiss()) close();
   });
 };

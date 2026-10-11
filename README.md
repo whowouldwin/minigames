@@ -48,6 +48,10 @@ A custom History API router keeps Home/Library, category, sort, page, game dialo
 
 Authentication, favorite changes, comment posting and comment likes belong to Story 4. Story 3 uses public read requests; favorite mutations are disabled. Login/Register remain presentation dialogs with URL state.
 
+## App session
+
+Story 4 keeps the authenticated UI session separately from Firebase Authentication. The app session is stored under the Local Storage key `minigames:whowouldwin-minigames:app-session` and expires five minutes after authentication. Reloading or using the app does not extend its lifetime.
+
 ## API and assets
 
 The backend base URL is `https://faxb76kxra.execute-api.eu-central-1.amazonaws.com/api`. Game artwork paths returned by the API resolve to locally stored files in `public`, using the application's Vite base path. The backend URL and the app asset URL serve different destinations.

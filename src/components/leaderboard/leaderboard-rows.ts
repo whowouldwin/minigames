@@ -1,12 +1,9 @@
 import type { LeaderboardPlayer } from "../../api";
+import { formatCompactCount } from "../../utils/format-compact-count";
 import { getInitials } from "../../utils/get-initials";
 
 const COLUMN_COUNT = 6;
 const scoreFormatter = new Intl.NumberFormat("en-US");
-const compactScoreFormatter = new Intl.NumberFormat("en-US", {
-  notation: "compact",
-  maximumFractionDigits: 1,
-});
 
 const createCell = (text: string, className?: string): HTMLTableCellElement => {
   const cell = document.createElement("td");
@@ -45,7 +42,7 @@ const createScoreCell = (score: number): HTMLTableCellElement => {
   const cell = document.createElement("td");
   const scores = [
     ["leaderboard__full-score", scoreFormatter.format(score)],
-    ["leaderboard__compact-score", compactScoreFormatter.format(score)],
+    ["leaderboard__compact-score", formatCompactCount(score)],
   ];
 
   for (const [className, value] of scores) {

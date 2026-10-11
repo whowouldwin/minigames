@@ -1,11 +1,19 @@
 import type { AppRoute, DialogRoute } from "./route-state";
-import { createRouteUrl, readRouteUrl } from "./route-url";
+import { createRouteUrl } from "./route-url";
+import {
+  getCurrentRouteUrl,
+  readCurrentAppRoute,
+  removeAuthDialogFromCurrentUrl,
+  writeRouteToHistory,
+} from "./route-history";
+import {
+  createDialogHistoryState,
+  restoreDialogHistory,
+  closeDialogUsingHistory,
+} from "./dialog-history";
+import type { DialogHistoryState } from "./dialog-history";
 
 type RouteListener = (route: AppRoute) => void;
-
-interface DialogHistoryState {
-  miniGamesDialogBase?: string;
-}
 
 export interface AppRouter {
   getRoute: () => AppRoute;
@@ -13,42 +21,39 @@ export interface AppRouter {
   navigate: (route: AppRoute) => void;
   openDialog: (dialog: DialogRoute) => void;
   closeDialog: () => void;
+  setNavigationGuard: (guard: () => void) => void;
+  setAuthDialogGuard: (shouldBlockAuthDialog: () => boolean) => void;
   start: () => void;
 }
-
-const getRoute = (): AppRoute =>
-  readRouteUrl(new URL(globalThis.location.href));
-
-const getCurrentUrl = (): string =>
-  globalThis.location.pathname + globalThis.location.search;
-
-const getAbsoluteRouteUrl = (routeUrl: string): string =>
-  globalThis.location.origin + routeUrl;
-
-const restoreDeepLinkHistory = (): void => {
-  const route = getRoute();
-  const state = globalThis.history.state as DialogHistoryState | undefined;
-  if (!route.dialog || state?.miniGamesDialogBase) return;
-
-  const dialogUrl: string = getCurrentUrl();
-  const baseUrl: string = createRouteUrl({ ...route, dialog: undefined });
-  globalThis.history.replaceState(undefined, "", getAbsoluteRouteUrl(baseUrl));
-  globalThis.history.pushState(
-    { miniGamesDialogBase: baseUrl },
-    "",
-    getAbsoluteRouteUrl(dialogUrl),
-  );
-};
 
 export const createAppRouter = (): AppRouter => {
   const listeners = new Set<RouteListener>();
   let isStarted: boolean = false;
   let isDialogClosePending: boolean = false;
+  let navigationGuard: (() => void) | undefined;
+  let authDialogGuard: (() => boolean) | undefined;
+
+  const checkNavigation = (): void => {
+    navigationGuard?.();
+  };
+
+  const getRouteAfterAuthGuard = (): AppRoute => {
+    const route = readCurrentAppRoute();
+    if (route.dialog?.kind !== "auth" || !authDialogGuard?.()) return route;
+
+    removeAuthDialogFromCurrentUrl();
+    return readCurrentAppRoute();
+  };
 
   const notify = (): void => {
     isDialogClosePending = false;
-    const route = getRoute();
+    const route = getRouteAfterAuthGuard();
     for (const listener of listeners) listener(route);
+  };
+
+  const notifyAfterPopState = (): void => {
+    checkNavigation();
+    notify();
   };
 
   const writeRoute = (
@@ -56,37 +61,36 @@ export const createAppRouter = (): AppRouter => {
     shouldReplace: boolean = false,
     state?: DialogHistoryState,
   ): void => {
-    const url: string = createRouteUrl(route);
-    const currentUrl: string = getCurrentUrl();
-    if (url === currentUrl) return;
-
-    if (shouldReplace) {
-      globalThis.history.replaceState(state, "", getAbsoluteRouteUrl(url));
-    } else {
-      globalThis.history.pushState(state, "", getAbsoluteRouteUrl(url));
+    checkNavigation();
+    if (route.dialog?.kind === "auth" && authDialogGuard?.()) {
+      if (readCurrentAppRoute().dialog?.kind === "auth") {
+        removeAuthDialogFromCurrentUrl();
+        notify();
+      }
+      return;
     }
+
+    const url: string = createRouteUrl(route);
+    if (url === getCurrentRouteUrl()) return;
+
+    writeRouteToHistory(url, shouldReplace, state);
     notify();
   };
 
   const openDialog = (dialog: DialogRoute): void => {
-    const route = getRoute();
+    const route = readCurrentAppRoute();
     const hasOpenDialog: boolean = route.dialog !== undefined;
-    const state: DialogHistoryState | undefined = hasOpenDialog
-      ? globalThis.history.state
-      : {
-          miniGamesDialogBase: getCurrentUrl(),
-        };
+    const state: DialogHistoryState | undefined =
+      createDialogHistoryState(hasOpenDialog);
     writeRoute({ ...route, dialog }, hasOpenDialog, state);
   };
 
   const closeDialog = (): void => {
-    const route = getRoute();
+    const route = readCurrentAppRoute();
     if (isDialogClosePending || !route.dialog) return;
 
-    const state = globalThis.history.state as DialogHistoryState | undefined;
-    if (state?.miniGamesDialogBase) {
+    if (closeDialogUsingHistory(checkNavigation) === "back") {
       isDialogClosePending = true;
-      globalThis.history.back();
       return;
     }
 
@@ -94,18 +98,26 @@ export const createAppRouter = (): AppRouter => {
   };
 
   return {
-    getRoute,
+    getRoute: readCurrentAppRoute,
     subscribe: (listener): void => {
       listeners.add(listener);
     },
     navigate: (route): void => writeRoute(route),
     openDialog,
     closeDialog,
+    setNavigationGuard: (guard): void => {
+      navigationGuard = guard;
+    },
+    setAuthDialogGuard: (shouldBlockAuthDialog): void => {
+      authDialogGuard = shouldBlockAuthDialog;
+    },
     start: (): void => {
       if (isStarted) return;
       isStarted = true;
-      restoreDeepLinkHistory();
-      globalThis.addEventListener("popstate", notify);
+      checkNavigation();
+      getRouteAfterAuthGuard();
+      restoreDialogHistory(readCurrentAppRoute());
+      globalThis.addEventListener("popstate", notifyAfterPopState);
       notify();
     },
   };

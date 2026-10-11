@@ -4,10 +4,21 @@ export {
   getFeaturedGames,
   getLibraryCategories,
   getLibraryGames,
-  getGameDetails,
+} from "./game-catalog";
+export { getGameDetails } from "./game-details";
+export { toggleGameFavorite } from "./game-favorites";
+export {
   getGameComments,
-} from "./games";
-export type { GameDetailsRequestOptions } from "./games";
+  createGameComment,
+  toggleCommentLike,
+} from "./game-comments";
+export type {
+  CommentLikeResponse,
+  CreateGameCommentRequest,
+  GameCommentsRequestOptions,
+} from "./game-comments";
+export type { FavoriteResponse } from "./game-favorites";
+export type { GameDetailsRequestOptions } from "./game-details";
 export { getLeaderboard } from "./leaderboard";
 export type {
   ApiResponse,

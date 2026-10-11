@@ -1,12 +1,7 @@
 import { appAssetUrl } from "../../api";
 import type { GameSummary } from "../../api";
+import { formatCompactCount } from "../../utils/format-compact-count";
 import type { LibraryGame } from "../library-game-card";
-
-const formatCompactCount = (count: number): string =>
-  new Intl.NumberFormat("en-US", {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(count);
 
 export const toLibraryGame = (game: GameSummary): LibraryGame => ({
   slug: game.slug,

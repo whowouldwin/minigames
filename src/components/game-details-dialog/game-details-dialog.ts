@@ -1,8 +1,10 @@
-import { ApiError, getErrorMessage, getGameDetails } from "../../api";
 import type { SnackbarController } from "../ui/snackbar";
+import type { AppSession } from "../../auth";
 import { closeDialogWithAnimation, setupDialogDismissal } from "../ui/dialog";
 import { createGameDetailsContent } from "./game-details-content";
 import { createGameDetailsCommentsLoader } from "./game-details-comments-loader";
+import { createGameDetailsCommentForm } from "./game-details-comment-form";
+import { createGameDetailsLoader } from "./game-details-loader";
 import "./game-details-dialog.scss";
 
 export interface GameDetailsDialog {
@@ -10,6 +12,8 @@ export interface GameDetailsDialog {
   open: (gameSlug: string) => void;
   close: () => Promise<void>;
 }
+
+type AuthenticatedActionGuard = (message?: string) => boolean;
 
 const lockPageScroll = (): (() => void) => {
   const body: HTMLElement = document.body;
@@ -36,6 +40,8 @@ const lockPageScroll = (): (() => void) => {
 export const createGameDetailsDialog = (
   snackbar: SnackbarController,
   onClose: () => void,
+  getActiveSession: () => AppSession | undefined,
+  canContinueWithSession: AuthenticatedActionGuard,
 ): GameDetailsDialog => {
   const dialog: HTMLDialogElement = document.createElement("dialog");
   dialog.className = "game-details-dialog";
@@ -44,15 +50,40 @@ export const createGameDetailsDialog = (
   let isClosing: boolean = false;
   let trigger: HTMLElement | undefined;
   let restorePageScroll: (() => void) | undefined;
-  let detailsRequest: AbortController | undefined;
-  let requestId: number = 0;
   let activeGameSlug: string | undefined;
 
+  const content = createGameDetailsContent(onClose, {
+    getActiveSession,
+    canContinueWithSession,
+    snackbar,
+  });
+  dialog.append(content.hero, content.body);
+
+  const isDialogOpen = (): boolean => dialog.open;
+  const detailsLoader = createGameDetailsLoader({
+    content,
+    snackbar,
+    isDialogOpen,
+  });
+  const commentsLoader = createGameDetailsCommentsLoader({
+    comments: content.comments,
+    snackbar,
+    isDialogOpen,
+  });
+  const commentForm = createGameDetailsCommentForm({
+    getActiveSession,
+    canContinueWithSession,
+    snackbar,
+    onCommentCreated: async (gameSlug, userEmail): Promise<void> => {
+      if (activeGameSlug !== gameSlug || !isDialogOpen()) return;
+      await commentsLoader.load(gameSlug, userEmail);
+    },
+  });
+  content.comments.setComposer(commentForm.element);
+
   const cancelRequests = (): void => {
-    detailsRequest?.abort();
-    detailsRequest = undefined;
+    detailsLoader.cancel();
     commentsLoader.cancel();
-    requestId += 1;
   };
 
   const close = async (): Promise<void> => {
@@ -67,74 +98,6 @@ export const createGameDetailsDialog = (
     restorePageScroll = undefined;
 
     if (trigger?.isConnected) trigger.focus();
-  };
-
-  const content = createGameDetailsContent(onClose);
-  dialog.append(content.hero, content.body);
-
-  const isCurrentRequest = (currentRequestId: number): boolean =>
-    currentRequestId === requestId && dialog.open;
-
-  const commentsLoader = createGameDetailsCommentsLoader({
-    comments: content.comments,
-    snackbar,
-    isDialogOpen: (): boolean => dialog.open,
-  });
-
-  const loadGameDetails = async (
-    gameSlug: string,
-    currentRequestId: number,
-  ): Promise<void> => {
-    if (!isCurrentRequest(currentRequestId)) return;
-
-    detailsRequest?.abort();
-    const controller = new AbortController();
-    detailsRequest = controller;
-    content.showLoading();
-
-    try {
-      const response = await getGameDetails(gameSlug, {
-        signal: controller.signal,
-      });
-      if (
-        detailsRequest !== controller ||
-        controller.signal.aborted ||
-        !isCurrentRequest(currentRequestId)
-      ) {
-        return;
-      }
-
-      if (!response.data) {
-        content.showNotFound();
-        return;
-      }
-
-      content.renderGame(response.data);
-    } catch (error) {
-      if (
-        detailsRequest !== controller ||
-        controller.signal.aborted ||
-        !isCurrentRequest(currentRequestId)
-      ) {
-        return;
-      }
-
-      if (error instanceof ApiError && error.status === 404) {
-        content.showNotFound();
-        return;
-      }
-
-      const message: string = getErrorMessage(
-        error,
-        "Unable to load game details.",
-      );
-      content.showError(message, (): void => {
-        void loadGameDetails(gameSlug, currentRequestId);
-      });
-      snackbar.show(message, "error");
-    } finally {
-      if (detailsRequest === controller) detailsRequest = undefined;
-    }
   };
 
   setupDialogDismissal(dialog, onClose);
@@ -154,9 +117,10 @@ export const createGameDetailsDialog = (
         dialog.showModal();
       }
       activeGameSlug = gameSlug;
-      requestId += 1;
-      void loadGameDetails(gameSlug, requestId);
-      void commentsLoader.load(gameSlug);
+      const session = getActiveSession();
+      commentForm.prepareForOpen(gameSlug, session);
+      void detailsLoader.load(gameSlug, session?.email);
+      void commentsLoader.load(gameSlug, session?.email);
     },
   };
 };

@@ -5,15 +5,24 @@ import { createSiteLogo } from "../ui/site-logo";
 import { createMobileMenu, setupMobileMenu } from "../mobile-menu";
 
 import type { AuthMode } from "../auth-dialog";
+import type { AppSession } from "../../auth";
 import type { AppPage } from "../../types/app-page";
+import { createProfileIdentity } from "./profile-identity";
 
 import "./header.scss";
+
+export interface HeaderController {
+  element: HTMLElement;
+  setAuthenticated: (session: AppSession) => void;
+  setGuest: () => void;
+}
 
 export const createHeader = (
   openAuth: (mode: AuthMode) => void,
   activePage: AppPage | undefined,
   navigateTo: (page: AppPage) => void,
-): HTMLElement => {
+  onLogout: () => void,
+): HeaderController => {
   const header: HTMLElement = document.createElement("header");
 
   header.className = "header";
@@ -26,9 +35,11 @@ export const createHeader = (
 
   const loginButton: HTMLButtonElement = createButton("Log In", "outlined");
   const signupButton: HTMLButtonElement = createButton("Sign Up", "filled");
+  const logoutButton: HTMLButtonElement = createButton("Log Out", "outlined");
 
   loginButton.classList.add("header__login-button");
   signupButton.classList.add("header__signup-button");
+  logoutButton.classList.add("header__logout-button");
 
   loginButton.addEventListener("click", (): void => {
     openAuth("login");
@@ -36,6 +47,7 @@ export const createHeader = (
   signupButton.addEventListener("click", (): void => {
     openAuth("register");
   });
+  logoutButton.addEventListener("click", onLogout);
   buttons.append(loginButton, signupButton);
 
   const menuToggle: HTMLButtonElement = createMenuToggle();
@@ -47,10 +59,47 @@ export const createHeader = (
   );
 
   const mobileMenu: HTMLElement = createMobileMenu(activePage, navigateTo);
+  const mobileMenuLogoutButton = mobileMenu.querySelector<HTMLButtonElement>(
+    ".mobile-menu__logout-button",
+  );
+  const mobileMenuActions = mobileMenu.querySelector<HTMLElement>(
+    ".mobile-menu__actions",
+  );
+  const mobileMenuLoginButton = mobileMenu.querySelector<HTMLButtonElement>(
+    ".mobile-menu__login-button",
+  );
+  const mobileMenuSignupButton = mobileMenu.querySelector<HTMLButtonElement>(
+    ".mobile-menu__signup-button",
+  );
 
-  setupMobileMenu(menuToggle, mobileMenu, openAuth);
+  setupMobileMenu(menuToggle, mobileMenu, openAuth, onLogout);
 
   header.append(createSiteLogo(navigateTo), actions, mobileMenu);
 
-  return header;
+  return {
+    element: header,
+    setAuthenticated: (session: AppSession): void => {
+      logoutButton.hidden = false;
+      buttons.replaceChildren(
+        createProfileIdentity(session, "header__account profile-identity"),
+        logoutButton,
+      );
+      if (mobileMenuLogoutButton) mobileMenuLogoutButton.hidden = false;
+      mobileMenuActions?.replaceChildren(
+        createProfileIdentity(session, "mobile-menu__account profile-identity"),
+        ...(mobileMenuLogoutButton ? [mobileMenuLogoutButton] : []),
+      );
+    },
+    setGuest: (): void => {
+      logoutButton.hidden = true;
+      if (mobileMenuLogoutButton) mobileMenuLogoutButton.hidden = true;
+      buttons.replaceChildren(loginButton, signupButton);
+      if (mobileMenuLoginButton && mobileMenuSignupButton) {
+        mobileMenuActions?.replaceChildren(
+          mobileMenuLoginButton,
+          mobileMenuSignupButton,
+        );
+      }
+    },
+  };
 };

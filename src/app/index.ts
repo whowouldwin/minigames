@@ -1,17 +1,17 @@
 import { createHeader } from "../components/header";
 import { createFooter } from "../components/footer";
-import { createAuthDialog } from "../components/auth-dialog";
 import type { AuthMode } from "../components/auth-dialog";
 import { createGameDetailsDialog } from "../components/game-details-dialog";
-import { updateNavigationState } from "../components/navigation/create-navigation-list";
-import { createHomePage } from "../pages/home";
-import { createLibraryPage } from "../pages/library";
-import { createNotFoundPage } from "../pages/not-found";
 import type { AppPage } from "../types/app-page";
 import { createSnackbar } from "../components/ui/snackbar";
 import { createAppRouter, createPageRoute } from "../router";
-import type { AppRoute } from "../router";
+import { createAppSessionController } from "./app-session-controller";
+import { createProtectedActionGuard } from "./protected-action-guard";
 import { createDialogRouteSync } from "./synchronize-dialog-route";
+import { createAppAuthDialog } from "./create-auth-dialog";
+import { createPageRenderer } from "./create-page-renderer";
+import { createAuthDialogUrlGuard } from "./create-auth-dialog-url-guard";
+import { auth as firebaseAuth } from "../firebase";
 
 interface AppController {
   element: HTMLDivElement;
@@ -23,79 +23,88 @@ export const createApp = (): AppController => {
   app.className = "app";
 
   const router = createAppRouter();
+  const snackbar = createSnackbar();
   const openAuth = (mode: AuthMode): void => {
     router.openDialog({ kind: "auth", mode });
   };
-  const auth = createAuthDialog({
-    onClose: router.closeDialog,
-    onModeChange: openAuth,
-  });
-  const snackbar = createSnackbar();
-  const gameDetails: ReturnType<typeof createGameDetailsDialog> =
-    createGameDetailsDialog(snackbar, router.closeDialog);
-  const synchronizeDialogs = createDialogRouteSync(auth, gameDetails);
-  const pageOutlet: HTMLDivElement = document.createElement("div");
-  pageOutlet.className = "app__page";
-
   const navigateTo = (page: AppPage): void =>
     router.navigate(createPageRoute(page));
   const openGameDetails = (gameSlug: string): void => {
     router.openDialog({ kind: "game", gameSlug });
   };
-
+  const handleLogout = async (): Promise<void> => {
+    try {
+      await sessionController.logout();
+      snackbar.show("Signed out successfully.", "success");
+    } catch {
+      snackbar.show(
+        "You are in Guest Mode, but Firebase sign-out failed.",
+        "error",
+      );
+    }
+  };
   const initialPage = router.getRoute().page;
   const header = createHeader(
     openAuth,
     initialPage === "not-found" ? undefined : initialPage,
     navigateTo,
+    (): void => {
+      void handleLogout();
+    },
   );
-  let activePage: AppRoute["page"] | undefined;
-  let library: ReturnType<typeof createLibraryPage> | undefined;
-
-  const renderRoute = (route: AppRoute): void => {
-    if (activePage !== route.page) {
-      library?.destroy();
-      library = undefined;
-
-      if (route.page === "library") {
-        library = createLibraryPage(
-          openGameDetails,
-          snackbar,
-          (query): void => {
-            router.navigate({ ...router.getRoute(), library: query });
-          },
-        );
-        pageOutlet.replaceChildren(library.element);
-      } else if (route.page === "not-found") {
-        pageOutlet.replaceChildren(
-          createNotFoundPage((): void => navigateTo("home")),
-        );
-      } else {
-        pageOutlet.replaceChildren(
-          createHomePage(openGameDetails, navigateTo, snackbar),
-        );
-      }
-
-      activePage = route.page;
-      updateNavigationState(
-        header,
-        route.page === "not-found" ? undefined : route.page,
-      );
-    }
-
-    if (route.page === "library") library?.update(route.library);
-    synchronizeDialogs(route.dialog);
-  };
-
-  router.subscribe(renderRoute);
-  app.append(
+  const sessionController = createAppSessionController(
+    firebaseAuth,
+    router,
     header,
-    pageOutlet,
+    snackbar,
+  );
+  router.setAuthDialogGuard(
+    createAuthDialogUrlGuard(sessionController, snackbar),
+  );
+  const requireAuthenticatedSession = createProtectedActionGuard(
+    router,
+    sessionController.hasActiveSession,
+    snackbar,
+  );
+  const auth = createAppAuthDialog({
+    auth: firebaseAuth,
+    router,
+    sessionController,
+    snackbar,
+    openAuth,
+  });
+  const gameDetails: ReturnType<typeof createGameDetailsDialog> =
+    createGameDetailsDialog(
+      snackbar,
+      router.closeDialog,
+      sessionController.getActiveSession,
+      requireAuthenticatedSession,
+    );
+  const synchronizeDialogs = createDialogRouteSync(auth, gameDetails);
+  const pageRenderer = createPageRenderer({
+    router,
+    headerElement: header.element,
+    snackbar,
+    navigateTo,
+    openGameDetails,
+    synchronizeDialogs,
+  });
+
+  router.subscribe(pageRenderer.render);
+  app.append(
+    header.element,
+    pageRenderer.element,
     createFooter(navigateTo),
     auth.element,
     gameDetails.element,
     snackbar.element,
   );
 
-  return { element: app, start: router.start };
+  return {
+    element: app,
+    start: (): void => {
+      sessionController.start();
+      router.start();
+    },
+  };
 };

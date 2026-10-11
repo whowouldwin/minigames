@@ -84,6 +84,21 @@
     line-height: normal;
   }
 
+  @each $index,
+    $color
+      in (
+        1: tokens.$avatar-random-1,
+        2: tokens.$avatar-random-2,
+        3: tokens.$avatar-random-3,
+        4: tokens.$avatar-random-4,
+        5: tokens.$avatar-random-5
+      )
+  {
+    &__avatar--random-#{$index} {
+      background-color: $color;
+    }
+  }
+
   &__author-name {
     overflow: hidden;
     margin: 0;
@@ -121,13 +136,33 @@
     min-height: tokens.$size-3;
     align-items: center;
     gap: tokens.$size-05;
+    padding: 0;
     color: tokens.$on-primary;
+    background: transparent;
+    border: 0;
     font-size: tokens.$label-medium;
     font-weight: tokens.$bold;
     line-height: normal;
+    cursor: pointer;
 
     &--active {
       color: tokens.$like;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    &:focus-visible {
+      border-radius: tokens.$corner-small;
+      outline: tokens.$border-width-medium solid tokens.$on-primary;
+      outline-offset: tokens.$size-05;
+    }
+
+    @media (hover: hover) {
+      &:not(:disabled):hover {
+        color: tokens.$like;
+      }
     }
   }
 
@@ -140,5 +175,20 @@
 
   &__likes--active &__likes-icon {
     opacity: 1;
+  }
+
+  &__likes-loader {
+    width: tokens.$size-2;
+    height: tokens.$size-2;
+    border: tokens.$border-width-medium solid currentColor;
+    border-top-color: transparent;
+    border-radius: tokens.$corner-full;
+    animation: game-details-comments-like-spin 700ms linear infinite;
+  }
+}
+
+@keyframes game-details-comments-like-spin {
+  to {
+    transform: rotate(360deg);
   }
 }

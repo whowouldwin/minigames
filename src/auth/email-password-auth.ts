@@ -1,0 +1,67 @@
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
+import type { Auth, User } from "firebase/auth";
+import { createAppSession } from "./create-app-session";
+import type { AppSession } from "./app-session";
+import {
+  AuthenticationCleanupError,
+  AuthenticationNotConfiguredError,
+} from "./auth-errors";
+
+export type EmailPasswordMode = "login" | "register";
+
+export interface EmailPasswordCredentials {
+  email: string;
+  password: string;
+  username?: string;
+}
+
+const signOutAfterFailure = async (
+  auth: Auth,
+  authenticationError: unknown,
+): Promise<void> => {
+  try {
+    await signOut(auth);
+  } catch (cleanupError: unknown) {
+    throw new AuthenticationCleanupError(authenticationError, cleanupError);
+  }
+};
+
+export const authenticateWithEmailPassword = async (
+  auth: Auth | undefined,
+  mode: EmailPasswordMode,
+  credentials: EmailPasswordCredentials,
+): Promise<AppSession> => {
+  if (!auth) throw new AuthenticationNotConfiguredError();
+
+  const authenticationResult =
+    mode === "login"
+      ? await signInWithEmailAndPassword(
+          auth,
+          credentials.email,
+          credentials.password,
+        )
+      : await createUserWithEmailAndPassword(
+          auth,
+          credentials.email,
+          credentials.password,
+        );
+  const user: User = authenticationResult.user;
+
+  try {
+    if (mode === "register") {
+      const username: string = credentials.username?.trim() ?? "";
+      if (!username) throw new Error("A registration username is required.");
+      await updateProfile(user, { displayName: username });
+    }
+
+    return createAppSession(user);
+  } catch (error: unknown) {
+    await signOutAfterFailure(auth, error);
+    throw error;
+  }
+};
