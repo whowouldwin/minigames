@@ -32,7 +32,7 @@ export const createGameDetailsContent = (
   body.setAttribute("aria-labelledby", "game-details-title");
 
   const hero = createGameDetailsHero(close);
-  const comments = createGameDetailsComments();
+  const comments = createGameDetailsComments(viewOptions);
 
   const showLoading = (): void => {
     hero.showLoading();

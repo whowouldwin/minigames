@@ -1,9 +1,17 @@
 import type { GameComment } from "../../../api";
-import favoriteFilledIcon from "../../../assets/icons/favorite-filled.svg";
-import favoriteOutlineIcon from "../../../assets/icons/favorite-outline.svg";
+import type { AppSession } from "../../../auth";
+import type { SnackbarController } from "../../ui/snackbar";
 import { createCommentAvatar } from "./comment-avatar";
 import type { CommentAvatarColorPicker } from "./comment-avatar";
+import { createCommentLikeButton } from "./comment-like-button";
 import { formatCommentRelativeTime } from "./comment-relative-time";
+
+interface CommentCardOptions {
+  getAvatarColor: CommentAvatarColorPicker;
+  getActiveSession: () => AppSession | undefined;
+  canContinueWithSession: (message?: string) => boolean;
+  snackbar: SnackbarController;
+}
 
 const getAuthorInitial = (authorName: string): string => {
   const firstLetter: string = authorName.trim().charAt(0);
@@ -50,33 +58,14 @@ const createCommentText = (text: string): HTMLParagraphElement => {
   return commentText;
 };
 
-const createCommentLikes = (comment: GameComment): HTMLSpanElement => {
-  const likes: HTMLSpanElement = document.createElement("span");
-  likes.className = "game-details-comments__likes";
-  likes.setAttribute("aria-label", `${comment.likesCount} likes`);
-
-  if (comment.isLikedByCurrentUser) {
-    likes.classList.add("game-details-comments__likes--active");
-  }
-
-  const icon: HTMLImageElement = document.createElement("img");
-  icon.className = "game-details-comments__likes-icon";
-  icon.src = comment.isLikedByCurrentUser
-    ? favoriteFilledIcon
-    : favoriteOutlineIcon;
-  icon.alt = "";
-  icon.setAttribute("aria-hidden", "true");
-
-  const count: HTMLSpanElement = document.createElement("span");
-  count.textContent = String(comment.likesCount);
-  likes.append(icon, count);
-
-  return likes;
-};
-
 export const createGameDetailsCommentCard = (
   comment: GameComment,
-  getAvatarColor: CommentAvatarColorPicker,
+  {
+    getAvatarColor,
+    getActiveSession,
+    canContinueWithSession,
+    snackbar,
+  }: CommentCardOptions,
 ): HTMLLIElement => {
   const card: HTMLLIElement = document.createElement("li");
   card.className = "game-details-comments__card";
@@ -88,7 +77,14 @@ export const createGameDetailsCommentCard = (
 
   const footer: HTMLDivElement = document.createElement("div");
   footer.className = "game-details-comments__footer";
-  footer.append(createCommentLikes(comment));
+  footer.append(
+    createCommentLikeButton({
+      comment,
+      getActiveSession,
+      canContinueWithSession,
+      snackbar,
+    }),
+  );
 
   article.append(
     createCommentHeader(comment, getAvatarColor),

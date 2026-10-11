@@ -1,4 +1,6 @@
 import type { GameComment } from "../../api";
+import type { AppSession } from "../../auth";
+import type { SnackbarController } from "../ui/snackbar";
 import {
   createEmptyState,
   createErrorState,
@@ -17,21 +19,35 @@ export interface GameDetailsComments {
   render: (comments: GameComment[], totalComments: number) => void;
 }
 
+interface GameDetailsCommentsOptions {
+  getActiveSession: () => AppSession | undefined;
+  canContinueWithSession: (message?: string) => boolean;
+  snackbar: SnackbarController;
+}
+
 const createCommentList = (
   comments: GameComment[],
   getAvatarColor: ReturnType<typeof createCommentAvatarColorPicker>,
+  options: GameDetailsCommentsOptions,
 ): HTMLUListElement => {
   const list: HTMLUListElement = document.createElement("ul");
   list.className = "game-details-comments__list";
 
   for (const comment of comments) {
-    list.append(createGameDetailsCommentCard(comment, getAvatarColor));
+    list.append(
+      createGameDetailsCommentCard(comment, {
+        ...options,
+        getAvatarColor,
+      }),
+    );
   }
 
   return list;
 };
 
-export const createGameDetailsComments = (): GameDetailsComments => {
+export const createGameDetailsComments = (
+  options: GameDetailsCommentsOptions,
+): GameDetailsComments => {
   const getAvatarColor = createCommentAvatarColorPicker();
 
   const section: HTMLElement = document.createElement("section");
@@ -80,7 +96,9 @@ export const createGameDetailsComments = (): GameDetailsComments => {
       return;
     }
 
-    content.replaceChildren(createCommentList(comments, getAvatarColor));
+    content.replaceChildren(
+      createCommentList(comments, getAvatarColor, options),
+    );
   };
 
   showLoading();
