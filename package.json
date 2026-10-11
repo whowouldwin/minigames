@@ -9,7 +9,7 @@
     "postbuild": "node scripts/create-spa-fallback.mjs",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage --passWithNoTests",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "prepare": "husky",
     "lint": "eslint . --max-warnings=0",
